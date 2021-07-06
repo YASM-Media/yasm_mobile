@@ -128,11 +128,20 @@ class _AuthState extends State<Auth> {
                 margin: EdgeInsets.all(30.0),
                 child: Column(
                   children: [
-                    Text('YASM!!🌟'),
+                    Container(
+                      margin: EdgeInsets.all(20.0),
+                      child: Image.asset(
+                        'assets/logo/logo_1024.png',
+                        scale: 8.0,
+                      ),
+                    ),
                     Text(
                       _authFormType == AuthFormType.Register
                           ? 'Register Here!!🌟'
                           : 'Login Here!! 🌟',
+                      style: TextStyle(
+                        fontSize: 30.0,
+                      ),
                     ),
                   ],
                 ),
