@@ -25,10 +25,10 @@ class _SplashState extends State<Splash> {
     setState(() {
       this._streamSubscription =
           FirebaseAuth.instance.authStateChanges().listen((User? user) {
-        if (user == null) {
-          Navigator.of(context).pushReplacementNamed(Auth.routeName);
-        } else {
+        if (user != null) {
           Navigator.of(context).pushReplacementNamed(Home.routeName);
+        } else {
+          Navigator.of(context).pushReplacementNamed(Auth.routeName);
         }
       });
     });
