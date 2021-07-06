@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 
 class Home extends StatelessWidget {
+  static const routeName = "/home";
+
   Home({Key? key}) : super(key: key);
 
   final AuthService _authService = AuthService();
