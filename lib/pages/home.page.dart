@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:yasm_mobile/services/auth.service.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+  Home({Key? key}) : super(key: key);
+
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +13,16 @@ class Home extends StatelessWidget {
         title: Text('YASM!!🌟'),
       ),
       body: Center(
-        child: Text('Welcome to YASM!!🌟'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Welcome to YASM!!🌟'),
+            TextButton(
+              onPressed: _authService.getLoggedInUserDetails,
+              child: Text('Test Node API'),
+            )
+          ],
+        ),
       ),
     );
   }

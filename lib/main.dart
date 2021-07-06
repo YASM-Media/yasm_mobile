@@ -7,7 +7,6 @@ void main() {
 }
 
 class App extends StatefulWidget {
-  // This widget is the root of your application.
   @override
   _AppState createState() => _AppState();
 }
