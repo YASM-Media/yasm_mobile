@@ -22,7 +22,11 @@ class Home extends StatelessWidget {
             TextButton(
               onPressed: _authService.getLoggedInUserDetails,
               child: Text('Test Node API'),
-            )
+            ),
+            TextButton(
+              onPressed: _authService.logout,
+              child: Text('Logout'),
+            ),
           ],
         ),
       ),
