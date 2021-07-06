@@ -5,7 +5,6 @@ import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
 import 'package:yasm_mobile/dto/auth/register_user/register_user.dto.dart';
-import 'package:yasm_mobile/exceptions/auth/NotLoggedIn.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/UserAlreadyExists.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/UserNotFound.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/WrongPassword.exception.dart';
@@ -13,29 +12,6 @@ import 'package:yasm_mobile/exceptions/auth/WrongPassword.exception.dart';
 class AuthService {
   final firebaseAuth.FirebaseAuth _firebaseAuth =
       firebaseAuth.FirebaseAuth.instance;
-
-  Future<void> getLoggedInUserDetails() async {
-    if (_firebaseAuth.currentUser != null) {
-      String firebaseAuthToken =
-          await this._firebaseAuth.currentUser!.getIdToken();
-
-      Uri url = Uri.parse("$endpoint/user/me");
-
-      Map<String, String> headers = {
-        "Authorization": "Bearer $firebaseAuthToken",
-      };
-
-      http.Response response = await http.get(url, headers: headers);
-
-      if (response.statusCode >= 400) {
-        throw NotLoggedInException(
-          message: "You are not logged in. Please log in and try again.",
-        );
-      }
-
-      print(json.decode(response.body));
-    }
-  }
 
   Future<void> registerUser(RegisterUser registerUser) async {
     Uri url = Uri.parse("$endpoint/auth/register");

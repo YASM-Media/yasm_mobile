@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 
 class Home extends StatelessWidget {
@@ -7,6 +8,11 @@ class Home extends StatelessWidget {
   Home({Key? key}) : super(key: key);
 
   final AuthService _authService = AuthService();
+
+  Future<void> logout(context) async {
+    await _authService.logout();
+    Navigator.of(context).pushReplacementNamed(Auth.routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +26,9 @@ class Home extends StatelessWidget {
           children: [
             Text('Welcome to YASM!!🌟'),
             TextButton(
-              onPressed: _authService.getLoggedInUserDetails,
-              child: Text('Test Node API'),
-            ),
-            TextButton(
-              onPressed: _authService.logout,
+              onPressed: () async {
+                this.logout(context);
+              },
               child: Text('Logout'),
             ),
           ],
