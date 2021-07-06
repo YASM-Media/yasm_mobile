@@ -1,0 +1,6 @@
+package com.yasm.yasm_mobile
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
