@@ -7,10 +7,12 @@ import 'package:yasm_mobile/exceptions/auth/WrongPassword.exception.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
 
 enum AuthFormType {
   Register,
   Login,
+  ForgotPassword,
 }
 
 class Auth extends StatefulWidget {
@@ -32,12 +34,6 @@ class _AuthState extends State<Auth> {
   final _lastNameController = TextEditingController();
   final _emailAddressController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -77,7 +73,7 @@ class _AuthState extends State<Auth> {
           "password": _passwordController.text,
         }));
 
-        _switchAuthState();
+        _switchAuthState(AuthFormType.Login);
         _displaySnackBar(
           "Registration success!!🌟 Now you can "
           "login here with your credentials!",
@@ -87,7 +83,7 @@ class _AuthState extends State<Auth> {
       } catch (error) {
         _displaySnackBar("Something went wrong on our side! Please try again");
       }
-    } else {
+    } else if (_authFormType == AuthFormType.Login) {
       try {
         await _authService.login(LoginUser.fromJson({
           "email": _emailAddressController.text,
@@ -102,16 +98,22 @@ class _AuthState extends State<Auth> {
       } catch (error) {
         _displaySnackBar("Something went wrong on our side! Please try again");
       }
+    } else {
+      try {
+        await _authService.sendPasswordResetMail(_emailAddressController.text);
+        _displaySnackBar(
+            "A mail containing the link to reset your password has been sent.");
+      } on UserNotFoundException catch (error) {
+        _displaySnackBar(error.message);
+      } catch (error) {
+        _displaySnackBar("Something went wrong on our side! Please try again");
+      }
     }
   }
 
-  void _switchAuthState() {
+  void _switchAuthState(AuthFormType authFormType) {
     setState(() {
-      if (_authFormType == AuthFormType.Register) {
-        _authFormType = AuthFormType.Login;
-      } else {
-        _authFormType = AuthFormType.Register;
-      }
+      _authFormType = authFormType;
     });
   }
 
@@ -137,8 +139,10 @@ class _AuthState extends State<Auth> {
                     ),
                     Text(
                       _authFormType == AuthFormType.Register
-                          ? 'Register Here!!🌟'
-                          : 'Login Here!! 🌟',
+                          ? 'Register an account'
+                          : _authFormType == AuthFormType.Login
+                              ? "Log in to your account"
+                              : "Reset your password",
                       style: TextStyle(
                         fontSize: 30.0,
                       ),
@@ -151,85 +155,43 @@ class _AuthState extends State<Auth> {
                 child: Column(
                   children: [
                     if (_authFormType == AuthFormType.Register)
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: 10.0,
-                          horizontal: 10.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          decoration: const InputDecoration(
-                            labelText: "First Name",
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(),
-                            ),
-                          ),
-                          controller: this._firstNameController,
-                          validator: RequiredValidator(
+                      CustomField(
+                        textFieldController: this._firstNameController,
+                        label: "First Name",
+                        validators: <FieldValidator>[
+                          RequiredValidator(
                             errorText: "Please enter your first name",
                           ),
-                        ),
+                        ],
                       ),
                     if (_authFormType == AuthFormType.Register)
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: 10.0,
-                          horizontal: 10.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          decoration: const InputDecoration(
-                            labelText: "Last Name",
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(),
-                            ),
-                          ),
-                          controller: this._lastNameController,
-                          validator: RequiredValidator(
+                      CustomField(
+                        textFieldController: this._lastNameController,
+                        label: "Last Name",
+                        validators: <FieldValidator>[
+                          RequiredValidator(
                             errorText: "Please enter your last name",
                           ),
+                        ],
+                      ),
+                    CustomField(
+                      textFieldController: this._emailAddressController,
+                      label: "Email Address",
+                      validators: <FieldValidator>[
+                        RequiredValidator(
+                          errorText: "Please enter your email address",
                         ),
-                      ),
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 10.0,
-                      ),
-                      child: TextFormField(
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: "Email Address",
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(),
-                          ),
-                        ),
-                        controller: this._emailAddressController,
-                        validator: MultiValidator([
-                          RequiredValidator(
-                            errorText: "Please enter your email address",
-                          ),
-                          EmailValidator(
-                            errorText: "Please enter a valid email address.",
-                          )
-                        ]),
-                      ),
+                        EmailValidator(
+                          errorText: "Please enter a valid email address.",
+                        )
+                      ],
                     ),
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 10.0,
-                      ),
-                      child: TextFormField(
+                    if (_authFormType != AuthFormType.ForgotPassword)
+                      CustomField(
+                        textFieldController: this._passwordController,
                         obscureText: true,
-                        keyboardType: TextInputType.visiblePassword,
-                        decoration: const InputDecoration(
-                          labelText: "Your Password",
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(),
-                          ),
-                        ),
-                        controller: this._passwordController,
-                        validator: MultiValidator([
+                        label: "Your Password",
+                        validators: <FieldValidator>[
                           RequiredValidator(
                             errorText: "Please enter your password",
                           ),
@@ -238,28 +200,58 @@ class _AuthState extends State<Auth> {
                             errorText:
                                 "Minimum password length is 5 characters.",
                           )
-                        ]),
+                        ],
                       ),
-                    ),
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: _onFormSubmit,
-                child: Text(
-                  _authFormType == AuthFormType.Register
-                      ? 'Register!!🌟'
-                      : 'Login!! 🌟',
+              if (_authFormType == AuthFormType.Login ||
+                  _authFormType == AuthFormType.Register)
+                ElevatedButton(
+                  onPressed: _onFormSubmit,
+                  child: Text(
+                    _authFormType == AuthFormType.Register
+                        ? 'Register'
+                        : 'Login',
+                  ),
                 ),
-              ),
-              ElevatedButton(
-                onPressed: _switchAuthState,
-                child: Text(
-                  _authFormType == AuthFormType.Register
-                      ? 'Switch to login mode!!🌟'
-                      : 'Switch to register mode!! 🌟',
+              if (_authFormType == AuthFormType.ForgotPassword)
+                ElevatedButton(
+                  onPressed: _onFormSubmit,
+                  child: Text("Send Password Reset Mail"),
                 ),
-              ),
+              if (_authFormType == AuthFormType.Login ||
+                  _authFormType == AuthFormType.Register)
+                TextButton(
+                  onPressed: () {
+                    if (_authFormType == AuthFormType.Login) {
+                      _switchAuthState(AuthFormType.Register);
+                    } else if (_authFormType == AuthFormType.Register) {
+                      _switchAuthState(AuthFormType.Login);
+                    }
+                  },
+                  child: Text(
+                    _authFormType == AuthFormType.Register
+                        ? 'Log in to your account here!'
+                        : 'Create an account here!',
+                  ),
+                ),
+              if (_authFormType == AuthFormType.ForgotPassword)
+                TextButton(
+                  onPressed: () {
+                    _switchAuthState(AuthFormType.Login);
+                  },
+                  child: Text(
+                    "Have an account?",
+                  ),
+                ),
+              if (_authFormType == AuthFormType.Login)
+                TextButton(
+                  onPressed: () {
+                    _switchAuthState(AuthFormType.ForgotPassword);
+                  },
+                  child: Text('Forgot Password?'),
+                ),
             ],
           ),
         ),

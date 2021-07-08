@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yasm_mobile/app.dart';
 import 'package:yasm_mobile/pages/common/loading.page.dart';
-import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() {
