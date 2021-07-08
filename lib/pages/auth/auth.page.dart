@@ -7,6 +7,7 @@ import 'package:yasm_mobile/exceptions/auth/WrongPassword.exception.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
 
 enum AuthFormType {
   Register,
@@ -33,12 +34,6 @@ class _AuthState extends State<Auth> {
   final _lastNameController = TextEditingController();
   final _emailAddressController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -160,96 +155,52 @@ class _AuthState extends State<Auth> {
                 child: Column(
                   children: [
                     if (_authFormType == AuthFormType.Register)
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: 10.0,
-                          horizontal: 10.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          decoration: const InputDecoration(
-                            labelText: "First Name",
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(),
-                            ),
-                          ),
-                          controller: this._firstNameController,
-                          validator: RequiredValidator(
+                      CustomField(
+                        textFieldController: this._firstNameController,
+                        label: "First Name",
+                        validators: <FieldValidator>[
+                          RequiredValidator(
                             errorText: "Please enter your first name",
                           ),
-                        ),
+                        ],
                       ),
                     if (_authFormType == AuthFormType.Register)
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: 10.0,
-                          horizontal: 10.0,
-                        ),
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          decoration: const InputDecoration(
-                            labelText: "Last Name",
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(),
-                            ),
-                          ),
-                          controller: this._lastNameController,
-                          validator: RequiredValidator(
+                      CustomField(
+                        textFieldController: this._lastNameController,
+                        label: "Last Name",
+                        validators: <FieldValidator>[
+                          RequiredValidator(
                             errorText: "Please enter your last name",
                           ),
+                        ],
+                      ),
+                    CustomField(
+                      textFieldController: this._emailAddressController,
+                      label: "Email Address",
+                      validators: <FieldValidator>[
+                        RequiredValidator(
+                          errorText: "Please enter your email address",
                         ),
-                      ),
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 10.0,
-                      ),
-                      child: TextFormField(
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: "Email Address",
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(),
-                          ),
-                        ),
-                        controller: this._emailAddressController,
-                        validator: MultiValidator([
-                          RequiredValidator(
-                            errorText: "Please enter your email address",
-                          ),
-                          EmailValidator(
-                            errorText: "Please enter a valid email address.",
-                          )
-                        ]),
-                      ),
+                        EmailValidator(
+                          errorText: "Please enter a valid email address.",
+                        )
+                      ],
                     ),
                     if (_authFormType != AuthFormType.ForgotPassword)
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: 10.0,
-                          horizontal: 10.0,
-                        ),
-                        child: TextFormField(
-                          obscureText: true,
-                          keyboardType: TextInputType.visiblePassword,
-                          decoration: const InputDecoration(
-                            labelText: "Your Password",
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(),
-                            ),
+                      CustomField(
+                        textFieldController: this._passwordController,
+                        obscureText: true,
+                        label: "Your Password",
+                        validators: <FieldValidator>[
+                          RequiredValidator(
+                            errorText: "Please enter your password",
                           ),
-                          controller: this._passwordController,
-                          validator: MultiValidator([
-                            RequiredValidator(
-                              errorText: "Please enter your password",
-                            ),
-                            MinLengthValidator(
-                              5,
-                              errorText:
-                                  "Minimum password length is 5 characters.",
-                            )
-                          ]),
-                        ),
+                          MinLengthValidator(
+                            5,
+                            errorText:
+                                "Minimum password length is 5 characters.",
+                          )
+                        ],
                       ),
                   ],
                 ),

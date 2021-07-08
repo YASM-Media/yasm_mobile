@@ -18,7 +18,13 @@ class Loading extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("YASM!!🌟"),
+              Container(
+                margin: EdgeInsets.all(20.0),
+                child: Image.asset(
+                  'assets/logo/logo_1024.png',
+                  scale: 8.0,
+                ),
+              ),
               CircularProgressIndicator(
                 color: Colors.pink,
               ),
