@@ -11,6 +11,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 enum AuthFormType {
   Register,
   Login,
+  ForgotPassword,
 }
 
 class Auth extends StatefulWidget {
@@ -77,7 +78,7 @@ class _AuthState extends State<Auth> {
           "password": _passwordController.text,
         }));
 
-        _switchAuthState();
+        _switchAuthState(AuthFormType.Login);
         _displaySnackBar(
           "Registration success!!🌟 Now you can "
           "login here with your credentials!",
@@ -87,7 +88,7 @@ class _AuthState extends State<Auth> {
       } catch (error) {
         _displaySnackBar("Something went wrong on our side! Please try again");
       }
-    } else {
+    } else if (_authFormType == AuthFormType.Login) {
       try {
         await _authService.login(LoginUser.fromJson({
           "email": _emailAddressController.text,
@@ -102,16 +103,22 @@ class _AuthState extends State<Auth> {
       } catch (error) {
         _displaySnackBar("Something went wrong on our side! Please try again");
       }
+    } else {
+      try {
+        await _authService.sendPasswordResetMail(_emailAddressController.text);
+        _displaySnackBar(
+            "A mail containing the link to reset your password has been sent.");
+      } on UserNotFoundException catch (error) {
+        _displaySnackBar(error.message);
+      } catch (error) {
+        _displaySnackBar("Something went wrong on our side! Please try again");
+      }
     }
   }
 
-  void _switchAuthState() {
+  void _switchAuthState(AuthFormType authFormType) {
     setState(() {
-      if (_authFormType == AuthFormType.Register) {
-        _authFormType = AuthFormType.Login;
-      } else {
-        _authFormType = AuthFormType.Register;
-      }
+      _authFormType = authFormType;
     });
   }
 
@@ -137,8 +144,10 @@ class _AuthState extends State<Auth> {
                     ),
                     Text(
                       _authFormType == AuthFormType.Register
-                          ? 'Register Here!!🌟'
-                          : 'Login Here!! 🌟',
+                          ? 'Register an account'
+                          : _authFormType == AuthFormType.Login
+                              ? "Log in to your account"
+                              : "Reset your password",
                       style: TextStyle(
                         fontSize: 30.0,
                       ),
@@ -214,52 +223,84 @@ class _AuthState extends State<Auth> {
                         ]),
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 10.0,
-                      ),
-                      child: TextFormField(
-                        obscureText: true,
-                        keyboardType: TextInputType.visiblePassword,
-                        decoration: const InputDecoration(
-                          labelText: "Your Password",
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(),
-                          ),
+                    if (_authFormType != AuthFormType.ForgotPassword)
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: 10.0,
+                          horizontal: 10.0,
                         ),
-                        controller: this._passwordController,
-                        validator: MultiValidator([
-                          RequiredValidator(
-                            errorText: "Please enter your password",
+                        child: TextFormField(
+                          obscureText: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          decoration: const InputDecoration(
+                            labelText: "Your Password",
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(),
+                            ),
                           ),
-                          MinLengthValidator(
-                            5,
-                            errorText:
-                                "Minimum password length is 5 characters.",
-                          )
-                        ]),
+                          controller: this._passwordController,
+                          validator: MultiValidator([
+                            RequiredValidator(
+                              errorText: "Please enter your password",
+                            ),
+                            MinLengthValidator(
+                              5,
+                              errorText:
+                                  "Minimum password length is 5 characters.",
+                            )
+                          ]),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: _onFormSubmit,
-                child: Text(
-                  _authFormType == AuthFormType.Register
-                      ? 'Register!!🌟'
-                      : 'Login!! 🌟',
+              if (_authFormType == AuthFormType.Login ||
+                  _authFormType == AuthFormType.Register)
+                ElevatedButton(
+                  onPressed: _onFormSubmit,
+                  child: Text(
+                    _authFormType == AuthFormType.Register
+                        ? 'Register'
+                        : 'Login',
+                  ),
                 ),
-              ),
-              ElevatedButton(
-                onPressed: _switchAuthState,
-                child: Text(
-                  _authFormType == AuthFormType.Register
-                      ? 'Switch to login mode!!🌟'
-                      : 'Switch to register mode!! 🌟',
+              if (_authFormType == AuthFormType.ForgotPassword)
+                ElevatedButton(
+                  onPressed: _onFormSubmit,
+                  child: Text("Send Password Reset Mail"),
                 ),
-              ),
+              if (_authFormType == AuthFormType.Login ||
+                  _authFormType == AuthFormType.Register)
+                TextButton(
+                  onPressed: () {
+                    if (_authFormType == AuthFormType.Login) {
+                      _switchAuthState(AuthFormType.Register);
+                    } else if (_authFormType == AuthFormType.Register) {
+                      _switchAuthState(AuthFormType.Login);
+                    }
+                  },
+                  child: Text(
+                    _authFormType == AuthFormType.Register
+                        ? 'Log in to your account here!'
+                        : 'Create an account here!',
+                  ),
+                ),
+              if (_authFormType == AuthFormType.ForgotPassword)
+                TextButton(
+                  onPressed: () {
+                    _switchAuthState(AuthFormType.Login);
+                  },
+                  child: Text(
+                    "Have an account?",
+                  ),
+                ),
+              if (_authFormType == AuthFormType.Login)
+                TextButton(
+                  onPressed: () {
+                    _switchAuthState(AuthFormType.ForgotPassword);
+                  },
+                  child: Text('Forgot Password?'),
+                ),
             ],
           ),
         ),
