@@ -48,6 +48,10 @@ class _AuthState extends State<Auth> {
     this._passwordController.dispose();
   }
 
+  /*
+   * Method to display a snack bar.
+   * @param message to display.
+   */
   void _displaySnackBar(String message) {
     final snackBar = SnackBar(
       backgroundColor: Colors.black54,
@@ -62,13 +66,19 @@ class _AuthState extends State<Auth> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  /*
+   * Method to handle form submission.
+   */
   Future<void> _onFormSubmit() async {
+    // Check for form validation.
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
+    // CASE 1: Submitting details for registering a user.
     if (_authFormType == AuthFormType.Register) {
       try {
+        // Send user details.
         await _authService.registerUser(RegisterUser.fromJson({
           "firstName": _firstNameController.text,
           "lastName": _lastNameController.text,
@@ -76,40 +86,58 @@ class _AuthState extends State<Auth> {
           "password": _passwordController.text,
         }));
 
+        // Switch form state to login.
         _switchAuthState(AuthFormType.Login);
+
+        // Display form submission success.
         _displaySnackBar(
           "Registration success!!🌟 Now you can "
           "login here with your credentials!",
         );
-      } on UserAlreadyExistsException catch (error) {
+      }
+      // Handle errors gracefully.
+      on UserAlreadyExistsException catch (error) {
         _displaySnackBar(error.message);
       } catch (error) {
         _displaySnackBar("Something went wrong on our side! Please try again");
       }
-    } else if (_authFormType == AuthFormType.Login) {
+    }
+    // CASE 2: Submitting details for logging a user in.
+    else if (_authFormType == AuthFormType.Login) {
       try {
+        // Send login details.
         User? user = await _authService.login(LoginUser.fromJson({
           "email": _emailAddressController.text,
           "password": _passwordController.text,
         }));
 
+        // Check if user details are returned.
         if (user != null) {
+          // Save user details in provider.
           Provider.of<AuthProvider>(context, listen: false).saveUser(user);
+
+          // Navigate to home page.
           Navigator.of(context).pushReplacementNamed(Home.routeName);
         }
-      } on UserNotFoundException catch (error) {
+      }
+      // Handle errors gracefully.
+      on UserNotFoundException catch (error) {
         _displaySnackBar(error.message);
       } on WrongPasswordException catch (error) {
         _displaySnackBar(error.message);
       } catch (error) {
         _displaySnackBar("Something went wrong on our side! Please try again");
       }
-    } else {
+    }
+    // CASE 3: Submitting details for sending password reset mail.
+    else {
       try {
         await _authService.sendPasswordResetMail(_emailAddressController.text);
         _displaySnackBar(
             "A mail containing the link to reset your password has been sent.");
-      } on UserNotFoundException catch (error) {
+      }
+      // Handle errors gracefully.
+      on UserNotFoundException catch (error) {
         _displaySnackBar(error.message);
       } catch (error) {
         _displaySnackBar("Something went wrong on our side! Please try again");
@@ -117,6 +145,9 @@ class _AuthState extends State<Auth> {
     }
   }
 
+  /*
+   * Method to handle form state changes.
+   */
   void _switchAuthState(AuthFormType authFormType) {
     setState(() {
       _authFormType = authFormType;
@@ -139,8 +170,8 @@ class _AuthState extends State<Auth> {
                     Container(
                       margin: EdgeInsets.all(20.0),
                       child: Image.asset(
-                        'assets/logo/logo_1024.png',
-                        scale: 8.0,
+                        'assets/logo/logo_text_1024.png',
+                        scale: 6.0,
                       ),
                     ),
                     Text(
@@ -169,6 +200,7 @@ class _AuthState extends State<Auth> {
                             errorText: "Please enter your first name",
                           ),
                         ],
+                        textInputType: TextInputType.text,
                       ),
                     if (_authFormType == AuthFormType.Register)
                       CustomField(
@@ -179,6 +211,7 @@ class _AuthState extends State<Auth> {
                             errorText: "Please enter your last name",
                           ),
                         ],
+                        textInputType: TextInputType.text,
                       ),
                     CustomField(
                       textFieldController: this._emailAddressController,
@@ -191,6 +224,7 @@ class _AuthState extends State<Auth> {
                           errorText: "Please enter a valid email address.",
                         )
                       ],
+                      textInputType: TextInputType.emailAddress,
                     ),
                     if (_authFormType != AuthFormType.ForgotPassword)
                       CustomField(
@@ -207,6 +241,7 @@ class _AuthState extends State<Auth> {
                                 "Minimum password length is 5 characters.",
                           )
                         ],
+                        textInputType: TextInputType.visiblePassword,
                       ),
                   ],
                 ),

@@ -19,7 +19,9 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
+  // Firebase stream subscription.
   StreamSubscription? _streamSubscription;
+
   final AuthService _authService = new AuthService();
 
   @override
@@ -27,6 +29,13 @@ class _SplashState extends State<Splash> {
     // TODO: implement initState
     super.initState();
     setState(() {
+      /*
+         * Listen for logged in user using firebase auth changes.
+         * If the user exists, fetch details from server and save
+         * it in provider and route the user to home page.
+         *
+         * Otherwise, route them to Auth page.
+         */
       this._streamSubscription =
           FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user != null) {

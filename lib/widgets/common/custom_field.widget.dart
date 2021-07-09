@@ -6,6 +6,7 @@ class CustomField extends StatelessWidget {
   final TextEditingController textFieldController;
   final List<FieldValidator> validators;
   final bool obscureText;
+  final TextInputType textInputType;
 
   CustomField({
     Key? key,
@@ -13,6 +14,7 @@ class CustomField extends StatelessWidget {
     required this.label,
     required this.validators,
     this.obscureText = false,
+    required this.textInputType,
   }) : super(key: key);
 
   @override
@@ -24,7 +26,7 @@ class CustomField extends StatelessWidget {
       ),
       child: TextFormField(
         obscureText: this.obscureText,
-        keyboardType: TextInputType.visiblePassword,
+        keyboardType: textInputType,
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(

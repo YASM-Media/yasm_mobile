@@ -14,6 +14,10 @@ class App extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         primarySwatch: Colors.pink,
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.black,
+        ),
         textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.all<Color>(
@@ -39,7 +43,6 @@ class App extends StatelessWidget {
           backgroundColor: Colors.pink,
           foregroundColor: Colors.white,
         ),
-
       ),
       themeMode: ThemeMode.dark,
       home: Splash(),
