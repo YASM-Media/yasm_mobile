@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yasm_mobile/app.dart';
 import 'package:yasm_mobile/pages/common/loading.page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 
 void main() {
   runApp(Root());
@@ -26,7 +28,14 @@ class _RootState extends State<Root> {
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
-          return App();
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider<AuthProvider>(
+                create: (context) => AuthProvider(),
+              )
+            ],
+            child: App(),
+          );
         }
 
         return Loading();

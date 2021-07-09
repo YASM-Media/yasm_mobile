@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 
 class Home extends StatelessWidget {
@@ -11,6 +13,7 @@ class Home extends StatelessWidget {
 
   Future<void> logout(context) async {
     await _authService.logout();
+    Provider.of<AuthProvider>(context, listen: false).removeUser();
     Navigator.of(context).pushReplacementNamed(Auth.routeName);
   }
 
@@ -24,7 +27,11 @@ class Home extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Welcome to YASM!!🌟'),
+            Consumer<AuthProvider>(
+              builder: (context, auth, _) => Text(auth.getUser() != null
+                  ? auth.getUser()!.emailAddress
+                  : "You are not logged in."),
+            ),
             TextButton(
               onPressed: () async {
                 this.logout(context);

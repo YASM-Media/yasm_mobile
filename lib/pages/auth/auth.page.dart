@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
 import 'package:yasm_mobile/dto/auth/register_user/register_user.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/UserAlreadyExists.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/UserNotFound.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/WrongPassword.exception.dart';
+import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
+import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
@@ -85,12 +88,15 @@ class _AuthState extends State<Auth> {
       }
     } else if (_authFormType == AuthFormType.Login) {
       try {
-        await _authService.login(LoginUser.fromJson({
+        User? user = await _authService.login(LoginUser.fromJson({
           "email": _emailAddressController.text,
           "password": _passwordController.text,
         }));
 
-        Navigator.of(context).pushReplacementNamed(Home.routeName);
+        if (user != null) {
+          Provider.of<AuthProvider>(context, listen: false).saveUser(user);
+          Navigator.of(context).pushReplacementNamed(Home.routeName);
+        }
       } on UserNotFoundException catch (error) {
         _displaySnackBar(error.message);
       } on WrongPasswordException catch (error) {
