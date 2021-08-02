@@ -2,28 +2,27 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebaseAuth;
+import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
 import 'package:yasm_mobile/dto/auth/register_user/register_user.dto.dart';
-import 'package:yasm_mobile/exceptions/auth/NotLoggedIn.exception.dart';
-import 'package:yasm_mobile/exceptions/auth/UserAlreadyExists.exception.dart';
-import 'package:yasm_mobile/exceptions/auth/UserNotFound.exception.dart';
-import 'package:yasm_mobile/exceptions/auth/WrongPassword.exception.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
+import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
+import 'package:yasm_mobile/exceptions/auth/user_not_found.exception.dart';
+import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 
 /*
  * Service implementation for authentication.
  */
 class AuthService {
-  final firebaseAuth.FirebaseAuth _firebaseAuth =
-      firebaseAuth.FirebaseAuth.instance;
+  final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
 
   /*
    * Method for fetching the user from server using firebase id token.
    */
   Future<User> getLoggedInUser() async {
     // Get the logged in user details.
-    firebaseAuth.User? firebaseUser = this._firebaseAuth.currentUser;
+    FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
     // Check if user is not null.
     if (firebaseUser != null) {
@@ -55,7 +54,7 @@ class AuthService {
       // Return the user details.
       return loggedInUser;
     } else {
-      // If there is no user logged ij using firebase, throw an exception.
+      // If there is no user logged is using firebase, throw an exception.
       throw NotLoggedInException(message: "User not logged in.");
     }
   }
@@ -100,7 +99,7 @@ class AuthService {
 
       // Return the user details from server.
       return await this.getLoggedInUser();
-    } on firebaseAuth.FirebaseAuthException catch (error) {
+    } on FA.FirebaseAuthException catch (error) {
       // Firebase Error: If the user does not exist.
       if (error.code == 'user-not-found') {
         throw UserNotFoundException(
@@ -124,7 +123,7 @@ class AuthService {
     try {
       // Send the password reset mail for the given mail address.
       await _firebaseAuth.sendPasswordResetEmail(email: emailAddress);
-    } on firebaseAuth.FirebaseAuthException catch (error) {
+    } on FA.FirebaseAuthException catch (error) {
       // If the user does not have an account, throw an error.
       if (error.code == 'user-not-found') {
         throw UserNotFoundException(
