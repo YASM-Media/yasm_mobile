@@ -26,27 +26,44 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
   late AuthProvider _authProvider;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    // Initializing the authentication provider.
+    this._authProvider = Provider.of<AuthProvider>(context, listen: false);
+  }
+
+  @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
 
-    this._authProvider = Provider.of<AuthProvider>(context, listen: false);
-
+    // Dispose off the controller.
     this._passwordController.dispose();
   }
 
+  /*
+   * Form submission method for user delete.
+   */
   Future<void> _onFormSubmit() async {
     try {
+      // Validate the form.
       if (this._formKey.currentState!.validate()) {
+        // Delete the account from the server.
         await this
             ._userService
             .deleteUserAccount(this._passwordController.text);
 
+        // Clear off the provider state.
         this._authProvider.removeUser();
 
+        // Log out to the authentication page.
         Navigator.of(context).pushReplacementNamed(Auth.routeName);
       }
-    } on ServerException catch (error) {
+    }
+    // Handle errors gracefully.
+    on ServerException catch (error) {
       displaySnackBar(error.message, context);
     } on NotLoggedInException {
       print("NOT LOGGED IN");

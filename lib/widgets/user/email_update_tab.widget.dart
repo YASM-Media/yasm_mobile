@@ -33,6 +33,8 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    // Initializing the authentication provider.
     this._authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
@@ -41,17 +43,25 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
     // TODO: implement dispose
     super.dispose();
 
+    // Dispose off the controllers.
     this._emailController.dispose();
     this._passwordController.dispose();
   }
 
+  /*
+   * Form submission method for user email update.
+   */
   Future<void> _onFormSubmit() async {
     try {
+      // Validate the form.
       if (this._formKey.currentState!.validate()) {
+        // Prepare DTO for updating password.
         UpdateEmailDto updateEmailDto = new UpdateEmailDto(
           emailAddress: this._emailController.text,
           password: this._passwordController.text,
         );
+
+        // Update it on server and also update the state as well.
         User user = await this._userService.updateUserEmailAddress(
               updateEmailDto,
               this._authProvider.getUser()!,
@@ -59,9 +69,12 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
 
         this._authProvider.saveUser(user);
 
+        // Display success snackbar.
         displaySnackBar("Email updated!", context);
       }
-    } on ServerException catch (error) {
+    }
+    // Handle errors gracefully.
+    on ServerException catch (error) {
       displaySnackBar(error.message, context);
     } on UserAlreadyExistsException catch (error) {
       displaySnackBar(error.message, context);

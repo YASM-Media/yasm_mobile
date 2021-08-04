@@ -27,6 +27,7 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
   TextEditingController _firstNameController = new TextEditingController();
   TextEditingController _lastNameController = new TextEditingController();
   TextEditingController _biographyController = new TextEditingController();
+
   late AuthProvider _authProvider;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -37,6 +38,8 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    // Initializing the authentication provider.
     this._authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
@@ -45,24 +48,36 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
     // TODO: implement dispose
     super.dispose();
 
+    // Disposing off the controllers
     this._firstNameController.dispose();
     this._lastNameController.dispose();
     this._biographyController.dispose();
   }
 
+  /*
+   * Method for uploading images from gallery.
+   */
   Future<void> _uploadFromGallery() async {
+    // Open the gallery and get the selected image.
     XFile? imageXFile = await openGallery();
 
+    // Run if there is an image selected.
     if (imageXFile != null) {
+      // Prepare the file from the selected image.
       File imageFile = new File(imageXFile.path);
+
+      // Upload the image to firebase and generate a URL.
       String uploadedUrl =
           await uploadImageAndGenerateUrl(imageFile, "profile-pictures");
 
+      // Update the user state
       User user = this._authProvider.getUser()!;
       user.imageUrl = uploadedUrl;
 
+      // Save the updated state.
       this._authProvider.saveUser(user);
 
+      // Display a success snackbar.
       displaySnackBar(
         "Image has been uploaded! Please click \"Update Profile\" to confirm your changes when you are done!",
         context,
@@ -70,19 +85,30 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
     }
   }
 
+  /*
+   * Method for uploading images from camera.
+   */
   Future<void> _uploadFromCamera() async {
+    // Open the gallery and get the selected image.
     XFile? imageXFile = await openCamera();
 
+    // Run if there is an image selected.
     if (imageXFile != null) {
+      // Prepare the file from the selected image.
       File imageFile = new File(imageXFile.path);
+
+      // Upload the image to firebase and generate a URL.
       String uploadedUrl =
           await uploadImageAndGenerateUrl(imageFile, "profile-pictures");
 
+      // Update the user state
       User user = this._authProvider.getUser()!;
       user.imageUrl = uploadedUrl;
 
+      // Save the updated state.
       this._authProvider.saveUser(user);
 
+      // Display a success snackbar.
       displaySnackBar(
         "Image has been uploaded! Please click \"Update Profile\" to confirm your changes when you are done!",
         context,
@@ -90,6 +116,9 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
     }
   }
 
+  /*
+   * Method to open up camera or gallery on user's selection.
+   */
   void _onUploadImage() {
     SBS.showBottomSheet(
       context,
@@ -110,15 +139,22 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
     );
   }
 
+  /*
+   * Form submission method for user profile update.
+   */
   Future<void> _onFormSubmit() async {
     try {
+      // Validate the form.
       if (this._formKey.currentState!.validate()) {
+        // Prepare DTO for updating profile.
         UpdateProfileDto updateProfileDto = new UpdateProfileDto(
           firstName: this._firstNameController.text,
           lastName: this._lastNameController.text,
           biography: this._biographyController.text,
           imageUrl: this._authProvider.getUser()!.imageUrl,
         );
+
+        // Update it on server and also update the state as well.
         User user = await this._userService.updateUserProfile(
               updateProfileDto,
               this._authProvider.getUser()!,
@@ -126,9 +162,12 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
 
         this._authProvider.saveUser(user);
 
+        // Display success snackbar.
         displaySnackBar("Profile updated!", context);
       }
-    } on ServerException catch (error) {
+    }
+    // Handle errors gracefully.
+    on ServerException catch (error) {
       displaySnackBar(error.message, context);
     } on NotLoggedInException {
       print("NOT LOGGED IN");

@@ -61,6 +61,7 @@ class UserService {
         throw ServerException(message: body["message"]);
       }
 
+      // Update the user state and return the object.
       user.imageUrl = updateProfileDto.imageUrl;
       user.firstName = updateProfileDto.firstName;
       user.lastName = updateProfileDto.lastName;
@@ -120,7 +121,8 @@ class UserService {
    * Update email address for the given user.
    * @param updateEmailDto DTO for email address update.
    */
-  Future<User> updateUserEmailAddress(UpdateEmailDto updateEmailDto, User user) async {
+  Future<User> updateUserEmailAddress(
+      UpdateEmailDto updateEmailDto, User user) async {
     // Fetching the currently logged in user.
     FA.User? loggedInUser = this._firebaseAuth.currentUser;
 
@@ -155,8 +157,10 @@ class UserService {
         throw ServerException(message: body["message"]);
       }
 
+      // Update the email address on firebase as well.
       await this._updateFirebaseUserEmailAddress(updateEmailDto);
 
+      // Update the user state and return the object.
       user.emailAddress = updateEmailDto.emailAddress;
 
       return user;
@@ -249,6 +253,7 @@ class UserService {
         throw ServerException(message: body["message"]);
       }
 
+      // Logout from firebase.
       await this._firebaseAuth.signOut();
     } else {
       // If there is no user logged is using firebase, throw an exception.

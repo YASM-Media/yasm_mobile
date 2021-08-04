@@ -3,7 +3,6 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:yasm_mobile/dto/user/update_password/update_password.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
-import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/exceptions/user/weak_password.exception.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
@@ -32,23 +31,34 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
     // TODO: implement dispose
     super.dispose();
 
+    // Dispose off the controllers.
     this._newPasswordController.dispose();
     this._newPasswordAgainController.dispose();
     this._oldPasswordController.dispose();
   }
 
+  /*
+   * Form submission method for user password update.
+   */
   Future<void> _onFormSubmit() async {
     try {
+      // Validate the form.
       if (this._formKey.currentState!.validate()) {
+        // Prepare DTO for updating password.
         UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto(
           oldPassword: this._oldPasswordController.text,
           newPassword: this._newPasswordController.text,
         );
+
+        // Update it on the server.
         await this._userService.updateUserPassword(updatePasswordDto);
 
+        // Display success snackbar.
         displaySnackBar("Password updated!", context);
       }
-    } on WrongPasswordException catch (error) {
+    }
+    // Handle errors gracefully.
+    on WrongPasswordException catch (error) {
       displaySnackBar(error.message, context);
     } on WeakPasswordException catch (error) {
       displaySnackBar(error.message, context);
