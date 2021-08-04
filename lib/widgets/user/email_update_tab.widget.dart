@@ -20,8 +20,10 @@ class EmailUpdateTab extends StatefulWidget {
 }
 
 class _EmailUpdateTabState extends State<EmailUpdateTab> {
-  late TextEditingController _emailController;
+  TextEditingController _emailController = new TextEditingController();
   TextEditingController _passwordController = new TextEditingController();
+
+  late AuthProvider _authProvider;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -31,13 +33,7 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    User user = Provider.of<AuthProvider>(context, listen: false).getUser()!;
-
-    this._emailController = TextEditingController.fromValue(
-      TextEditingValue(
-        text: user.emailAddress,
-      ),
-    );
+    this._authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
   @override
@@ -56,7 +52,12 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
           emailAddress: this._emailController.text,
           password: this._passwordController.text,
         );
-        await this._userService.updateUserEmailAddress(updateEmailDto);
+        User user = await this._userService.updateUserEmailAddress(
+              updateEmailDto,
+              this._authProvider.getUser()!,
+            );
+
+        this._authProvider.saveUser(user);
 
         displaySnackBar("Email updated!", context);
       }
@@ -79,45 +80,51 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
           vertical: 20.0,
           horizontal: 10.0,
         ),
-        child: Form(
-          key: this._formKey,
-          child: Column(
-            children: [
-              CustomField(
-                textFieldController: this._emailController,
-                label: "Email Address",
-                validators: [
-                  RequiredValidator(
-                    errorText: "Please enter your email address.",
+        child: Consumer<AuthProvider>(
+          builder: (context, state, child) {
+            User? user = state.getUser();
+            this._emailController.text = user != null ? user.emailAddress : '';
+            return Form(
+              key: this._formKey,
+              child: Column(
+                children: [
+                  CustomField(
+                    textFieldController: this._emailController,
+                    label: "Email Address",
+                    validators: [
+                      RequiredValidator(
+                        errorText: "Please enter your email address.",
+                      ),
+                      EmailValidator(
+                        errorText: "Please enter a valid email address.",
+                      ),
+                    ],
+                    textInputType: TextInputType.emailAddress,
                   ),
-                  EmailValidator(
-                    errorText: "Please enter a valid email address.",
+                  CustomField(
+                    textFieldController: this._passwordController,
+                    label: "Password",
+                    validators: [
+                      RequiredValidator(
+                        errorText: "Please enter your password.",
+                      ),
+                      MinLengthValidator(
+                        5,
+                        errorText:
+                            "Your password should be at least 5 characters long.",
+                      )
+                    ],
+                    textInputType: TextInputType.visiblePassword,
+                    obscureText: true,
                   ),
-                ],
-                textInputType: TextInputType.emailAddress,
-              ),
-              CustomField(
-                textFieldController: this._passwordController,
-                label: "Password",
-                validators: [
-                  RequiredValidator(
-                    errorText: "Please enter your password.",
-                  ),
-                  MinLengthValidator(
-                    5,
-                    errorText:
-                        "Your password should be at least 5 characters long.",
+                  ElevatedButton(
+                    onPressed: this._onFormSubmit,
+                    child: Text('Update Email Address'),
                   )
                 ],
-                textInputType: TextInputType.visiblePassword,
-                obscureText: true,
               ),
-              ElevatedButton(
-                onPressed: this._onFormSubmit,
-                child: Text('Update Email Address'),
-              )
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

@@ -184,6 +184,7 @@ class _AuthState extends State<Auth> {
                           : _authFormType == AuthFormType.Login
                               ? "Log in to your account"
                               : "Reset your password",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 30.0,
                       ),

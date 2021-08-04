@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yasm_mobile/widgets/user/delete_account_tab.widget.dart';
 import 'package:yasm_mobile/widgets/user/email_update_tab.widget.dart';
 import 'package:yasm_mobile/widgets/user/password_update_tab.widget.dart';
 import 'package:yasm_mobile/widgets/user/profile_update_tab.widget.dart';
@@ -19,16 +20,28 @@ class UserUpdate extends StatelessWidget {
             indicatorColor: Colors.pink,
             tabs: [
               Tab(
-                child: Text('User Details'),
+                child: Text(
+                  'User Details',
+                  textAlign: TextAlign.center,
+                ),
               ),
               Tab(
-                child: Text('Email Details'),
+                child: Text(
+                  'Email Details',
+                  textAlign: TextAlign.center,
+                ),
               ),
               Tab(
-                child: Text('Password Details'),
+                child: Text(
+                  'Password Details',
+                  textAlign: TextAlign.center,
+                ),
               ),
               Tab(
-                child: Text('Delete Account'),
+                child: Text(
+                  'Delete Account',
+                  textAlign: TextAlign.center,
+                ),
               ),
             ],
           ),
@@ -38,7 +51,7 @@ class UserUpdate extends StatelessWidget {
             ProfileUpdateTab(),
             EmailUpdateTab(),
             PasswordUpdateTab(),
-            Text('Delete Account'),
+            DeleteAccountTab(),
           ],
         ),
       ),
