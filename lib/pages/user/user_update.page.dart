@@ -25,7 +25,7 @@ class UserUpdate extends StatelessWidget {
                 child: Text('Email Details'),
               ),
               Tab(
-                child: Text('Password'),
+                child: Text('Password Details'),
               ),
               Tab(
                 child: Text('Delete Account'),

@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/dto/user/update_email/update_email.dto.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
+import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
+import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/user.service.dart';
+import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
 
 class EmailUpdateTab extends StatefulWidget {
@@ -16,9 +22,8 @@ class EmailUpdateTab extends StatefulWidget {
 class _EmailUpdateTabState extends State<EmailUpdateTab> {
   late TextEditingController _emailController;
   TextEditingController _passwordController = new TextEditingController();
-  TextEditingController _passwordAgainController = new TextEditingController();
 
-  final GlobalKey<FormState> _formKey = GlobalKey();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final UserService _userService = new UserService();
 
@@ -42,68 +47,78 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
 
     this._emailController.dispose();
     this._passwordController.dispose();
-    this._passwordAgainController.dispose();
   }
 
   Future<void> _onFormSubmit() async {
-    try {} catch (error) {}
+    try {
+      if (this._formKey.currentState!.validate()) {
+        UpdateEmailDto updateEmailDto = new UpdateEmailDto(
+          emailAddress: this._emailController.text,
+          password: this._passwordController.text,
+        );
+        await this._userService.updateUserEmailAddress(updateEmailDto);
+
+        displaySnackBar("Email updated!", context);
+      }
+    } on ServerException catch (error) {
+      displaySnackBar(error.message, context);
+    } on UserAlreadyExistsException catch (error) {
+      displaySnackBar(error.message, context);
+    } on WrongPasswordException catch (error) {
+      displaySnackBar(error.message, context);
+    } on NotLoggedInException {
+      print("NOT LOGGED IN");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      child: Column(
-        children: [
-          CustomField(
-            textFieldController: this._emailController,
-            label: "Email Address",
-            validators: [
-              RequiredValidator(
-                errorText: "Please enter your email address.",
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 20.0,
+          horizontal: 10.0,
+        ),
+        child: Form(
+          key: this._formKey,
+          child: Column(
+            children: [
+              CustomField(
+                textFieldController: this._emailController,
+                label: "Email Address",
+                validators: [
+                  RequiredValidator(
+                    errorText: "Please enter your email address.",
+                  ),
+                  EmailValidator(
+                    errorText: "Please enter a valid email address.",
+                  ),
+                ],
+                textInputType: TextInputType.emailAddress,
               ),
-              EmailValidator(
-                errorText: "Please enter a valid email address.",
+              CustomField(
+                textFieldController: this._passwordController,
+                label: "Password",
+                validators: [
+                  RequiredValidator(
+                    errorText: "Please enter your password.",
+                  ),
+                  MinLengthValidator(
+                    5,
+                    errorText:
+                        "Your password should be at least 5 characters long.",
+                  )
+                ],
+                textInputType: TextInputType.visiblePassword,
+                obscureText: true,
               ),
-            ],
-            textInputType: TextInputType.emailAddress,
-          ),
-          CustomField(
-            textFieldController: this._passwordController,
-            label: "Password",
-            validators: [
-              RequiredValidator(
-                errorText: "Please enter your password.",
-              ),
-              MinLengthValidator(
-                5,
-                errorText:
-                    "Your password should be at least 5 characters long.",
+              ElevatedButton(
+                onPressed: this._onFormSubmit,
+                child: Text('Update Email Address'),
               )
             ],
-            textInputType: TextInputType.visiblePassword,
-            obscureText: true,
           ),
-          CustomField(
-            textFieldController: this._passwordAgainController,
-            label: "Password Again",
-            validators: [
-              RequiredValidator(
-                errorText: "Please enter your password.",
-              ),
-              MinLengthValidator(
-                5,
-                errorText:
-                    "Your password should be at least 5 characters long.",
-              )
-            ],
-            textInputType: TextInputType.visiblePassword,
-            obscureText: true,
-          ),
-          ElevatedButton(
-            onPressed: this._onFormSubmit,
-            child: Text('Update Email Address'),
-          )
-        ],
+        ),
       ),
     );
   }

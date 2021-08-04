@@ -7,6 +7,7 @@ import 'package:yasm_mobile/dto/user/update_email/update_email.dto.dart';
 import 'package:yasm_mobile/dto/user/update_password/update_password.dto.dart';
 import 'package:yasm_mobile/dto/user/update_profile/update_profile.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
+import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/exceptions/user/weak_password.exception.dart';
@@ -50,10 +51,53 @@ class UserService {
       );
 
       // Checking for errors.
-      if (response.statusCode != 200) {
+      if (response.statusCode >= 400) {
         // Decode the response and throw an exception.
         Map<String, dynamic> body = json.decode(response.body);
         throw ServerException(message: body["message"]);
+      }
+    } else {
+      // If there is no user logged is using firebase, throw an exception.
+      throw NotLoggedInException(message: "User not logged in.");
+    }
+  }
+
+  Future<void> _updateFirebaseUserEmailAddress(
+      UpdateEmailDto updateEmailDto) async {
+    // Fetch the currently logged in user.
+    FA.User? loggedInUser = this._firebaseAuth.currentUser;
+
+    // Check is the user exists.
+    if (loggedInUser != null) {
+      try {
+        // Get the email address for the currently logged in user.
+        String currentUserEmailAddress = loggedInUser.email!;
+
+        // Prepare the auth credentials for re-authentication.
+        FA.AuthCredential authCredential = FA.EmailAuthProvider.credential(
+          email: currentUserEmailAddress,
+          password: updateEmailDto.password,
+        );
+
+        // Re-authenticate the user with credential.
+        await loggedInUser.reauthenticateWithCredential(authCredential);
+
+        // Update password for the user.
+        await loggedInUser.updateEmail(updateEmailDto.emailAddress);
+      } on FA.FirebaseAuthException catch (error) {
+        // Firebase Error: If the user has typed a weak password.
+        if (error.code == "email-already-in-use") {
+          throw UserAlreadyExistsException(
+            message: "There is an account associated with this email address.",
+          );
+        }
+
+        // Firebase Error: If the user has typed the wrong password.
+        else if (error.code == 'wrong-password') {
+          throw WrongPasswordException(
+            message: 'Wrong password provided for the specified user account.',
+          );
+        }
       }
     } else {
       // If there is no user logged is using firebase, throw an exception.
@@ -94,11 +138,13 @@ class UserService {
       );
 
       // Checking for errors.
-      if (response.statusCode != 200) {
+      if (response.statusCode >= 400) {
         // Decode the response and throw an exception.
         Map<String, dynamic> body = json.decode(response.body);
         throw ServerException(message: body["message"]);
       }
+
+      await this._updateFirebaseUserEmailAddress(updateEmailDto);
     } else {
       // If there is no user logged is using firebase, throw an exception.
       throw NotLoggedInException(message: "User not logged in.");

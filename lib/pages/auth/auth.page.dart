@@ -10,6 +10,7 @@ import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
 
 enum AuthFormType {
@@ -49,24 +50,6 @@ class _AuthState extends State<Auth> {
   }
 
   /*
-   * Method to display a snack bar.
-   * @param message to display.
-   */
-  void _displaySnackBar(String message) {
-    final snackBar = SnackBar(
-      backgroundColor: Colors.black54,
-      content: Text(
-        message,
-        style: TextStyle(
-          color: Colors.white,
-        ),
-      ),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  /*
    * Method to handle form submission.
    */
   Future<void> _onFormSubmit() async {
@@ -90,16 +73,20 @@ class _AuthState extends State<Auth> {
         _switchAuthState(AuthFormType.Login);
 
         // Display form submission success.
-        _displaySnackBar(
+        displaySnackBar(
           "Registration success!!🌟 Now you can "
           "login here with your credentials!",
+          context,
         );
       }
       // Handle errors gracefully.
       on UserAlreadyExistsException catch (error) {
-        _displaySnackBar(error.message);
+        displaySnackBar(error.message, context);
       } catch (error) {
-        _displaySnackBar("Something went wrong on our side! Please try again");
+        displaySnackBar(
+          "Something went wrong on our side! Please try again",
+          context,
+        );
       }
     }
     // CASE 2: Submitting details for logging a user in.
@@ -122,25 +109,42 @@ class _AuthState extends State<Auth> {
       }
       // Handle errors gracefully.
       on UserNotFoundException catch (error) {
-        _displaySnackBar(error.message);
+        displaySnackBar(
+          error.message,
+          context,
+        );
       } on WrongPasswordException catch (error) {
-        _displaySnackBar(error.message);
+        displaySnackBar(
+          error.message,
+          context,
+        );
       } catch (error) {
-        _displaySnackBar("Something went wrong on our side! Please try again");
+        displaySnackBar(
+          "Something went wrong on our side! Please try again",
+          context,
+        );
       }
     }
     // CASE 3: Submitting details for sending password reset mail.
     else {
       try {
         await _authService.sendPasswordResetMail(_emailAddressController.text);
-        _displaySnackBar(
-            "A mail containing the link to reset your password has been sent.");
+        displaySnackBar(
+          "A mail containing the link to reset your password has been sent.",
+          context,
+        );
       }
       // Handle errors gracefully.
       on UserNotFoundException catch (error) {
-        _displaySnackBar(error.message);
+        displaySnackBar(
+          error.message,
+          context,
+        );
       } catch (error) {
-        _displaySnackBar("Something went wrong on our side! Please try again");
+        displaySnackBar(
+          "Something went wrong on our side! Please try again",
+          context,
+        );
       }
     }
   }
