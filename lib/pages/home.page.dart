@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 
@@ -33,10 +34,10 @@ class Home extends StatelessWidget {
                   : "You are not logged in."),
             ),
             TextButton(
-              onPressed: () async {
-                this.logout(context);
+              onPressed: () {
+                Navigator.of(context).pushNamed(UserUpdate.routeName);
               },
-              child: Text('Logout'),
+              child: Text('User Update'),
             ),
           ],
         ),
