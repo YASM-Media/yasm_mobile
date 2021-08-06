@@ -31,7 +31,7 @@ class AuthService {
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$endpoint/user/me");
+      Uri url = Uri.parse("$endpoint/follow-api/get");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };

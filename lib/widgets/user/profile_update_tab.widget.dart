@@ -15,6 +15,7 @@ import 'package:yasm_mobile/utils/image_picker.util.dart';
 import 'package:yasm_mobile/utils/image_upload.util.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
+import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
 class ProfileUpdateTab extends StatefulWidget {
   const ProfileUpdateTab({Key? key}) : super(key: key);
@@ -196,21 +197,9 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
               children: [
                 Column(
                   children: [
-                    CircleAvatar(
-                      child: imageUrl.length == 0
-                          ? Icon(
-                              Icons.person,
-                              size: 100.0,
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(100.0),
-                              child: Image.network(
-                                imageUrl,
-                                height: 200.0,
-                                width: 200.0,
-                              ),
-                            ),
-                      radius: 100.0,
+                    ProfilePicture(
+                      imageUrl: imageUrl,
+                      size: 200,
                     ),
                     TextButton(
                       onPressed: this._onUploadImage,
