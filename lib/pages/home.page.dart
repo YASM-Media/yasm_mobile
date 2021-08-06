@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
@@ -33,11 +34,21 @@ class Home extends StatelessWidget {
                   ? auth.getUser()!.emailAddress
                   : "You are not logged in."),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(UserUpdate.routeName);
-              },
-              child: Text('User Update'),
+            Column(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(UserUpdate.routeName);
+                  },
+                  child: Text('User Update'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(UserProfile.routeName);
+                  },
+                  child: Text('User Profile'),
+                ),
+              ],
             ),
           ],
         ),

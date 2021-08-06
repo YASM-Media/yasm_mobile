@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/common/splash.page.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
+import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 
 class App extends StatelessWidget {
@@ -51,6 +52,7 @@ class App extends StatelessWidget {
         Home.routeName: (context) => Home(),
         Auth.routeName: (context) => Auth(),
         UserUpdate.routeName: (context) => UserUpdate(),
+        UserProfile.routeName: (context) => UserProfile(),
       },
     );
   }
