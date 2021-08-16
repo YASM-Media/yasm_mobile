@@ -21,7 +21,7 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final UserService _userService = new UserService();
+  late UserService _userService;
 
   late AuthProvider _authProvider;
 
@@ -29,6 +29,9 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    // Injecting User Service from context.
+    this._userService = Provider.of<UserService>(context, listen: false);
 
     // Initializing the authentication provider.
     this._authProvider = Provider.of<AuthProvider>(context, listen: false);

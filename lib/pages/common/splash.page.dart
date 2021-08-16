@@ -22,12 +22,13 @@ class _SplashState extends State<Splash> {
   // Firebase stream subscription.
   StreamSubscription? _streamSubscription;
 
-  final AuthService _authService = new AuthService();
+  late AuthService _authService;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    this._authService = Provider.of<AuthService>(context, listen: false);
     setState(() {
       /*
          * Listen for logged in user using firebase auth changes.

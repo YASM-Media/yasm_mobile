@@ -27,12 +27,15 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final UserService _userService = new UserService();
+  late UserService _userService;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    // Injecting User Service from context.
+    this._userService = Provider.of<UserService>(context, listen: false);
 
     // Initializing the authentication provider.
     this._authProvider = Provider.of<AuthProvider>(context, listen: false);

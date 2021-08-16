@@ -29,7 +29,7 @@ class Auth extends StatefulWidget {
 }
 
 class _AuthState extends State<Auth> {
-  final AuthService _authService = AuthService();
+  late AuthService _authService;
   final _formKey = GlobalKey<FormState>();
 
   AuthFormType _authFormType = AuthFormType.Login;
@@ -38,6 +38,13 @@ class _AuthState extends State<Auth> {
   final _lastNameController = TextEditingController();
   final _emailAddressController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    this._authService = Provider.of<AuthService>(context, listen: false);
+  }
 
   @override
   void dispose() {

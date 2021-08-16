@@ -8,6 +8,7 @@ import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/utils/validators/value_validator.dart';
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
+import 'package:provider/provider.dart';
 
 class PasswordUpdateTab extends StatefulWidget {
   const PasswordUpdateTab({Key? key}) : super(key: key);
@@ -24,7 +25,16 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final UserService _userService = new UserService();
+  late UserService _userService;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    // Injecting User Service from context.
+    this._userService = Provider.of<UserService>(context, listen: false);
+  }
 
   @override
   void dispose() {
