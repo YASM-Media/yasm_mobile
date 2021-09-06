@@ -5,7 +5,7 @@ part 'create_post.dto.g.dart';
 
 @JsonSerializable()
 class CreatePostDto {
-  final List<Image> images;
+  final List<String> images;
   final String text;
 
   CreatePostDto({

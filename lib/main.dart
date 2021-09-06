@@ -36,9 +36,15 @@ class _RootState extends State<Root> {
               ChangeNotifierProvider<AuthProvider>(
                 create: (context) => AuthProvider(),
               ),
-              Provider<AuthService>.value(value: AuthService()),
-              Provider<UserService>.value(value: UserService()),
-              Provider<PostService>.value(value: PostService()),
+              Provider<AuthService>(
+                create: (context) => AuthService(),
+              ),
+              Provider<UserService>(
+                create: (context) => UserService(),
+              ),
+              Provider<PostService>(
+                create: (context) => PostService(),
+              ),
             ],
             child: App(),
           );
