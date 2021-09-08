@@ -14,24 +14,16 @@ class ImagePost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      child: Column(
+    return Container(
+      child: Stack(
         children: [
           Image.file(
             this.imageFile,
           ),
-          Container(
-            margin: EdgeInsets.all(30.0),
-            child: TextButton(
-              child: Text(
-                'Remove',
-                style: TextStyle(
-                  fontSize: 70.0,
-                ),
-              ),
-              onPressed: this.onDelete,
-            ),
-          )
+          IconButton(
+            onPressed: this.onDelete,
+            icon: Icon(Icons.clear),
+          ),
         ],
       ),
     );

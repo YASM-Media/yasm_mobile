@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
-import 'package:yasm_mobile/pages/posts/new_post.page.dart';
+import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
@@ -56,7 +56,7 @@ class Home extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed(NewPost.routeName);
+          Navigator.of(context).pushNamed(SelectImages.routeName);
         },
         child: Icon(Icons.add),
       ),

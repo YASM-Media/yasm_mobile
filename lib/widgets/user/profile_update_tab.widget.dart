@@ -15,6 +15,7 @@ import 'package:yasm_mobile/utils/image_picker.util.dart';
 import 'package:yasm_mobile/utils/image_upload.util.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
+import 'package:yasm_mobile/widgets/common/custom_text_area.widget.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
 class ProfileUpdateTab extends StatefulWidget {
@@ -231,7 +232,7 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
                   ],
                   textInputType: TextInputType.text,
                 ),
-                CustomField(
+                CustomTextArea(
                   textFieldController: this._biographyController,
                   label: "Biography",
                   validators: [
