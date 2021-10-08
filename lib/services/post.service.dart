@@ -131,7 +131,7 @@ class PostService {
       }
 
       // Decoding all posts to JSON and converting them to post objects.
-      List<Map<String, dynamic>> rawPosts = json.decode(response.body);
+      List<dynamic> rawPosts = json.decode(response.body);
       List<Post> posts = rawPosts.map((post) => Post.fromJson(post)).toList();
 
       // Returning posts.

@@ -9,9 +9,15 @@ import 'package:yasm_mobile/widgets/posts/post_card.widget.dart';
 
 class PostList extends StatefulWidget {
   final PostFetchType postFetchType;
-  final PostListType postListType = PostListType.NORMAL;
+  final PostListType postListType;
+  final String userId;
 
-  PostList({Key? key, required this.postFetchType}) : super(key: key);
+  PostList({
+    Key? key,
+    this.postFetchType = PostFetchType.BEST,
+    this.postListType = PostListType.NORMAL,
+    this.userId = '',
+  }) : super(key: key);
 
   @override
   _PostListState createState() => _PostListState();
@@ -31,7 +37,9 @@ class _PostListState extends State<PostList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: this._postService.fetchPostsByCategory(widget.postFetchType),
+      future: widget.postListType == PostListType.NORMAL
+          ? this._postService.fetchPostsByCategory(widget.postFetchType)
+          : this._postService.fetchPostsByUser(widget.userId),
       builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
         if (snapshot.hasError) {
           print("ERROR: ${snapshot.error}");

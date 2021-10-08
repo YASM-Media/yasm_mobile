@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/post_options.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
@@ -122,9 +123,19 @@ class PostCard extends StatelessWidget {
         ),
         Consumer<AuthProvider>(
           builder: (context, auth, _) => this.post.user.id == auth.getUser()!.id
-              ? IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.more_vert),
+              ? PopupMenuButton(
+                  child: Icon(Icons.more_vert),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Text("Update Post"),
+                      value: PostOptionsType.UPDATE,
+                    ),
+                    PopupMenuItem(
+                      child: Text("Delete Post"),
+                      value: PostOptionsType.DELETE,
+                    ),
+                  ],
+                  onSelected: (PostOptionsType selectedData) {},
                 )
               : SizedBox(),
         ),

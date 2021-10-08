@@ -1,0 +1,1 @@
+enum PostOptionsType { UPDATE, DELETE }
