@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
@@ -48,6 +49,12 @@ class Home extends StatelessWidget {
                     Navigator.of(context).pushNamed(UserProfile.routeName);
                   },
                   child: Text('User Profile'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(Posts.routeName);
+                  },
+                  child: Text('Posts'),
                 ),
               ],
             ),
