@@ -1,0 +1,4 @@
+enum PostListType {
+  USER,
+  NORMAL,
+}

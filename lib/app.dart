@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:yasm_mobile/dto/post/update_post/update_post.dto.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/common/splash.page.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
+import 'package:yasm_mobile/pages/posts/post_description.page.dart';
+import 'package:yasm_mobile/pages/posts/posts.page.dart';
+import 'package:yasm_mobile/pages/posts/select_images.page.dart';
+import 'package:yasm_mobile/pages/posts/update_post.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 
@@ -53,6 +58,10 @@ class App extends StatelessWidget {
         Auth.routeName: (context) => Auth(),
         UserUpdate.routeName: (context) => UserUpdate(),
         UserProfile.routeName: (context) => UserProfile(),
+        SelectImages.routeName: (context) => SelectImages(),
+        PostDescription.routeName: (context) => PostDescription(),
+        Posts.routeName: (context) => Posts(),
+        UpdatePost.routeName: (context) => UpdatePost(),
       },
     );
   }

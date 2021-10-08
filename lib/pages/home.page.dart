@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/posts/posts.page.dart';
+import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
@@ -48,13 +50,21 @@ class Home extends StatelessWidget {
                   },
                   child: Text('User Profile'),
                 ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(Posts.routeName);
+                  },
+                  child: Text('Posts'),
+                ),
               ],
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).pushNamed(SelectImages.routeName);
+        },
         child: Icon(Icons.add),
       ),
     );
