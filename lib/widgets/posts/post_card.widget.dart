@@ -5,12 +5,31 @@ import 'package:yasm_mobile/constants/post_options.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/pages/posts/update_post.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/services/post.service.dart';
+import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
+import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final Post post;
+  final Function refreshPosts;
 
-  PostCard({Key? key, required this.post}) : super(key: key);
+  PostCard({Key? key, required this.post, required this.refreshPosts})
+      : super(key: key);
+
+  @override
+  _PostCardState createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  late final PostService _postService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this._postService = Provider.of(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +47,45 @@ class PostCard extends StatelessWidget {
     );
   }
 
+  void _onDeletePost(BuildContext context) {
+    SBS.showBottomSheet(
+      context,
+      Wrap(
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text('Are you sure you want to delete this post?'),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () async {
+                  await this._postService.deletePost(widget.post.id);
+
+                  Navigator.of(context).pop();
+
+                  displaySnackBar("Post Deleted!", context);
+
+                  await widget.refreshPosts();
+                },
+                child: Text('YES'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('NO'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Padding _buildBottomRow() {
     return Padding(
       padding: const EdgeInsets.all(10.0),
@@ -36,12 +94,12 @@ class PostCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Liked by ${this.post.likes.length} others",
+            "Liked by ${this.widget.post.likes.length} others",
             style: TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(this.post.text),
+          Text(this.widget.post.text),
         ],
       ),
     );
@@ -72,6 +130,7 @@ class PostCard extends StatelessWidget {
 
   bool _checkIfLiked(AuthProvider auth) {
     return this
+            .widget
             .post
             .likes
             .where((like) => like.user.id == auth.getUser()!.id)
@@ -86,11 +145,11 @@ class PostCard extends StatelessWidget {
         physics: PageScrollPhysics(),
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        itemCount: this.post.images.length,
+        itemCount: this.widget.post.images.length,
         itemBuilder: (context, index) => CachedNetworkImage(
-          imageUrl: this.post.images[index].imageUrl,
+          imageUrl: this.widget.post.images[index].imageUrl,
           width: MediaQuery.of(context).size.width,
-          fit: BoxFit.fitWidth,
+          fit: BoxFit.contain,
           progressIndicatorBuilder: (context, url, downloadProgress) {
             return Center(
               child:
@@ -115,37 +174,42 @@ class PostCard extends StatelessWidget {
             Container(
               margin: EdgeInsets.all(10.0),
               child: ProfilePicture(
-                imageUrl: this.post.user.imageUrl,
+                imageUrl: this.widget.post.user.imageUrl,
                 size: 40,
               ),
             ),
-            Text("${this.post.user.firstName} ${this.post.user.lastName}"),
+            Text(
+                "${this.widget.post.user.firstName} ${this.widget.post.user.lastName}"),
           ],
         ),
         Consumer<AuthProvider>(
-          builder: (context, auth, _) => this.post.user.id == auth.getUser()!.id
-              ? PopupMenuButton(
-                  child: Icon(Icons.more_vert),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: Text("Update Post"),
-                      value: PostOptionsType.UPDATE,
-                    ),
-                    PopupMenuItem(
-                      child: Text("Delete Post"),
-                      value: PostOptionsType.DELETE,
-                    ),
-                  ],
-                  onSelected: (PostOptionsType selectedData) {
-                    if (selectedData == PostOptionsType.UPDATE) {
-                      Navigator.of(context).pushNamed(
-                        UpdatePost.routeName,
-                        arguments: this.post,
-                      );
-                    }
-                  },
-                )
-              : SizedBox(),
+          builder: (context, auth, _) =>
+              this.widget.post.user.id == auth.getUser()!.id
+                  ? PopupMenuButton(
+                      child: Icon(Icons.more_vert),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          child: Text("Update Post"),
+                          value: PostOptionsType.UPDATE,
+                        ),
+                        PopupMenuItem(
+                          child: Text("Delete Post"),
+                          value: PostOptionsType.DELETE,
+                        ),
+                      ],
+                      onSelected: (PostOptionsType selectedData) {
+                        if (selectedData == PostOptionsType.UPDATE) {
+                          Navigator.of(context).pushNamed(
+                            UpdatePost.routeName,
+                            arguments: this.widget.post,
+                          );
+                        }
+                        if (selectedData == PostOptionsType.DELETE) {
+                          this._onDeletePost(context);
+                        }
+                      },
+                    )
+                  : SizedBox(),
         ),
       ],
     );

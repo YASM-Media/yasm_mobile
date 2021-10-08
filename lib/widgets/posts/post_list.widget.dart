@@ -34,6 +34,16 @@ class _PostListState extends State<PostList> {
     this._postService = Provider.of<PostService>(context, listen: false);
   }
 
+  Future<void> refreshPosts() async {
+    List<Post> postsArray = await (widget.postListType == PostListType.NORMAL
+        ? this._postService.fetchPostsByCategory(widget.postFetchType)
+        : this._postService.fetchPostsByUser(widget.userId));
+
+    setState(() {
+      this.posts = postsArray;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -54,7 +64,7 @@ class _PostListState extends State<PostList> {
             itemCount: this.posts.length,
             itemBuilder: (BuildContext context, int index) {
               Post post = this.posts[index];
-              return PostCard(post: post);
+              return PostCard(post: post, refreshPosts: this.refreshPosts,);
             },
           );
         }
