@@ -45,11 +45,11 @@ class _UpdatePostState extends State<UpdatePost> {
     try {
       UpdatePostDto updatePostDto = new UpdatePostDto(
         id: this.post.id,
-        images: this.post.images,
+        images: this.post.images.map((e) => e.imageUrl).toList(),
         text: this._descriptionController.text,
       );
 
-      this._postService.updatePost(updatePostDto);
+      await this._postService.updatePost(updatePostDto);
 
       displaySnackBar("Post Updated!", context);
 

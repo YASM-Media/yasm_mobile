@@ -221,7 +221,7 @@ class PostService {
       // Checking for errors.
       if (response.statusCode >= 400) {
         // Decode the response and throw an exception.
-        Map<String, dynamic> body = json.decode(response.body);
+        dynamic body = json.decode(response.body);
         throw ServerException(message: body["message"]);
       }
     } else {

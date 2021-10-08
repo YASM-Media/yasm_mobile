@@ -9,9 +9,7 @@ part of 'update_post.dto.dart';
 UpdatePostDto _$UpdatePostDtoFromJson(Map<String, dynamic> json) {
   return UpdatePostDto(
     id: json['id'] as String,
-    images: (json['images'] as List<dynamic>)
-        .map((e) => Image.fromJson(e as Map<String, dynamic>))
-        .toList(),
+    images: (json['images'] as List<dynamic>).map((e) => e as String).toList(),
     text: json['text'] as String,
   );
 }

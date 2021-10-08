@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
+import 'package:yasm_mobile/pages/posts/update_post.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
@@ -135,7 +136,14 @@ class PostCard extends StatelessWidget {
                       value: PostOptionsType.DELETE,
                     ),
                   ],
-                  onSelected: (PostOptionsType selectedData) {},
+                  onSelected: (PostOptionsType selectedData) {
+                    if (selectedData == PostOptionsType.UPDATE) {
+                      Navigator.of(context).pushNamed(
+                        UpdatePost.routeName,
+                        arguments: this.post,
+                      );
+                    }
+                  },
                 )
               : SizedBox(),
         ),

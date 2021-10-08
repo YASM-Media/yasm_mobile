@@ -1,12 +1,11 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:yasm_mobile/models/image/image.model.dart';
 
 part 'update_post.dto.g.dart';
 
 @JsonSerializable()
 class UpdatePostDto {
   final String id;
-  final List<Image> images;
+  final List<String> images;
   final String text;
 
   UpdatePostDto({
