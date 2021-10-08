@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -149,7 +151,6 @@ class _PostCardState extends State<PostCard> {
         itemBuilder: (context, index) => CachedNetworkImage(
           imageUrl: this.widget.post.images[index].imageUrl,
           width: MediaQuery.of(context).size.width,
-          fit: BoxFit.contain,
           progressIndicatorBuilder: (context, url, downloadProgress) {
             return Center(
               child:
@@ -160,6 +161,23 @@ class _PostCardState extends State<PostCard> {
             print(error);
             return Icon(Icons.error);
           },
+          imageBuilder: (context, imageProvider) => Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: ClipRRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Image(
+                  image: imageProvider,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
