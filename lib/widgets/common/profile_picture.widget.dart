@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePicture extends StatelessWidget {
@@ -17,10 +18,17 @@ class ProfilePicture extends StatelessWidget {
             )
           : ClipRRect(
               borderRadius: BorderRadius.circular(100.0),
-              child: Image.network(
-                imageUrl,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
                 height: size,
                 width: size,
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: downloadProgress.progress,
+                    ),
+                  );
+                },
               ),
             ),
       radius: size / 2,
