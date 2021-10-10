@@ -46,7 +46,13 @@ class Home extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(UserProfile.routeName);
+                    Navigator.of(context).pushNamed(
+                      UserProfile.routeName,
+                      arguments:
+                          Provider.of<AuthProvider>(context, listen: false)
+                              .getUser()!
+                              .id,
+                    );
                   },
                   child: Text('User Profile'),
                 ),

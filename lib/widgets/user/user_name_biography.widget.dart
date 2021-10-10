@@ -4,7 +4,10 @@ import 'package:yasm_mobile/models/user/user.model.dart';
 class UserNameBiography extends StatelessWidget {
   final User user;
 
-  UserNameBiography({Key? key, required this.user}) : super(key: key);
+  UserNameBiography({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

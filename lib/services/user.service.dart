@@ -20,6 +20,48 @@ class UserService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
 
   /*
+   * Method for fetching the user from server using firebase id token.
+   */
+  Future<User> getUser(String userId) async {
+    // Get the logged in user details.
+    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+
+    // Check if user is not null.
+    if (firebaseUser != null) {
+      // Fetch the ID token for the user.
+      String firebaseAuthToken =
+          await this._firebaseAuth.currentUser!.getIdToken(true);
+
+      // Prepare URL and the auth header.
+      Uri url = Uri.parse("$endpoint/follow-api/get/$userId");
+      Map<String, String> headers = {
+        "Authorization": "Bearer $firebaseAuthToken",
+      };
+
+      // Fetch user details from the server
+      http.Response response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      // Check if the response does not contain any error.
+      if (response.statusCode >= 400) {
+        throw NotLoggedInException(message: "User not logged in.");
+      }
+
+      // Decode the JSON object and build the user object from JSON.
+      Map<String, dynamic> body = json.decode(response.body);
+      User user = User.fromJson(body);
+
+      // Return the user details.
+      return user;
+    } else {
+      // If there is no user logged is using firebase, throw an exception.
+      throw NotLoggedInException(message: "User not logged in.");
+    }
+  }
+
+  /*
    * Update user profile such as name and profile picture.
    * @param updateProfileDto DTO for profile update.
    */
