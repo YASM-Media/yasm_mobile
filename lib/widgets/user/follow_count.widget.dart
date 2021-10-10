@@ -25,7 +25,7 @@ class FollowCount extends StatelessWidget {
             subtitle: Text(userDup.biography),
             trailing: TextButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(
+                Navigator.of(context).pushReplacementNamed(
                   UserProfile.routeName,
                   arguments: userDup.id,
                 );

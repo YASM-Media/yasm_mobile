@@ -13,19 +13,17 @@ class UserProfile extends StatelessWidget {
     String userId = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                UserDetails(
-                  userId: userId,
-                ),
-                PostList(
-                  postListType: PostListType.USER,
-                  userId: userId,
-                ),
-              ],
-            ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              UserDetails(
+                userId: userId,
+              ),
+              PostList(
+                postListType: PostListType.USER,
+                userId: userId,
+              ),
+            ],
           ),
         ),
       ),
