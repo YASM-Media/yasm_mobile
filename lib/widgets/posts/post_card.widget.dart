@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/pages/posts/update_post.page.dart';
+import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/post.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
@@ -187,18 +188,26 @@ class _PostCardState extends State<PostCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Container(
-              margin: EdgeInsets.all(10.0),
-              child: ProfilePicture(
-                imageUrl: this.widget.post.user.imageUrl,
-                size: 40,
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              UserProfile.routeName,
+              arguments: widget.post.user.id,
+            );
+          },
+          child: Row(
+            children: [
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: ProfilePicture(
+                  imageUrl: this.widget.post.user.imageUrl,
+                  size: 40,
+                ),
               ),
-            ),
-            Text(
-                "${this.widget.post.user.firstName} ${this.widget.post.user.lastName}"),
-          ],
+              Text(
+                  "${this.widget.post.user.firstName} ${this.widget.post.user.lastName}"),
+            ],
+          ),
         ),
         Consumer<AuthProvider>(
           builder: (context, auth, _) =>
