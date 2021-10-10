@@ -15,16 +15,18 @@ class UserProfile extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              UserDetails(),
-              Consumer<AuthProvider>(
-                builder: (context, auth, _) => PostList(
+          child: Consumer<AuthProvider>(
+            builder: (context, auth, _) => Column(
+              children: [
+                PostList(
                   postListType: PostListType.USER,
                   userId: auth.getUser()!.id,
                 ),
-              ),
-            ],
+                UserDetails(
+                  userId: auth.getUser()!.id,
+                ),
+              ],
+            ),
           ),
         ),
       ),

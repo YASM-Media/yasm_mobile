@@ -6,8 +6,20 @@ import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 import 'package:yasm_mobile/widgets/user/follow_count.widget.dart';
 import 'package:yasm_mobile/widgets/user/user_name_biography.widget.dart';
 
-class UserDetails extends StatelessWidget {
-  const UserDetails({Key? key}) : super(key: key);
+class UserDetails extends StatefulWidget {
+  final String userId;
+
+  UserDetails({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
+
+  @override
+  _UserDetailsState createState() => _UserDetailsState();
+}
+
+class _UserDetailsState extends State<UserDetails> {
+  late final User user;
 
   @override
   Widget build(BuildContext context) {
@@ -20,27 +32,21 @@ class UserDetails extends StatelessWidget {
             10.0,
           ),
           border: Border.all(
-            color: Colors.white10,
+            color: Colors.white24,
           ),
         ),
-        child: Consumer<AuthProvider>(
-          builder: (context, state, child) {
-            User user = state.getUser()!;
-            return Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-                  child: ProfilePicture(
-                    imageUrl: user.imageUrl,
-                    size: 140,
-                  ),
-                ),
-                UserNameBiography(user: user),
-                FollowCount(user: user),
-              ],
-            );
-          },
-          child: Container(),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+              child: ProfilePicture(
+                imageUrl: user.imageUrl,
+                size: 140,
+              ),
+            ),
+            UserNameBiography(user: user),
+            FollowCount(user: user),
+          ],
         ),
       ),
     );
