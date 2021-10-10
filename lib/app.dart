@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:yasm_mobile/dto/post/update_post/update_post.dto.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/common/splash.page.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
