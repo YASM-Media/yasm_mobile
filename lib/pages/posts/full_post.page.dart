@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/comment_form_type.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
 import 'package:yasm_mobile/widgets/comments/comment_form.widget.dart';
 import 'package:yasm_mobile/widgets/comments/comment_list.widget.dart';
 import 'package:yasm_mobile/widgets/posts/post_card.widget.dart';
+import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 
 class FullPost extends StatefulWidget {
   const FullPost({Key? key}) : super(key: key);
@@ -39,6 +41,24 @@ class _FullPostState extends State<FullPost> {
     });
   }
 
+  void _onEditComment(BuildContext context, Post comment) {
+    SBS.showBottomSheet(
+      context,
+      Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height * 0.5,
+        ),
+        child: CommentForm(
+          refreshPost: this._refreshPost,
+          postId: this._post.id,
+          commentFormType: CommentFormType.UPDATE,
+          text: comment.text,
+          commentId: comment.id,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     this._postId = ModalRoute.of(context)!.settings.arguments as String;
@@ -65,9 +85,11 @@ class _FullPostState extends State<FullPost> {
                   CommentForm(
                     postId: this._post.id,
                     refreshPost: this._refreshPost,
+                    commentFormType: CommentFormType.CREATE,
                   ),
                   CommentList(
                     comments: this._post.comments,
+                    onEditComment: this._onEditComment,
                   ),
                 ],
               ),

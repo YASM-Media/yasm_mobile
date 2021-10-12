@@ -9,10 +9,12 @@ import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
 class Comment extends StatefulWidget {
   final Post comment;
+  final Function onEditComment;
 
   Comment({
     Key? key,
     required this.comment,
+    required this.onEditComment,
   }) : super(key: key);
 
   @override
@@ -99,28 +101,30 @@ class _CommentState extends State<Comment> {
                 ),
               ),
               Consumer<AuthProvider>(
-                builder: (context, auth, _) =>
-                    this.widget.comment.user.id == auth.getUser()!.id
-                        ? PopupMenuButton(
-                            child: Icon(Icons.more_vert),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                child: Text("Update Comment"),
-                                value: PostOptionsType.UPDATE,
-                              ),
-                              PopupMenuItem(
-                                child: Text("Delete Comment"),
-                                value: PostOptionsType.DELETE,
-                              ),
-                            ],
-                            onSelected: (PostOptionsType selectedData) {
-                              if (selectedData == PostOptionsType.UPDATE) {}
-                              if (selectedData == PostOptionsType.DELETE) {}
-                            },
-                          )
-                        : SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.057,
+                builder: (context, auth, _) => this.widget.comment.user.id ==
+                        auth.getUser()!.id
+                    ? PopupMenuButton(
+                        child: Icon(Icons.more_vert),
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            child: Text("Update Comment"),
+                            value: PostOptionsType.UPDATE,
                           ),
+                          PopupMenuItem(
+                            child: Text("Delete Comment"),
+                            value: PostOptionsType.DELETE,
+                          ),
+                        ],
+                        onSelected: (PostOptionsType selectedData) {
+                          if (selectedData == PostOptionsType.UPDATE) {
+                            widget.onEditComment(context, this.widget.comment);
+                          }
+                          if (selectedData == PostOptionsType.DELETE) {}
+                        },
+                      )
+                    : SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.057,
+                      ),
               ),
             ],
           )

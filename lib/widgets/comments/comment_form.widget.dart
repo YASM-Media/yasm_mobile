@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/comment_form_type.constant.dart';
 import 'package:yasm_mobile/dto/comment/create_comment/create_comment.dto.dart';
+import 'package:yasm_mobile/dto/comment/update_comment/update_comment.dto.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
@@ -10,11 +12,17 @@ import 'package:yasm_mobile/widgets/common/custom_text_area.widget.dart';
 class CommentForm extends StatefulWidget {
   final Function refreshPost;
   final String postId;
+  final CommentFormType commentFormType;
+  final String commentId;
+  final String text;
 
   CommentForm({
     Key? key,
     required this.refreshPost,
     required this.postId,
+    required this.commentFormType,
+    this.commentId = '',
+    this.text = '',
   }) : super(key: key);
 
   @override
@@ -33,15 +41,27 @@ class _CommentFormState extends State<CommentForm> {
     }
 
     try {
-      CreateCommentDto createCommentDto = new CreateCommentDto(
-        text: this._commentController.text,
-        postId: widget.postId,
-      );
+      if (widget.commentFormType == CommentFormType.CREATE) {
+        CreateCommentDto createCommentDto = new CreateCommentDto(
+          text: this._commentController.text,
+          postId: widget.postId,
+        );
 
-      this._commentService.createComment(createCommentDto);
-      widget.refreshPost();
+        await this._commentService.createComment(createCommentDto);
+        await widget.refreshPost();
 
-      displaySnackBar("Comment created!", context);
+        displaySnackBar("Comment created!", context);
+      } else {
+        UpdateCommentDto updateCommentDto = new UpdateCommentDto(
+          id: widget.commentId,
+          text: this._commentController.text,
+        );
+
+        await this._commentService.updateComment(updateCommentDto);
+        await widget.refreshPost();
+
+        displaySnackBar("Comment updated!", context);
+      }
     } on ServerException catch (error) {
       print(error.message);
       displaySnackBar("Something went wrong, try again later.", context);
@@ -64,6 +84,7 @@ class _CommentFormState extends State<CommentForm> {
 
   @override
   Widget build(BuildContext context) {
+    this._commentController.text = widget.text;
     return Container(
       margin: EdgeInsets.fromLTRB(0, 10, 0, 20),
       child: Form(
