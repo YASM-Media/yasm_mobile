@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
+import 'package:yasm_mobile/pages/posts/full_post.page.dart';
 import 'package:yasm_mobile/pages/posts/update_post.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
@@ -138,7 +139,13 @@ class _PostCardState extends State<PostCard> {
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(
+              context,
+              FullPost.routeName,
+              arguments: widget.post.id,
+            );
+          },
           icon: Icon(
             Icons.textsms_outlined,
             color: Colors.pink,
@@ -222,7 +229,8 @@ class _PostCardState extends State<PostCard> {
                 ),
               ),
               Text(
-                  "${this.widget.post.user.firstName} ${this.widget.post.user.lastName}"),
+                "${this.widget.post.user.firstName} ${this.widget.post.user.lastName}",
+              ),
             ],
           ),
         ),

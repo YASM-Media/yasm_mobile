@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/common/splash.page.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
+import 'package:yasm_mobile/pages/posts/full_post.page.dart';
 import 'package:yasm_mobile/pages/posts/post_description.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
@@ -61,6 +62,7 @@ class App extends StatelessWidget {
         PostDescription.routeName: (context) => PostDescription(),
         Posts.routeName: (context) => Posts(),
         UpdatePost.routeName: (context) => UpdatePost(),
+        FullPost.routeName: (context) => FullPost(),
       },
     );
   }
