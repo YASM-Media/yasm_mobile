@@ -87,11 +87,11 @@ class _CommentState extends State<Comment> {
             children: [
               IconButton(
                 onPressed: () async {
-                  // if (this._isLiked) {
-                  //   await this._likeService.unlikePost(widget.comment.id);
-                  // } else {
-                  //   await this._likeService.likePost(widget.comment.id);
-                  // }
+                  if (this._isLiked) {
+                    await this._likeService.unlikePost(widget.comment.id);
+                  } else {
+                    await this._likeService.likePost(widget.comment.id);
+                  }
 
                   setState(() {
                     this._isLiked = !this._isLiked;
