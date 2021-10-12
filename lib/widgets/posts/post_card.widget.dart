@@ -8,6 +8,7 @@ import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/pages/posts/update_post.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/services/like.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
@@ -26,12 +27,20 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   late final PostService _postService;
+  late final LikeService _likeService;
+
+  late bool _isLiked;
 
   @override
   void initState() {
     super.initState();
 
-    this._postService = Provider.of(context, listen: false);
+    this._postService = Provider.of<PostService>(context, listen: false);
+    this._likeService = Provider.of<LikeService>(context, listen: false);
+
+    this._isLiked = !(this._checkIfNotLiked(
+      Provider.of<AuthProvider>(context, listen: false),
+    ));
   }
 
   @override
@@ -111,13 +120,21 @@ class _PostCardState extends State<PostCard> {
   Widget _buildActions() {
     return Row(
       children: [
-        Consumer<AuthProvider>(
-          builder: (context, auth, _) => IconButton(
-            onPressed: () {},
-            icon: Icon(
-              _checkIfLiked(auth) ? Icons.favorite_border : Icons.favorite,
-              color: Colors.pink,
-            ),
+        IconButton(
+          onPressed: () async {
+            if (this._isLiked) {
+              await this._likeService.unlikePost(widget.post.id);
+            } else {
+              await this._likeService.likePost(widget.post.id);
+            }
+
+            setState(() {
+              this._isLiked = !this._isLiked;
+            });
+          },
+          icon: Icon(
+            this._isLiked ? Icons.favorite : Icons.favorite_border,
+            color: Colors.pink,
           ),
         ),
         IconButton(
@@ -131,7 +148,7 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  bool _checkIfLiked(AuthProvider auth) {
+  bool _checkIfNotLiked(AuthProvider auth) {
     return this
             .widget
             .post

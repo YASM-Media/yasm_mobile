@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:yasm_mobile/services/follow.service.dart';
+import 'package:yasm_mobile/services/like.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 
@@ -48,6 +49,9 @@ class _RootState extends State<Root> {
               ),
               Provider<FollowService>(
                 create: (context) => FollowService(),
+              ),
+              Provider<LikeService>(
+                create: (context) => LikeService(),
               ),
             ],
             child: App(),
