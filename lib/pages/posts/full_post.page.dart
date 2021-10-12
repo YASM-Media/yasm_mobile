@@ -21,6 +21,8 @@ class _FullPostState extends State<FullPost> {
   late final PostService _postService;
   late final CommentService _commentService;
 
+  String _postId = '';
+
   @override
   void initState() {
     super.initState();
@@ -29,15 +31,23 @@ class _FullPostState extends State<FullPost> {
     this._commentService = Provider.of<CommentService>(context, listen: false);
   }
 
+  Future<void> _refreshPost() async {
+    Post newPost = await this._postService.fetchPostById(_postId);
+
+    setState(() {
+      this._post = newPost;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    String postId = ModalRoute.of(context)!.settings.arguments as String;
+    this._postId = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         title: Text('Post'),
       ),
       body: FutureBuilder(
-        future: this._postService.fetchPostById(postId),
+        future: this._postService.fetchPostById(this._postId),
         builder: (BuildContext context, AsyncSnapshot<Post> snapshot) {
           if (snapshot.hasError) {
             print(snapshot.error);
@@ -50,9 +60,12 @@ class _FullPostState extends State<FullPost> {
                 children: [
                   PostCard(
                     post: this._post,
-                    refreshPosts: () {},
+                    refreshPosts: this._refreshPost,
                   ),
-                  CommentForm(),
+                  CommentForm(
+                    postId: this._post.id,
+                    refreshPost: this._refreshPost,
+                  ),
                   CommentList(
                     comments: this._post.comments,
                   ),
