@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/comment_form_type.constant.dart';
+import 'package:yasm_mobile/dto/comment/delete_comment/delete_comment.dto.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
+import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/comments/comment_form.widget.dart';
 import 'package:yasm_mobile/widgets/comments/comment_list.widget.dart';
 import 'package:yasm_mobile/widgets/posts/post_card.widget.dart';
@@ -59,6 +61,50 @@ class _FullPostState extends State<FullPost> {
     );
   }
 
+  void _onDeleteComment(BuildContext context, Post comment) {
+    SBS.showBottomSheet(
+      context,
+      Wrap(
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text('Are you sure you want to delete this comment?'),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () async {
+                  DeleteCommentDto deleteCommentDto = new DeleteCommentDto(
+                    postId: this._post.id,
+                    commentId: comment.id,
+                  );
+
+                  await this._commentService.deleteComment(deleteCommentDto);
+
+                  Navigator.of(context).pop();
+
+                  displaySnackBar("Comment Deleted!", context);
+
+                  await this._refreshPost();
+                },
+                child: Text('YES'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('NO'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     this._postId = ModalRoute.of(context)!.settings.arguments as String;
@@ -90,6 +136,7 @@ class _FullPostState extends State<FullPost> {
                   CommentList(
                     comments: this._post.comments,
                     onEditComment: this._onEditComment,
+                    onDeleteComment: this._onDeleteComment,
                   ),
                 ],
               ),

@@ -60,6 +60,8 @@ class _CommentFormState extends State<CommentForm> {
         await this._commentService.updateComment(updateCommentDto);
         await widget.refreshPost();
 
+        Navigator.of(context).pop();
+
         displaySnackBar("Comment updated!", context);
       }
     } on ServerException catch (error) {

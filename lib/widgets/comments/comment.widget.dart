@@ -10,11 +10,13 @@ import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 class Comment extends StatefulWidget {
   final Post comment;
   final Function onEditComment;
+  final Function onDeleteComment;
 
   Comment({
     Key? key,
     required this.comment,
     required this.onEditComment,
+    required this.onDeleteComment,
   }) : super(key: key);
 
   @override
@@ -85,11 +87,11 @@ class _CommentState extends State<Comment> {
             children: [
               IconButton(
                 onPressed: () async {
-                  if (this._isLiked) {
-                    await this._likeService.unlikePost(widget.comment.id);
-                  } else {
-                    await this._likeService.likePost(widget.comment.id);
-                  }
+                  // if (this._isLiked) {
+                  //   await this._likeService.unlikePost(widget.comment.id);
+                  // } else {
+                  //   await this._likeService.likePost(widget.comment.id);
+                  // }
 
                   setState(() {
                     this._isLiked = !this._isLiked;
@@ -119,7 +121,10 @@ class _CommentState extends State<Comment> {
                           if (selectedData == PostOptionsType.UPDATE) {
                             widget.onEditComment(context, this.widget.comment);
                           }
-                          if (selectedData == PostOptionsType.DELETE) {}
+                          if (selectedData == PostOptionsType.DELETE) {
+                            widget.onDeleteComment(
+                                context, this.widget.comment);
+                          }
                         },
                       )
                     : SizedBox(
