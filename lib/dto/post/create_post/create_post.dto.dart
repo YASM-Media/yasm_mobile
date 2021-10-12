@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:yasm_mobile/models/image/image.model.dart';
 
 part 'create_post.dto.g.dart';
 

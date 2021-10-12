@@ -142,6 +142,48 @@ class PostService {
     }
   }
 
+  Future<Post> fetchPostById(String postId) async {
+    // Fetch the currently logged in user.
+    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+
+    // Check is the user exists.
+    if (firebaseUser != null) {
+      // Fetching the ID token for authentication.
+      String firebaseAuthToken = await firebaseUser.getIdToken();
+
+      // Preparing the URL for the server request.
+      Uri url = Uri.parse("$endpoint/posts/get/post/$postId");
+
+      // Preparing the headers for the request.
+      Map<String, String> headers = {
+        "Authorization": "Bearer $firebaseAuthToken",
+      };
+
+      // Fetching posts from the server.
+      http.Response response = await http.get(
+        url,
+        headers: headers,
+      );
+
+      // Checking for errors.
+      if (response.statusCode >= 400) {
+        // Decode the response and throw an exception.
+        Map<String, dynamic> body = json.decode(response.body);
+        throw ServerException(message: body["message"]);
+      }
+
+      // Decoding all posts to JSON and converting them to post objects.
+      dynamic rawPost = json.decode(response.body);
+      Post post = Post.fromJson(rawPost);
+
+      // Returning posts.
+      return post;
+    } else {
+      // If there is no user logged is using firebase, throw an exception.
+      throw NotLoggedInException(message: "User not logged in.");
+    }
+  }
+
   /*
    * Create a new post with images.
    * @param createPostDto DTO for creating posts
