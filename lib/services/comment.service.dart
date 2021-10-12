@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/dto/comment/create_comment/create_comment.dto.dart';
+import 'package:yasm_mobile/dto/comment/delete_comment/delete_comment.dto.dart';
 import 'package:yasm_mobile/dto/comment/update_comment/update_comment.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
