@@ -3,6 +3,7 @@ import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
+import 'package:yasm_mobile/widgets/user/user_list.widget.dart';
 
 class FollowCount extends StatelessWidget {
   final User user;
@@ -12,28 +13,8 @@ class FollowCount extends StatelessWidget {
   void _showUserList(BuildContext context, List<User> users) {
     SBS.showBottomSheet(
       context,
-      ListView.builder(
-        itemCount: users.length,
-        itemBuilder: (BuildContext context, int index) {
-          User userDup = users[index];
-          return ListTile(
-            leading: ProfilePicture(
-              imageUrl: userDup.imageUrl,
-              size: 50,
-            ),
-            title: Text("${userDup.firstName} ${userDup.lastName}"),
-            subtitle: Text(userDup.biography),
-            trailing: TextButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacementNamed(
-                  UserProfile.routeName,
-                  arguments: userDup.id,
-                );
-              },
-              child: Text('PROFILE'),
-            ),
-          );
-        },
+      UserList(
+        users: users,
       ),
     );
   }
