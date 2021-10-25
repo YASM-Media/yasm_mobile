@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
-import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
-import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 import 'package:yasm_mobile/widgets/user/user_list.widget.dart';
 
 class FollowCount extends StatelessWidget {

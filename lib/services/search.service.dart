@@ -12,6 +12,10 @@ class SearchService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
 
   Future<List<User>> searchForUser(String searchQuery) async {
+    if (searchQuery.length == 0) {
+      return [];
+    }
+
     // Fetch the currently logged in user.
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
 

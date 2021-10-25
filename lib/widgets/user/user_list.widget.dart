@@ -11,6 +11,8 @@ class UserList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       itemCount: users.length,
       itemBuilder: (BuildContext context, int index) {
         User userDup = users[index];
