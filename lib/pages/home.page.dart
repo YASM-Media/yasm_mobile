@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
+import 'package:yasm_mobile/pages/search/search.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
-import 'package:yasm_mobile/services/search.service.dart';
 
 class Home extends StatelessWidget {
   static const routeName = "/home";
@@ -15,7 +15,6 @@ class Home extends StatelessWidget {
   Home({Key? key}) : super(key: key);
 
   final AuthService _authService = AuthService();
-  final SearchService _searchService = SearchService();
 
   Future<void> logout(context) async {
     await _authService.logout();
@@ -63,6 +62,12 @@ class Home extends StatelessWidget {
                     Navigator.of(context).pushNamed(Posts.routeName);
                   },
                   child: Text('Posts'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(Search.routeName);
+                  },
+                  child: Text('Search'),
                 ),
               ],
             ),
