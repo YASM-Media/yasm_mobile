@@ -64,12 +64,6 @@ class Home extends StatelessWidget {
                   },
                   child: Text('Posts'),
                 ),
-                TextButton(
-                  onPressed: () {
-                    _searchService.searchForUser("varun");
-                  },
-                  child: Text('timepass'),
-                ),
               ],
             ),
           ],
