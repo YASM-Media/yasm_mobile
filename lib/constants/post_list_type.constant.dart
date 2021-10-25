@@ -1,4 +1,1 @@
-enum PostListType {
-  USER,
-  NORMAL,
-}
+enum PostListType { USER, NORMAL, SEARCH }

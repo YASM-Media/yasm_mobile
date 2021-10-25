@@ -1,22 +1,24 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
 import 'package:yasm_mobile/constants/post_list_type.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/services/post.service.dart';
+import 'package:yasm_mobile/services/search.service.dart';
 import 'package:yasm_mobile/widgets/posts/post_card.widget.dart';
 
 class PostList extends StatefulWidget {
   final PostFetchType postFetchType;
   final PostListType postListType;
   final String userId;
+  final String searchQuery;
 
   PostList({
     Key? key,
     this.postFetchType = PostFetchType.BEST,
     this.postListType = PostListType.NORMAL,
     this.userId = '',
+    this.searchQuery = '',
   }) : super(key: key);
 
   @override
@@ -25,6 +27,7 @@ class PostList extends StatefulWidget {
 
 class _PostListState extends State<PostList> {
   late final PostService _postService;
+  late final SearchService _searchService;
   late List<Post> posts;
 
   @override
@@ -32,6 +35,7 @@ class _PostListState extends State<PostList> {
     super.initState();
 
     this._postService = Provider.of<PostService>(context, listen: false);
+    this._searchService = Provider.of<SearchService>(context, listen: false);
   }
 
   Future<void> refreshPosts() async {
@@ -49,7 +53,9 @@ class _PostListState extends State<PostList> {
     return FutureBuilder(
       future: widget.postListType == PostListType.NORMAL
           ? this._postService.fetchPostsByCategory(widget.postFetchType)
-          : this._postService.fetchPostsByUser(widget.userId),
+          : widget.postListType == PostListType.USER
+              ? this._postService.fetchPostsByUser(widget.userId)
+              : this._searchService.searchForPosts(widget.searchQuery),
       builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
         if (snapshot.hasError) {
           print("ERROR: ${snapshot.error}");
@@ -64,12 +70,19 @@ class _PostListState extends State<PostList> {
             itemCount: this.posts.length,
             itemBuilder: (BuildContext context, int index) {
               Post post = this.posts[index];
-              return PostCard(post: post, refreshPosts: this.refreshPosts,);
+              return PostCard(
+                post: post,
+                refreshPosts: this.refreshPosts,
+              );
             },
           );
         }
 
-        return CircularProgressIndicator();
+        return Column(
+          children: [
+            CircularProgressIndicator(),
+          ],
+        );
       },
     );
   }
