@@ -10,6 +10,7 @@ import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/follow.service.dart';
 import 'package:yasm_mobile/services/like.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
+import 'package:yasm_mobile/services/search.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 
 void main() {
@@ -56,6 +57,9 @@ class _RootState extends State<Root> {
               ),
               Provider<CommentService>(
                 create: (context) => CommentService(),
+              ),
+              Provider<SearchService>(
+                create: (context) => SearchService(),
               ),
             ],
             child: App(),

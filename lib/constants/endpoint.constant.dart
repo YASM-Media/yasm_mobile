@@ -1,1 +1,1 @@
-const endpoint = "http://127.0.0.1:5000/v1/api";
+const endpoint = "http://10.0.2.2:5000/v1/api";

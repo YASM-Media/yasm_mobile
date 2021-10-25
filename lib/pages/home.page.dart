@@ -7,6 +7,7 @@ import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
+import 'package:yasm_mobile/services/search.service.dart';
 
 class Home extends StatelessWidget {
   static const routeName = "/home";
@@ -14,6 +15,7 @@ class Home extends StatelessWidget {
   Home({Key? key}) : super(key: key);
 
   final AuthService _authService = AuthService();
+  final SearchService _searchService = SearchService();
 
   Future<void> logout(context) async {
     await _authService.logout();
@@ -61,6 +63,12 @@ class Home extends StatelessWidget {
                     Navigator.of(context).pushNamed(Posts.routeName);
                   },
                   child: Text('Posts'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _searchService.searchForUser("varun");
+                  },
+                  child: Text('timepass'),
                 ),
               ],
             ),
