@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:yasm_mobile/constants/post_list_type.constant.dart';
-import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
 import 'package:yasm_mobile/widgets/posts/post_list.widget.dart';
 import 'package:yasm_mobile/widgets/search/user_search.widget.dart';
 
@@ -13,44 +12,77 @@ class SearchResults extends StatefulWidget {
   _SearchResultsState createState() => _SearchResultsState();
 }
 
-class _SearchResultsState extends State<SearchResults> {
+class _SearchResultsState extends State<SearchResults>
+    with SingleTickerProviderStateMixin {
   String _searchQuery = '';
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this._tabController = new TabController(length: 2, vsync: this);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Search'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  labelText: 'Search',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(),
-                  ),
-                ),
-                onChanged: (String text) {
-                  setState(() {
-                    this._searchQuery = text;
-                  });
-                },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).size.height * 0.2,
+        ),
+        child: AppBar(
+          toolbarHeight: MediaQuery.of(context).size.height * 0.2,
+          automaticallyImplyLeading: false,
+          title: TextFormField(
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              labelText: 'Search',
+              border: OutlineInputBorder(
+                borderSide: BorderSide(),
               ),
             ),
-            // PostList(
-            //   postListType: PostListType.SEARCH,
-            //   searchQuery: this._searchQuery,
-            // ),
-            UserSearch(
+            onChanged: (String text) {
+              setState(() {
+                this._searchQuery = text;
+              });
+            },
+          ),
+          bottom: TabBar(
+            controller: this._tabController,
+            indicatorColor: Colors.pink,
+            tabs: [
+              Tab(
+                child: Text(
+                  'Users',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Tab(
+                child: Text(
+                  'Posts',
+                  textAlign: TextAlign.center,
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      body: TabBarView(
+        controller: this._tabController,
+        children: [
+          SingleChildScrollView(
+            child: UserSearch(
               searchQuery: this._searchQuery,
             ),
-          ],
-        ),
+          ),
+          SingleChildScrollView(
+            child: PostList(
+              postListType: PostListType.SEARCH,
+              searchQuery: this._searchQuery,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -44,7 +44,11 @@ class _UserSearchState extends State<UserSearch> {
           );
         }
 
-        return CircularProgressIndicator();
+        return Column(
+          children: [
+            CircularProgressIndicator(),
+          ],
+        );
       },
     );
   }

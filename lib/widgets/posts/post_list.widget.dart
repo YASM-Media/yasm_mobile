@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
@@ -79,7 +78,11 @@ class _PostListState extends State<PostList> {
           );
         }
 
-        return CircularProgressIndicator();
+        return Column(
+          children: [
+            CircularProgressIndicator(),
+          ],
+        );
       },
     );
   }
