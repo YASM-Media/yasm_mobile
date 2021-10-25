@@ -4,7 +4,6 @@ import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
-import 'package:yasm_mobile/pages/search/search_results.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
@@ -69,12 +68,6 @@ class Home extends StatelessWidget {
                     Navigator.of(context).pushNamed(Search.routeName);
                   },
                   child: Text('Search'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(SearchResults.routeName);
-                  },
-                  child: Text('Search Results'),
                 ),
               ],
             ),
