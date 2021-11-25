@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:yasm_mobile/constants/post_list_type.constant.dart';
 import 'package:yasm_mobile/widgets/posts/post_list.widget.dart';
 import 'package:yasm_mobile/widgets/search/user_search.widget.dart';
@@ -63,21 +64,44 @@ class _SearchResultsState extends State<SearchResults>
           ),
         ),
       ),
-      body: TabBarView(
-        controller: this._tabController,
-        children: [
-          SingleChildScrollView(
-            child: UserSearch(
-              searchQuery: this._searchQuery,
-            ),
-          ),
-          SingleChildScrollView(
-            child: PostList(
-              postListType: PostListType.SEARCH,
-              searchQuery: this._searchQuery,
-            ),
-          ),
-        ],
+      body: OfflineBuilder(
+        connectivityBuilder: (
+          BuildContext context,
+          ConnectivityResult connectivity,
+          Widget _,
+        ) {
+          final bool connected = connectivity != ConnectivityResult.none;
+
+          return connected
+              ? TabBarView(
+                  controller: this._tabController,
+                  children: [
+                    SingleChildScrollView(
+                      child: UserSearch(
+                        searchQuery: this._searchQuery,
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      child: PostList(
+                        postListType: PostListType.SEARCH,
+                        searchQuery: this._searchQuery,
+                      ),
+                    ),
+                  ],
+                )
+              : TabBarView(
+                  controller: this._tabController,
+                  children: [
+                    Center(
+                      child: Text('You are offline'),
+                    ),
+                    Center(
+                      child: Text('You are offline'),
+                    ),
+                  ],
+                );
+        },
+        child: SizedBox(),
       ),
     );
   }
