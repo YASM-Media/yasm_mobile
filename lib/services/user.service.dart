@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
