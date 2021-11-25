@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
-import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/like.service.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
@@ -25,7 +24,6 @@ class Comment extends StatefulWidget {
 
 class _CommentState extends State<Comment> {
   late final LikeService _likeService;
-  late final CommentService _commentService;
   late bool _isLiked;
 
   @override
@@ -33,7 +31,6 @@ class _CommentState extends State<Comment> {
     super.initState();
 
     this._likeService = Provider.of<LikeService>(context, listen: false);
-    this._commentService = Provider.of<CommentService>(context, listen: false);
 
     this._isLiked = !(this._checkIfNotLiked(
       Provider.of<AuthProvider>(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
 import 'package:yasm_mobile/dto/auth/register_user/register_user.dto.dart';
-import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/user_not_found.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
+import 'package:yasm_mobile/exceptions/common/general.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
@@ -87,9 +89,10 @@ class _AuthState extends State<Auth> {
         );
       }
       // Handle errors gracefully.
-      on UserAlreadyExistsException catch (error) {
+      on ServerException catch (error) {
         displaySnackBar(error.message, context);
-      } catch (error) {
+      } catch (error, stackTrace) {
+        log.e(error, error, stackTrace);
         displaySnackBar(
           "Something went wrong on our side! Please try again",
           context,
@@ -100,19 +103,15 @@ class _AuthState extends State<Auth> {
     else if (_authFormType == AuthFormType.Login) {
       try {
         // Send login details.
-        User? user = await _authService.login(LoginUser.fromJson({
+        User user = await _authService.login(LoginUser.fromJson({
           "email": _emailAddressController.text,
           "password": _passwordController.text,
         }));
+        // Save user details in provider.
+        Provider.of<AuthProvider>(context, listen: false).saveUser(user);
 
-        // Check if user details are returned.
-        if (user != null) {
-          // Save user details in provider.
-          Provider.of<AuthProvider>(context, listen: false).saveUser(user);
-
-          // Navigate to home page.
-          Navigator.of(context).pushReplacementNamed(Home.routeName);
-        }
+        // Navigate to home page.
+        Navigator.of(context).pushReplacementNamed(Home.routeName);
       }
       // Handle errors gracefully.
       on UserNotFoundException catch (error) {
@@ -125,7 +124,18 @@ class _AuthState extends State<Auth> {
           error.message,
           context,
         );
-      } catch (error) {
+      } on ServerException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } on GeneralException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } catch (error, stackTrace) {
+        log.e(error, error, stackTrace);
         displaySnackBar(
           "Something went wrong on our side! Please try again",
           context,
@@ -147,7 +157,13 @@ class _AuthState extends State<Auth> {
           error.message,
           context,
         );
-      } catch (error) {
+      } on GeneralException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } catch (error, stackTrace) {
+        log.e(error, error, stackTrace);
         displaySnackBar(
           "Something went wrong on our side! Please try again",
           context,

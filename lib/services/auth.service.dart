@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
@@ -12,9 +11,9 @@ import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
 import 'package:yasm_mobile/dto/auth/register_user/register_user.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
-import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/user_not_found.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
+import 'package:yasm_mobile/exceptions/common/general.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 
@@ -120,11 +119,14 @@ class AuthService {
         )
         .timeout(new Duration(seconds: 10));
 
-    // Check for errors and then throw an error.
-    if (response.statusCode == 422) {
-      // Get the server response decoded from JSON form.
+    // Check if the response does not contain any error.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
       Map<String, dynamic> body = json.decode(response.body);
-      throw UserAlreadyExistsException(message: body["message"]);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
     }
   }
 
@@ -132,7 +134,7 @@ class AuthService {
    * Method to log the user in the application.
    * @param loginUser DTO for user login
    */
-  Future<User?> login(LoginUser loginUser) async {
+  Future<User> login(LoginUser loginUser) async {
     try {
       // Log the user in with firebase using their credentials.
       await _firebaseAuth.signInWithEmailAndPassword(
@@ -142,7 +144,7 @@ class AuthService {
 
       // Return the user details from server.
       return await this.getLoggedInUser();
-    } on FA.FirebaseAuthException catch (error) {
+    } on FA.FirebaseAuthException catch (error, stackTrace) {
       // Firebase Error: If the user does not exist.
       if (error.code == 'user-not-found') {
         throw UserNotFoundException(
@@ -154,7 +156,16 @@ class AuthService {
         throw WrongPasswordException(
           message: 'Wrong password provided for the specified user account.',
         );
+      } else {
+        log.e(error.code, error.code, stackTrace);
+        throw GeneralException(
+            message: 'Something went wrong, please try again later.');
       }
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      throw GeneralException(
+          message: 'Something went wrong, please try again later.');
     }
   }
 
@@ -173,6 +184,11 @@ class AuthService {
           message: 'No user found for that email.',
         );
       }
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      throw GeneralException(
+          message: 'Something went wrong, please try again later.');
     }
   }
 
@@ -182,8 +198,11 @@ class AuthService {
   Future<void> logout() async {
     try {
       await _firebaseAuth.signOut();
-    } catch (error) {
-      print(error);
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      throw GeneralException(
+          message: 'Something went wrong, please try again later.');
     }
   }
 }
