@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart' as FA;
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/dto/user/update_email/update_email.dto.dart';
 import 'package:yasm_mobile/dto/user/update_password/update_password.dto.dart';
@@ -18,6 +20,17 @@ import 'package:yasm_mobile/models/user/user.model.dart';
  */
 class UserService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+  final Box<User> _yasmUserDb = Hive.box<User>("yasm-user");
+
+  final Logger log = new Logger(
+    printer: new PrettyPrinter(
+      methodCount: 0,
+      errorMethodCount: 10,
+      colors: true,
+      printEmojis: true,
+      printTime: true,
+    ),
+  );
 
   /*
    * Method for fetching the user from server using firebase id token.
@@ -108,6 +121,10 @@ class UserService {
       user.firstName = updateProfileDto.firstName;
       user.lastName = updateProfileDto.lastName;
       user.biography = updateProfileDto.biography;
+
+      log.i("Saving user to Hive DB");
+      this._yasmUserDb.put("logged-in-user", user);
+      log.i("Saved user to Hive DB");
 
       return user;
     } else {
@@ -204,6 +221,10 @@ class UserService {
 
       // Update the user state and return the object.
       user.emailAddress = updateEmailDto.emailAddress;
+
+      log.i("Saving user to Hive DB");
+      this._yasmUserDb.put("logged-in-user", user);
+      log.i("Saved user to Hive DB");
 
       return user;
     } else {

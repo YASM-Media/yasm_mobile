@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:yasm_mobile/constants/post_list_type.constant.dart';
 import 'package:yasm_mobile/widgets/posts/post_list.widget.dart';
@@ -29,19 +30,13 @@ class _SearchResultsState extends State<SearchResults>
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.2,
+          MediaQuery.of(context).size.height * 0.15,
         ),
         child: AppBar(
           toolbarHeight: MediaQuery.of(context).size.height * 0.2,
           automaticallyImplyLeading: false,
-          title: TextFormField(
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              labelText: 'Search',
-              border: OutlineInputBorder(
-                borderSide: BorderSide(),
-              ),
-            ),
+          title: CupertinoSearchTextField(
+            style: TextStyle(color: Colors.white),
             onChanged: (String text) {
               setState(() {
                 this._searchQuery = text;

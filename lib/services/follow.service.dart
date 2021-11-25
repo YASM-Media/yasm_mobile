@@ -30,8 +30,6 @@ class FollowService {
         headers: headers,
       ).timeout(new Duration(seconds: 10));
 
-      print(json.decode(response.body));
-
       // Check if the response does not contain any error.
       if (response.statusCode >= 400) {
         print(json.decode(response.body));
@@ -64,8 +62,6 @@ class FollowService {
         url,
         headers: headers,
       ).timeout(new Duration(seconds: 10));
-
-      print(json.decode(response.body));
 
       // Check if the response does not contain any error.
       if (response.statusCode >= 400) {
