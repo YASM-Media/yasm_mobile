@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/app.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
@@ -21,6 +22,7 @@ Future<void> main() async {
   await Hive.initFlutter();
 
   Hive.registerAdapter<User>(new UserAdapter());
+  Hive.registerAdapter<Post>(new PostAdapter());
 
   await Hive.openBox('yasm-user');
   await Hive.openBox('yasm-posts');
