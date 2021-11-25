@@ -39,11 +39,30 @@ class _FullPostState extends State<FullPost> {
   }
 
   Future<void> _refreshPost() async {
-    Post newPost = await this._postService.fetchPostById(_postId);
+    try {
+      Post newPost = await this._postService.fetchPostById(_postId);
 
-    setState(() {
-      this._post = newPost;
-    });
+      setState(() {
+        this._post = newPost;
+      });
+    } on ServerException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } on NotLoggedInException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      displaySnackBar(
+        "Something went wrong, please try again later.",
+        context,
+      );
+    }
   }
 
   void _onEditComment(BuildContext context, Post comment) {
@@ -133,7 +152,9 @@ class _FullPostState extends State<FullPost> {
         future: this._postService.fetchPostById(this._postId),
         builder: (BuildContext context, AsyncSnapshot<Post> snapshot) {
           if (snapshot.hasError) {
-            print(snapshot.error);
+            log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
+
+            return Text("Something went wrong, please try again later.");
           }
 
           if (snapshot.connectionState == ConnectionState.done) {

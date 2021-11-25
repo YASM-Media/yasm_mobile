@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
 import 'package:yasm_mobile/dto/post/create_post/create_post.dto.dart';
 import 'package:yasm_mobile/dto/post/update_post/update_post.dto.dart';
@@ -59,41 +60,47 @@ class PostService {
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
     // Check is the user exists.
-    if (firebaseUser != null) {
-      // Fetching the ID token for authentication.
-      String firebaseAuthToken = await firebaseUser.getIdToken();
-
-      // Preparing the URL for the server request.
-      Uri url = Uri.parse(this._generatePostFetchingUrl(postFetchType));
-
-      // Preparing the headers for the request.
-      Map<String, String> headers = {
-        "Authorization": "Bearer $firebaseAuthToken",
-      };
-
-      // Fetching posts from the server.
-      http.Response response = await http.get(
-        url,
-        headers: headers,
-      ).timeout(new Duration(seconds: 10));
-
-      // Checking for errors.
-      if (response.statusCode >= 400) {
-        // Decode the response and throw an exception.
-        Map<String, dynamic> body = json.decode(response.body);
-        throw ServerException(message: body["message"]);
-      }
-
-      // Decoding all posts to JSON and converting them to post objects.
-      List<dynamic> rawPosts = json.decode(response.body);
-      List<Post> posts = rawPosts.map((post) => Post.fromJson(post)).toList();
-
-      // Returning posts.
-      return posts;
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
+    if (firebaseUser == null) {
       throw NotLoggedInException(message: "User not logged in.");
     }
+    // Fetching the ID token for authentication.
+    String firebaseAuthToken = await firebaseUser.getIdToken();
+
+    // Preparing the URL for the server request.
+    Uri url = Uri.parse(this._generatePostFetchingUrl(postFetchType));
+
+    // Preparing the headers for the request.
+    Map<String, String> headers = {
+      "Authorization": "Bearer $firebaseAuthToken",
+    };
+
+    // Fetching posts from the server.
+    http.Response response = await http
+        .get(
+          url,
+          headers: headers,
+        )
+        .timeout(new Duration(seconds: 10));
+
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
+    }
+
+    // Decoding all posts to JSON and converting them to post objects.
+    List<dynamic> rawPosts = json.decode(response.body);
+    List<Post> posts = rawPosts.map((post) => Post.fromJson(post)).toList();
+
+    // Returning posts.
+    return posts;
   }
 
   /*
@@ -105,41 +112,48 @@ class PostService {
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
     // Check is the user exists.
-    if (firebaseUser != null) {
-      // Fetching the ID token for authentication.
-      String firebaseAuthToken = await firebaseUser.getIdToken();
-
-      // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/posts/get/user/$userId");
-
-      // Preparing the headers for the request.
-      Map<String, String> headers = {
-        "Authorization": "Bearer $firebaseAuthToken",
-      };
-
-      // Fetching posts from the server.
-      http.Response response = await http.get(
-        url,
-        headers: headers,
-      ).timeout(new Duration(seconds: 10));
-
-      // Checking for errors.
-      if (response.statusCode >= 400) {
-        // Decode the response and throw an exception.
-        Map<String, dynamic> body = json.decode(response.body);
-        throw ServerException(message: body["message"]);
-      }
-
-      // Decoding all posts to JSON and converting them to post objects.
-      List<dynamic> rawPosts = json.decode(response.body);
-      List<Post> posts = rawPosts.map((post) => Post.fromJson(post)).toList();
-
-      // Returning posts.
-      return posts;
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
+    if (firebaseUser == null) {
       throw NotLoggedInException(message: "User not logged in.");
     }
+    // Fetching the ID token for authentication.
+    String firebaseAuthToken = await firebaseUser.getIdToken();
+
+    // Preparing the URL for the server request.
+    Uri url = Uri.parse("$ENDPOINT/posts/get/user/$userId");
+
+    // Preparing the headers for the request.
+    Map<String, String> headers = {
+      "Authorization": "Bearer $firebaseAuthToken",
+    };
+
+    // Fetching posts from the server.
+    http.Response response = await http
+        .get(
+          url,
+          headers: headers,
+        )
+        .timeout(new Duration(seconds: 10));
+
+    // Checking for errors.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
+    }
+
+    // Decoding all posts to JSON and converting them to post objects.
+    List<dynamic> rawPosts = json.decode(response.body);
+    List<Post> posts = rawPosts.map((post) => Post.fromJson(post)).toList();
+
+    // Returning posts.
+    return posts;
   }
 
   Future<Post> fetchPostById(String postId) async {
@@ -147,41 +161,48 @@ class PostService {
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
     // Check is the user exists.
-    if (firebaseUser != null) {
-      // Fetching the ID token for authentication.
-      String firebaseAuthToken = await firebaseUser.getIdToken();
-
-      // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/posts/get/post/$postId");
-
-      // Preparing the headers for the request.
-      Map<String, String> headers = {
-        "Authorization": "Bearer $firebaseAuthToken",
-      };
-
-      // Fetching posts from the server.
-      http.Response response = await http.get(
-        url,
-        headers: headers,
-      ).timeout(new Duration(seconds: 10));
-
-      // Checking for errors.
-      if (response.statusCode >= 400) {
-        // Decode the response and throw an exception.
-        Map<String, dynamic> body = json.decode(response.body);
-        throw ServerException(message: body["message"]);
-      }
-
-      // Decoding all posts to JSON and converting them to post objects.
-      dynamic rawPost = json.decode(response.body);
-      Post post = Post.fromJson(rawPost);
-
-      // Returning posts.
-      return post;
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
+    if (firebaseUser == null) {
       throw NotLoggedInException(message: "User not logged in.");
     }
+    // Fetching the ID token for authentication.
+    String firebaseAuthToken = await firebaseUser.getIdToken();
+
+    // Preparing the URL for the server request.
+    Uri url = Uri.parse("$ENDPOINT/posts/get/post/$postId");
+
+    // Preparing the headers for the request.
+    Map<String, String> headers = {
+      "Authorization": "Bearer $firebaseAuthToken",
+    };
+
+    // Fetching posts from the server.
+    http.Response response = await http
+        .get(
+          url,
+          headers: headers,
+        )
+        .timeout(new Duration(seconds: 10));
+
+    // Checking for errors.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
+    }
+
+    // Decoding all posts to JSON and converting them to post objects.
+    dynamic rawPost = json.decode(response.body);
+    Post post = Post.fromJson(rawPost);
+
+    // Returning posts.
+    return post;
   }
 
   /*
@@ -193,38 +214,45 @@ class PostService {
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
     // Check is the user exists.
-    if (firebaseUser != null) {
-      // Fetching the ID token for authentication.
-      String firebaseAuthToken = await firebaseUser.getIdToken();
-
-      // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/posts/create");
-
-      // Preparing the headers for the request.
-      Map<String, String> headers = {
-        "Authorization": "Bearer $firebaseAuthToken",
-        "Content-Type": "application/json",
-      };
-
-      // Preparing the body for the request
-      String body = json.encode(createPostDto.toJson());
-
-      // POSTing to the server with new post details.
-      http.Response response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      ).timeout(new Duration(seconds: 10));
-
-      // Checking for errors.
-      if (response.statusCode >= 400) {
-        // Decode the response and throw an exception.
-        Map<String, dynamic> body = json.decode(response.body);
-        throw ServerException(message: body["message"]);
-      }
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
+    if (firebaseUser == null) {
       throw NotLoggedInException(message: "User not logged in.");
+    }
+    // Fetching the ID token for authentication.
+    String firebaseAuthToken = await firebaseUser.getIdToken();
+
+    // Preparing the URL for the server request.
+    Uri url = Uri.parse("$ENDPOINT/posts/create");
+
+    // Preparing the headers for the request.
+    Map<String, String> headers = {
+      "Authorization": "Bearer $firebaseAuthToken",
+      "Content-Type": "application/json",
+    };
+
+    // Preparing the body for the request
+    String body = json.encode(createPostDto.toJson());
+
+    // POSTing to the server with new post details.
+    http.Response response = await http
+        .post(
+          url,
+          headers: headers,
+          body: body,
+        )
+        .timeout(new Duration(seconds: 10));
+
+    // Checking for errors.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
     }
   }
 
@@ -237,38 +265,45 @@ class PostService {
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
     // Check is the user exists.
-    if (firebaseUser != null) {
-      // Fetching the ID token for authentication.
-      String firebaseAuthToken = await firebaseUser.getIdToken();
-
-      // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/posts/update");
-
-      // Preparing the headers for the request.
-      Map<String, String> headers = {
-        "Authorization": "Bearer $firebaseAuthToken",
-        "Content-Type": "application/json",
-      };
-
-      // Preparing the body for the request
-      String body = json.encode(updatePostDto.toJson());
-
-      // POSTing to the server with updated post details.
-      http.Response response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      ).timeout(new Duration(seconds: 10));
-
-      // Checking for errors.
-      if (response.statusCode >= 400) {
-        // Decode the response and throw an exception.
-        dynamic body = json.decode(response.body);
-        throw ServerException(message: body["message"]);
-      }
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
+    if (firebaseUser == null) {
       throw NotLoggedInException(message: "User not logged in.");
+    }
+    // Fetching the ID token for authentication.
+    String firebaseAuthToken = await firebaseUser.getIdToken();
+
+    // Preparing the URL for the server request.
+    Uri url = Uri.parse("$ENDPOINT/posts/update");
+
+    // Preparing the headers for the request.
+    Map<String, String> headers = {
+      "Authorization": "Bearer $firebaseAuthToken",
+      "Content-Type": "application/json",
+    };
+
+    // Preparing the body for the request
+    String body = json.encode(updatePostDto.toJson());
+
+    // POSTing to the server with updated post details.
+    http.Response response = await http
+        .post(
+          url,
+          headers: headers,
+          body: body,
+        )
+        .timeout(new Duration(seconds: 10));
+
+    // Checking for errors.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
     }
   }
 
@@ -281,38 +316,45 @@ class PostService {
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
     // Check is the user exists.
-    if (firebaseUser != null) {
-      // Fetching the ID token for authentication.
-      String firebaseAuthToken = await firebaseUser.getIdToken();
-
-      // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/posts/delete");
-
-      // Preparing the headers for the request.
-      Map<String, String> headers = {
-        "Authorization": "Bearer $firebaseAuthToken",
-        "Content-Type": "application/json",
-      };
-
-      // Preparing the body for the request
-      String body = json.encode({"id": postId});
-
-      // POSTing to the server to delete the post.
-      http.Response response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      ).timeout(new Duration(seconds: 10));
-
-      // Checking for errors.
-      if (response.statusCode >= 400) {
-        // Decode the response and throw an exception.
-        Map<String, dynamic> body = json.decode(response.body);
-        throw ServerException(message: body["message"]);
-      }
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
+    if (firebaseUser == null) {
       throw NotLoggedInException(message: "User not logged in.");
+    }
+    // Fetching the ID token for authentication.
+    String firebaseAuthToken = await firebaseUser.getIdToken();
+
+    // Preparing the URL for the server request.
+    Uri url = Uri.parse("$ENDPOINT/posts/delete");
+
+    // Preparing the headers for the request.
+    Map<String, String> headers = {
+      "Authorization": "Bearer $firebaseAuthToken",
+      "Content-Type": "application/json",
+    };
+
+    // Preparing the body for the request
+    String body = json.encode({"id": postId});
+
+    // POSTing to the server to delete the post.
+    http.Response response = await http
+        .post(
+          url,
+          headers: headers,
+          body: body,
+        )
+        .timeout(new Duration(seconds: 10));
+
+    // Checking for errors.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
     }
   }
 }

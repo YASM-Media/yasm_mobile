@@ -3,7 +3,10 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/pages/posts/full_post.page.dart';
 import 'package:yasm_mobile/pages/posts/update_post.page.dart';
@@ -76,13 +79,7 @@ class _PostCardState extends State<PostCard> {
             children: [
               TextButton(
                 onPressed: () async {
-                  await this._postService.deletePost(widget.post.id);
-
-                  Navigator.of(context).pop();
-
-                  displaySnackBar("Post Deleted!", context);
-
-                  await widget.refreshPosts();
+                  await _confirmPostDeletion(context);
                 },
                 child: Text('YES'),
               ),
@@ -97,6 +94,35 @@ class _PostCardState extends State<PostCard> {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmPostDeletion(BuildContext context) async {
+    try {
+      await this._postService.deletePost(widget.post.id);
+
+      Navigator.of(context).pop();
+
+      displaySnackBar("Post Deleted!", context);
+
+      await widget.refreshPosts();
+    } on ServerException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } on NotLoggedInException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      displaySnackBar(
+        "Something went wrong, please try again later.",
+        context,
+      );
+    }
   }
 
   Padding _buildBottomRow() {
