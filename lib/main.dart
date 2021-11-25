@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/app.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:yasm_mobile/models/image/image.model.dart' as ImageModel;
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
@@ -23,6 +23,7 @@ Future<void> main() async {
 
   Hive.registerAdapter<User>(new UserAdapter());
   Hive.registerAdapter<Post>(new PostAdapter());
+  Hive.registerAdapter<ImageModel.Image>(new ImageModel.ImageAdapter());
 
   await Hive.openBox('yasm-user');
   await Hive.openBox('yasm-posts');
