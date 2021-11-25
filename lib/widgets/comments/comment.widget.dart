@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/like.service.dart';
+import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
 class Comment extends StatefulWidget {
@@ -84,15 +88,7 @@ class _CommentState extends State<Comment> {
             children: [
               IconButton(
                 onPressed: () async {
-                  if (this._isLiked) {
-                    await this._likeService.unlikePost(widget.comment.id);
-                  } else {
-                    await this._likeService.likePost(widget.comment.id);
-                  }
-
-                  setState(() {
-                    this._isLiked = !this._isLiked;
-                  });
+                  await _handleLikeUnlikePost();
                 },
                 icon: Icon(
                   this._isLiked ? Icons.favorite : Icons.favorite_border,
@@ -133,5 +129,36 @@ class _CommentState extends State<Comment> {
         ],
       ),
     );
+  }
+
+  Future<void> _handleLikeUnlikePost() async {
+    try {
+      if (this._isLiked) {
+        await this._likeService.unlikePost(widget.comment.id);
+      } else {
+        await this._likeService.likePost(widget.comment.id);
+      }
+
+      setState(() {
+        this._isLiked = !this._isLiked;
+      });
+    } on ServerException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } on NotLoggedInException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      displaySnackBar(
+        "Something went wrong, please try again later.",
+        context,
+      );
+    }
   }
 }
