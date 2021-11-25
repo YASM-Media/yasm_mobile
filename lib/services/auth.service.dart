@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -84,6 +85,15 @@ class AuthService {
       // Return the user details.
       return loggedInUser;
     } on SocketException {
+      log.wtf("Dedicated Server Offline");
+      User? loggedInUser = this.fetchOfflineUser();
+      if (loggedInUser == null) {
+        throw NotLoggedInException(message: "User not logged in.");
+      } else {
+        return loggedInUser;
+      }
+    } on TimeoutException {
+      log.wtf("Dedicated Server Offline");
       User? loggedInUser = this.fetchOfflineUser();
       if (loggedInUser == null) {
         throw NotLoggedInException(message: "User not logged in.");
@@ -110,11 +120,13 @@ class AuthService {
     };
 
     // Send details to server for user registration.
-    http.Response response = await http.post(
-      url,
-      headers: headers,
-      body: json.encode(registerUser.toJson()),
-    ).timeout(new Duration(seconds: 10));
+    http.Response response = await http
+        .post(
+          url,
+          headers: headers,
+          body: json.encode(registerUser.toJson()),
+        )
+        .timeout(new Duration(seconds: 10));
 
     // Check for errors and then throw an error.
     if (response.statusCode == 422) {
