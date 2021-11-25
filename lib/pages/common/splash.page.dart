@@ -43,38 +43,55 @@ class _SplashState extends State<Splash> {
          * Otherwise, route them to Auth page.
          */
       this._streamSubscription =
-          FA.FirebaseAuth.instance.authStateChanges().listen((FA.User? user) {
-        if (user != null) {
-          this._loggerProvider.log.i("Firebase Logged In User");
-
-          _authService.getLoggedInUser().then((user) {
-            this._loggerProvider.log.i("Server Logged In User");
-
-            Provider.of<AuthProvider>(context, listen: false).saveUser(user);
-            Navigator.of(context).pushReplacementNamed(Home.routeName);
-          }).catchError((error, stackTrace) {
-            if (error.runtimeType == FA.FirebaseAuthException) {
-              FA.FirebaseAuthException exception =
-                  error as FA.FirebaseAuthException;
-
-              this
-                  ._loggerProvider
-                  .log
-                  .e(exception.code, exception.code, exception.stackTrace);
-              this._checkForOfflineUser();
-            } else {
-              this._loggerProvider.log.e(error.toString(), error, stackTrace);
-              Navigator.of(context).pushReplacementNamed(Auth.routeName);
-            }
-          });
-        } else {
-          Navigator.of(context).pushReplacementNamed(Auth.routeName);
-        }
-      }, onError: (error, stackTrace) {
-        this._loggerProvider.log.e(error.toString(), error, stackTrace);
-        this._checkForOfflineUser();
-      });
+          FA.FirebaseAuth.instance.authStateChanges().listen(
+                _handleFirebaseAuthEvents,
+                onError: _handleFirebaseStreamError,
+              );
     });
+  }
+
+  void _handleFirebaseAuthEvents(FA.User? user) {
+    if (user != null) {
+      this._loggerProvider.log.i("Firebase Logged In User");
+      _handleServerAuthStatus();
+    } else {
+      Navigator.of(context).pushReplacementNamed(Auth.routeName);
+    }
+  }
+
+  void _handleServerAuthStatus() {
+    _authService
+        .getLoggedInUser()
+        .then(_handleServerAuthSuccess)
+        .catchError(_handleServerAuthError);
+  }
+
+  _handleServerAuthError(error, stackTrace) {
+    if (error.runtimeType == FA.FirebaseAuthException) {
+      FA.FirebaseAuthException exception = error as FA.FirebaseAuthException;
+
+      this
+          ._loggerProvider
+          .log
+          .e(exception.code, exception.code, exception.stackTrace);
+
+      this._checkForOfflineUser();
+    } else {
+      this._loggerProvider.log.e(error.toString(), error, stackTrace);
+      Navigator.of(context).pushReplacementNamed(Auth.routeName);
+    }
+  }
+
+  FutureOr<Null> _handleServerAuthSuccess(user) {
+    this._loggerProvider.log.i("Server Logged In User");
+
+    Provider.of<AuthProvider>(context, listen: false).saveUser(user);
+    Navigator.of(context).pushReplacementNamed(Home.routeName);
+  }
+
+  _handleFirebaseStreamError(error, stackTrace) {
+    this._loggerProvider.log.e(error.toString(), error, stackTrace);
+    this._checkForOfflineUser();
   }
 
   void _checkForOfflineUser() {
