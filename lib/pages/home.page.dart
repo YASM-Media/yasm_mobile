@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
@@ -76,11 +77,24 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(SelectImages.routeName);
+      floatingActionButton: OfflineBuilder(
+        connectivityBuilder: (
+          BuildContext context,
+          ConnectivityResult connectivity,
+          Widget _,
+        ) {
+          final bool connected = connectivity != ConnectivityResult.none;
+
+          return FloatingActionButton(
+            onPressed: connected
+                ? () {
+                    Navigator.of(context).pushNamed(SelectImages.routeName);
+                  }
+                : null,
+            child: Icon(Icons.add),
+          );
         },
-        child: Icon(Icons.add),
+        child: SizedBox(),
       ),
     );
   }
