@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/comment_form_type.constant.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/comment/create_comment/create_comment.dto.dart';
 import 'package:yasm_mobile/dto/comment/update_comment/update_comment.dto.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
@@ -65,8 +67,12 @@ class _CommentFormState extends State<CommentForm> {
         displaySnackBar("Comment updated!", context);
       }
     } on ServerException catch (error) {
-      print(error.message);
-      displaySnackBar("Something went wrong, try again later.", context);
+      displaySnackBar(error.message, context);
+    } on NotLoggedInException catch (error) {
+      displaySnackBar(error.message, context);
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+      displaySnackBar("Something went wrong, please try again later.", context);
     }
   }
 

@@ -60,6 +60,10 @@ class AuthService {
         Map<String, dynamic> body = json.decode(response.body);
         throw ServerException(message: body['message']);
       } else if (response.statusCode >= 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+
+        log.e(body["message"]);
+
         throw ServerException(
           message: 'Something went wrong, please try again later.',
         );
@@ -124,6 +128,10 @@ class AuthService {
       Map<String, dynamic> body = json.decode(response.body);
       throw ServerException(message: body['message']);
     } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
       throw ServerException(
         message: 'Something went wrong, please try again later.',
       );
