@@ -29,7 +29,7 @@ Future<void> main() async {
   Hive.registerAdapter<Like>(new LikeAdapter());
 
   await Hive.openBox<User>(YASM_USER_BOX);
-  await Hive.openBox<List<Post>>(YASM_POSTS_BOX);
+  await Hive.openBox<List<dynamic>>(YASM_POSTS_BOX);
   runApp(Root());
 }
 

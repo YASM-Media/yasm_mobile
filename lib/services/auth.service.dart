@@ -74,7 +74,7 @@ class AuthService {
       User loggedInUser = User.fromJson(body);
 
       log.i("Saving user to Hive DB");
-      this._yasmUserDb.put("logged-in-user", loggedInUser);
+      this._yasmUserDb.put(LOGGED_IN_USER, loggedInUser);
       log.i("Saved user to Hive DB");
 
       // Return the user details.

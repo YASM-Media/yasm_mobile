@@ -9,3 +9,4 @@ const LOGGED_IN_USER = "logged-in-user";
 const NEW_POSTS = "new-posts";
 const SUGGESTED_POSTS = "suggested-posts";
 const BEST_POSTS = "best-posts";
+const USER_POSTS = "user-posts";

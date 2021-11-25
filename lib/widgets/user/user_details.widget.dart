@@ -87,7 +87,7 @@ class _UserDetailsState extends State<UserDetails> {
           minHeight: 300,
         ),
         child: FutureBuilder(
-          future: this._authService.getLoggedInUser(),
+          future: this._userService.getUser(widget.userId),
           builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
             if (snapshot.hasError) {
               log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
