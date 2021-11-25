@@ -38,7 +38,7 @@ class CommentService {
         url,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -78,7 +78,7 @@ class CommentService {
         url,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -118,7 +118,7 @@ class CommentService {
         url,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {

@@ -42,7 +42,7 @@ class UserService {
       http.Response response = await http.get(
         url,
         headers: headers,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Check if the response does not contain any error.
       if (response.statusCode >= 400) {
@@ -94,7 +94,7 @@ class UserService {
         uri,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -190,7 +190,7 @@ class UserService {
         uri,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -286,7 +286,7 @@ class UserService {
         uri,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {

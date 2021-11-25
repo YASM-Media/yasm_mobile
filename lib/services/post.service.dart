@@ -75,7 +75,7 @@ class PostService {
       http.Response response = await http.get(
         url,
         headers: headers,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -121,7 +121,7 @@ class PostService {
       http.Response response = await http.get(
         url,
         headers: headers,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -163,7 +163,7 @@ class PostService {
       http.Response response = await http.get(
         url,
         headers: headers,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -214,7 +214,7 @@ class PostService {
         url,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -258,7 +258,7 @@ class PostService {
         url,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {
@@ -302,7 +302,7 @@ class PostService {
         url,
         headers: headers,
         body: body,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       // Checking for errors.
       if (response.statusCode >= 400) {

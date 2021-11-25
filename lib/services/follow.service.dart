@@ -28,7 +28,7 @@ class FollowService {
       http.Response response = await http.post(
         url,
         headers: headers,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       print(json.decode(response.body));
 
@@ -63,7 +63,7 @@ class FollowService {
       http.Response response = await http.post(
         url,
         headers: headers,
-      );
+      ).timeout(new Duration(seconds: 10));
 
       print(json.decode(response.body));
 

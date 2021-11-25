@@ -56,10 +56,12 @@ class AuthService {
       };
 
       // Fetch user details from the server
-      http.Response response = await http.get(
-        url,
-        headers: headers,
-      );
+      http.Response response = await http
+          .get(
+            url,
+            headers: headers,
+          )
+          .timeout(new Duration(seconds: 10));
 
       // Check if the response does not contain any error.
       if (response.statusCode >= 400 && response.statusCode < 500) {
@@ -112,7 +114,7 @@ class AuthService {
       url,
       headers: headers,
       body: json.encode(registerUser.toJson()),
-    );
+    ).timeout(new Duration(seconds: 10));
 
     // Check for errors and then throw an error.
     if (response.statusCode == 422) {
