@@ -146,39 +146,53 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildActions() {
-    return Row(
-      children: [
-        IconButton(
-          onPressed: () async {
-            if (this._isLiked) {
-              await this._likeService.unlikePost(widget.post.id);
-            } else {
-              await this._likeService.likePost(widget.post.id);
-            }
+    return OfflineBuilder(
+      connectivityBuilder: (
+        BuildContext context,
+        ConnectivityResult connectivity,
+        Widget _,
+      ) {
+        final bool connected = connectivity != ConnectivityResult.none;
+        return Row(
+          children: [
+            IconButton(
+              onPressed: connected
+                  ? () async {
+                      if (this._isLiked) {
+                        await this._likeService.unlikePost(widget.post.id);
+                      } else {
+                        await this._likeService.likePost(widget.post.id);
+                      }
 
-            setState(() {
-              this._isLiked = !this._isLiked;
-            });
-          },
-          icon: Icon(
-            this._isLiked ? Icons.favorite : Icons.favorite_border,
-            color: Colors.pink,
-          ),
-        ),
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(
-              context,
-              FullPost.routeName,
-              arguments: widget.post.id,
-            );
-          },
-          icon: Icon(
-            Icons.textsms_outlined,
-            color: Colors.pink,
-          ),
-        ),
-      ],
+                      setState(() {
+                        this._isLiked = !this._isLiked;
+                      });
+                    }
+                  : null,
+              icon: Icon(
+                this._isLiked ? Icons.favorite : Icons.favorite_border,
+                color: Colors.pink,
+              ),
+            ),
+            IconButton(
+              onPressed: connected
+                  ? () {
+                      Navigator.pushNamed(
+                        context,
+                        FullPost.routeName,
+                        arguments: widget.post.id,
+                      );
+                    }
+                  : null,
+              icon: Icon(
+                Icons.textsms_outlined,
+                color: Colors.pink,
+              ),
+            ),
+          ],
+        );
+      },
+      child: SizedBox(),
     );
   }
 
