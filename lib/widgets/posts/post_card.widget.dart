@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
@@ -235,61 +236,84 @@ class _PostCardState extends State<PostCard> {
   }
 
   Widget _buildTopRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushNamed(
-              UserProfile.routeName,
-              arguments: widget.post.user.id,
-            );
-          },
-          child: Row(
-            children: [
-              Container(
-                margin: EdgeInsets.all(10.0),
-                child: ProfilePicture(
-                  imageUrl: this.widget.post.user.imageUrl,
-                  size: 40,
+    return OfflineBuilder(
+      connectivityBuilder: (
+        BuildContext context,
+        ConnectivityResult connectivity,
+        Widget _,
+      ) {
+        final bool connected = connectivity != ConnectivityResult.none;
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: connected
+                  ? () {
+                      Navigator.of(context).pushNamed(
+                        UserProfile.routeName,
+                        arguments: widget.post.user.id,
+                      );
+                    }
+                  : null,
+              child: Row(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(10.0),
+                    child: ProfilePicture(
+                      imageUrl: this.widget.post.user.imageUrl,
+                      size: 40,
+                    ),
+                  ),
+                  Text(
+                    "${this.widget.post.user.firstName} ${this.widget.post.user.lastName}",
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              children: [
+                Consumer<AuthProvider>(
+                  builder: (context, auth, _) =>
+                      this.widget.post.user.id == auth.getUser()!.id
+                          ? Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.05,
+                              ),
+                              child: PopupMenuButton(
+                                enabled: connected,
+                                child: Icon(Icons.more_vert),
+                                itemBuilder: (context) => [
+                                  PopupMenuItem(
+                                    child: Text("Update Post"),
+                                    value: PostOptionsType.UPDATE,
+                                  ),
+                                  PopupMenuItem(
+                                    child: Text("Delete Post"),
+                                    value: PostOptionsType.DELETE,
+                                  ),
+                                ],
+                                onSelected: (PostOptionsType selectedData) {
+                                  if (selectedData == PostOptionsType.UPDATE) {
+                                    Navigator.of(context).pushNamed(
+                                      UpdatePost.routeName,
+                                      arguments: this.widget.post,
+                                    );
+                                  }
+                                  if (selectedData == PostOptionsType.DELETE) {
+                                    this._onDeletePost(context);
+                                  }
+                                },
+                              ),
+                            )
+                          : SizedBox(),
                 ),
-              ),
-              Text(
-                "${this.widget.post.user.firstName} ${this.widget.post.user.lastName}",
-              ),
-            ],
-          ),
-        ),
-        Consumer<AuthProvider>(
-          builder: (context, auth, _) =>
-              this.widget.post.user.id == auth.getUser()!.id
-                  ? PopupMenuButton(
-                      child: Icon(Icons.more_vert),
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          child: Text("Update Post"),
-                          value: PostOptionsType.UPDATE,
-                        ),
-                        PopupMenuItem(
-                          child: Text("Delete Post"),
-                          value: PostOptionsType.DELETE,
-                        ),
-                      ],
-                      onSelected: (PostOptionsType selectedData) {
-                        if (selectedData == PostOptionsType.UPDATE) {
-                          Navigator.of(context).pushNamed(
-                            UpdatePost.routeName,
-                            arguments: this.widget.post,
-                          );
-                        }
-                        if (selectedData == PostOptionsType.DELETE) {
-                          this._onDeletePost(context);
-                        }
-                      },
-                    )
-                  : SizedBox(),
-        ),
-      ],
+              ],
+            ),
+          ],
+        );
+      },
+      child: SizedBox(),
     );
   }
 }
