@@ -22,7 +22,7 @@ class CommentService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/comments/create");
+      Uri url = Uri.parse("$ENDPOINT/comments/create");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -62,7 +62,7 @@ class CommentService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/comments/update");
+      Uri url = Uri.parse("$ENDPOINT/comments/update");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -102,7 +102,7 @@ class CommentService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/comments/delete");
+      Uri url = Uri.parse("$ENDPOINT/comments/delete");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {

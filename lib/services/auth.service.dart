@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
@@ -9,6 +12,7 @@ import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/user_not_found.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 
 /*
@@ -16,22 +20,37 @@ import 'package:yasm_mobile/models/user/user.model.dart';
  */
 class AuthService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+  final Box<User> _yasmUserDb = Hive.box<User>("yasm-user");
+
+  final Logger log = new Logger(
+    printer: new PrettyPrinter(
+      methodCount: 0,
+      errorMethodCount: 10,
+      colors: true,
+      printEmojis: true,
+      printTime: true,
+    ),
+  );
 
   /*
    * Method for fetching the user from server using firebase id token.
    */
   Future<User> getLoggedInUser() async {
-    // Get the logged in user details.
-    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+    try {
+      // Get the logged in user details.
+      FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
-    // Check if user is not null.
-    if (firebaseUser != null) {
+      // Check if user is not null.
+      if (firebaseUser == null) {
+        // If there is no user logged is using firebase, throw an exception.
+        throw NotLoggedInException(message: "User not logged in.");
+      }
       // Fetch the ID token for the user.
       String firebaseAuthToken =
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$endpoint/follow-api/get");
+      Uri url = Uri.parse("$ENDPOINT/follow-api/get");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };
@@ -43,20 +62,38 @@ class AuthService {
       );
 
       // Check if the response does not contain any error.
-      if (response.statusCode >= 400) {
-        throw NotLoggedInException(message: "User not logged in.");
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+        throw ServerException(message: body['message']);
+      } else if (response.statusCode >= 500) {
+        throw ServerException(
+          message: 'Something went wrong, please try again later.',
+        );
       }
 
       // Decode the JSON object and build the user object from JSON.
       Map<String, dynamic> body = json.decode(response.body);
       User loggedInUser = User.fromJson(body);
 
+      log.i("Saving user to Hive DB");
+      this._yasmUserDb.put("logged-in-user", loggedInUser);
+      log.i("Saved user to Hive DB");
+
       // Return the user details.
       return loggedInUser;
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
-      throw NotLoggedInException(message: "User not logged in.");
+    } on SocketException {
+      User? loggedInUser = this.fetchOfflineUser();
+      if (loggedInUser == null) {
+        throw NotLoggedInException(message: "User not logged in.");
+      } else {
+        return loggedInUser;
+      }
     }
+  }
+
+  User? fetchOfflineUser() {
+    log.i("Fetching user from Hive DB");
+    return this._yasmUserDb.get("logged-in-user");
   }
 
   /*
@@ -65,7 +102,7 @@ class AuthService {
    */
   Future<void> registerUser(RegisterUser registerUser) async {
     // Prepare URL and the content type header.
-    Uri url = Uri.parse("$endpoint/auth/register");
+    Uri url = Uri.parse("$ENDPOINT/auth/register");
     Map<String, String> headers = {
       "Content-Type": "application/json",
     };

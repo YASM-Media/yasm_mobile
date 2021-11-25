@@ -19,7 +19,7 @@ class LikeService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/like-api/like");
+      Uri url = Uri.parse("$ENDPOINT/like-api/like");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -59,7 +59,7 @@ class LikeService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/like-api/unlike");
+      Uri url = Uri.parse("$ENDPOINT/like-api/unlike");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {

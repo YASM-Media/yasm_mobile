@@ -19,7 +19,7 @@ class FollowService {
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$endpoint/follow-api/follow/$userId");
+      Uri url = Uri.parse("$ENDPOINT/follow-api/follow/$userId");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };
@@ -54,7 +54,7 @@ class FollowService {
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$endpoint/follow-api/unfollow/$userId");
+      Uri url = Uri.parse("$ENDPOINT/follow-api/unfollow/$userId");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };

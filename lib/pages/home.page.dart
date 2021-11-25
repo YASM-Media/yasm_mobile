@@ -33,9 +33,11 @@ class Home extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Consumer<AuthProvider>(
-              builder: (context, auth, _) => Text(auth.getUser() != null
-                  ? auth.getUser()!.emailAddress
-                  : "You are not logged in."),
+              builder: (context, auth, _) => Text(
+                auth.getUser() != null
+                    ? auth.getUser()!.emailAddress
+                    : "You are not logged in.",
+              ),
             ),
             Column(
               children: [

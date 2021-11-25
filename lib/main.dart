@@ -9,6 +9,7 @@ import 'package:yasm_mobile/models/like/like.model.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/providers/logger/logger.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/follow.service.dart';
@@ -27,8 +28,8 @@ Future<void> main() async {
   Hive.registerAdapter<ImageModel.Image>(new ImageModel.ImageAdapter());
   Hive.registerAdapter<Like>(new LikeAdapter());
 
-  await Hive.openBox('yasm-user');
-  await Hive.openBox('yasm-posts');
+  await Hive.openBox<User>('yasm-user');
+  await Hive.openBox<List<Post>>('yasm-posts');
   runApp(Root());
 }
 
@@ -42,6 +43,9 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<LoggerProvider>(
+          create: (context) => LoggerProvider(),
+        ),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(),
         ),

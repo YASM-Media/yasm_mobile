@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/common/loading.page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/providers/logger/logger.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 
 class Splash extends StatefulWidget {
@@ -22,13 +24,16 @@ class _SplashState extends State<Splash> {
   // Firebase stream subscription.
   StreamSubscription? _streamSubscription;
 
-  late AuthService _authService;
+  late final AuthService _authService;
+  late final LoggerProvider _loggerProvider;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     this._authService = Provider.of<AuthService>(context, listen: false);
+    this._loggerProvider = Provider.of<LoggerProvider>(context, listen: false);
+
     setState(() {
       /*
          * Listen for logged in user using firebase auth changes.
@@ -38,25 +43,53 @@ class _SplashState extends State<Splash> {
          * Otherwise, route them to Auth page.
          */
       this._streamSubscription =
-          FirebaseAuth.instance.authStateChanges().listen((User? user) {
+          FA.FirebaseAuth.instance.authStateChanges().listen((FA.User? user) {
         if (user != null) {
+          this._loggerProvider.log.i("Firebase Logged In User");
+
           _authService.getLoggedInUser().then((user) {
+            this._loggerProvider.log.i("Server Logged In User");
+
             Provider.of<AuthProvider>(context, listen: false).saveUser(user);
             Navigator.of(context).pushReplacementNamed(Home.routeName);
-          }).catchError((error) {
-            print(error);
-            Navigator.of(context).pushReplacementNamed(Auth.routeName);
+          }).catchError((error, stackTrace) {
+            if (error.runtimeType == FA.FirebaseAuthException) {
+              FA.FirebaseAuthException exception =
+                  error as FA.FirebaseAuthException;
+
+              this
+                  ._loggerProvider
+                  .log
+                  .e(exception.code, exception.code, exception.stackTrace);
+              this._checkForOfflineUser();
+            } else {
+              this._loggerProvider.log.e(error.toString(), error, stackTrace);
+              Navigator.of(context).pushReplacementNamed(Auth.routeName);
+            }
           });
         } else {
           Navigator.of(context).pushReplacementNamed(Auth.routeName);
         }
+      }, onError: (error, stackTrace) {
+        this._loggerProvider.log.e(error.toString(), error, stackTrace);
+        this._checkForOfflineUser();
       });
     });
   }
 
+  void _checkForOfflineUser() {
+    User? user = this._authService.fetchOfflineUser();
+
+    if (user != null) {
+      Provider.of<AuthProvider>(context, listen: false).saveUser(user);
+      Navigator.of(context).pushReplacementNamed(Home.routeName);
+    } else {
+      Navigator.of(context).pushReplacementNamed(Auth.routeName);
+    }
+  }
+
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     this._streamSubscription!.cancel();
   }

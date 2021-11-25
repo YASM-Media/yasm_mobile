@@ -22,7 +22,7 @@ class PostService {
    * @param postFetchType Enum for post fetching type.
    */
   String _generatePostFetchingUrl(PostFetchType postFetchType) {
-    String url = endpoint;
+    String url = ENDPOINT;
 
     switch (postFetchType) {
       case PostFetchType.SUGGESTED:
@@ -110,7 +110,7 @@ class PostService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/posts/get/user/$userId");
+      Uri url = Uri.parse("$ENDPOINT/posts/get/user/$userId");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -152,7 +152,7 @@ class PostService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/posts/get/post/$postId");
+      Uri url = Uri.parse("$ENDPOINT/posts/get/post/$postId");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -198,7 +198,7 @@ class PostService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/posts/create");
+      Uri url = Uri.parse("$ENDPOINT/posts/create");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -242,7 +242,7 @@ class PostService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/posts/update");
+      Uri url = Uri.parse("$ENDPOINT/posts/update");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -286,7 +286,7 @@ class PostService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/posts/delete");
+      Uri url = Uri.parse("$ENDPOINT/posts/delete");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {

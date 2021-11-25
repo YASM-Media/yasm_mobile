@@ -31,7 +31,7 @@ class SearchService {
       String queryString = Uri(queryParameters: queryParams).query;
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/search/user?$queryString");
+      Uri url = Uri.parse("$ENDPOINT/search/user?$queryString");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -83,7 +83,7 @@ class SearchService {
       String queryString = Uri(queryParameters: queryParams).query;
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$endpoint/search/post?$queryString");
+      Uri url = Uri.parse("$ENDPOINT/search/post?$queryString");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {

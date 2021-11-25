@@ -33,7 +33,7 @@ class UserService {
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$endpoint/follow-api/get/$userId");
+      Uri url = Uri.parse("$ENDPOINT/follow-api/get/$userId");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };
@@ -75,7 +75,7 @@ class UserService {
     // Check if user is null
     if (loggedInUser != null) {
       // Preparing the URL for the server request.
-      Uri uri = Uri.parse("$endpoint/user/update/profile");
+      Uri uri = Uri.parse("$ENDPOINT/user/update/profile");
 
       // Fetching the ID token for authentication.
       String firebaseAuthToken = await loggedInUser.getIdToken();
@@ -171,7 +171,7 @@ class UserService {
     // Check if user is null
     if (loggedInUser != null) {
       // Preparing the URL for the server request.
-      Uri uri = Uri.parse("$endpoint/user/update/email");
+      Uri uri = Uri.parse("$ENDPOINT/user/update/email");
 
       // Fetching the ID token for authentication.
       String firebaseAuthToken = await loggedInUser.getIdToken();
@@ -267,7 +267,7 @@ class UserService {
     // Check if user is null
     if (loggedInUser != null) {
       // Preparing the URL for the server request.
-      Uri uri = Uri.parse("$endpoint/auth/delete");
+      Uri uri = Uri.parse("$ENDPOINT/auth/delete");
 
       // Fetching the ID token for authentication.
       String firebaseAuthToken = await loggedInUser.getIdToken();
