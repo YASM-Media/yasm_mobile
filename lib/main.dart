@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/app.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/models/image/image.model.dart' as ImageModel;
 import 'package:yasm_mobile/models/like/like.model.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
@@ -28,8 +29,8 @@ Future<void> main() async {
   Hive.registerAdapter<ImageModel.Image>(new ImageModel.ImageAdapter());
   Hive.registerAdapter<Like>(new LikeAdapter());
 
-  await Hive.openBox<User>('yasm-user');
-  await Hive.openBox<List<Post>>('yasm-posts');
+  await Hive.openBox<User>(YASM_USER_BOX);
+  await Hive.openBox<List<Post>>(YASM_POSTS_BOX);
   runApp(Root());
 }
 

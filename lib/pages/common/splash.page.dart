@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/common/loading.page.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
-import 'package:yasm_mobile/providers/logger/logger.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 
 class Splash extends StatefulWidget {
@@ -25,14 +25,12 @@ class _SplashState extends State<Splash> {
   StreamSubscription? _streamSubscription;
 
   late final AuthService _authService;
-  late final LoggerProvider _loggerProvider;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     this._authService = Provider.of<AuthService>(context, listen: false);
-    this._loggerProvider = Provider.of<LoggerProvider>(context, listen: false);
 
     setState(() {
       /*
@@ -52,7 +50,7 @@ class _SplashState extends State<Splash> {
 
   void _handleFirebaseAuthEvents(FA.User? user) {
     if (user != null) {
-      this._loggerProvider.log.i("Firebase Logged In User");
+      log.i("Firebase Logged In User");
       _handleServerAuthStatus();
     } else {
       Navigator.of(context).pushReplacementNamed(Auth.routeName);
@@ -70,27 +68,24 @@ class _SplashState extends State<Splash> {
     if (error.runtimeType == FA.FirebaseAuthException) {
       FA.FirebaseAuthException exception = error as FA.FirebaseAuthException;
 
-      this
-          ._loggerProvider
-          .log
-          .e(exception.code, exception.code, exception.stackTrace);
+      log.e(exception.code, exception.code, exception.stackTrace);
 
       this._checkForOfflineUser();
     } else {
-      this._loggerProvider.log.e(error.toString(), error, stackTrace);
+      log.e(error.toString(), error, stackTrace);
       Navigator.of(context).pushReplacementNamed(Auth.routeName);
     }
   }
 
   FutureOr<Null> _handleServerAuthSuccess(user) {
-    this._loggerProvider.log.i("Server Logged In User");
+    log.i("Server Logged In User");
 
     Provider.of<AuthProvider>(context, listen: false).saveUser(user);
     Navigator.of(context).pushReplacementNamed(Home.routeName);
   }
 
   _handleFirebaseStreamError(error, stackTrace) {
-    this._loggerProvider.log.e(error.toString(), error, stackTrace);
+    log.e(error.toString(), error, stackTrace);
     this._checkForOfflineUser();
   }
 

@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
 import 'package:yasm_mobile/dto/auth/register_user/register_user.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
@@ -21,17 +23,7 @@ import 'package:yasm_mobile/models/user/user.model.dart';
  */
 class AuthService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
-  final Box<User> _yasmUserDb = Hive.box<User>("yasm-user");
-
-  final Logger log = new Logger(
-    printer: new PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 10,
-      colors: true,
-      printEmojis: true,
-      printTime: true,
-    ),
-  );
+  final Box<User> _yasmUserDb = Hive.box<User>(YASM_USER_BOX);
 
   /*
    * Method for fetching the user from server using firebase id token.
@@ -105,7 +97,7 @@ class AuthService {
 
   User? fetchOfflineUser() {
     log.i("Fetching user from Hive DB");
-    return this._yasmUserDb.get("logged-in-user");
+    return this._yasmUserDb.get(LOGGED_IN_USER);
   }
 
   /*
