@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
@@ -141,10 +142,23 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
                     textInputType: TextInputType.visiblePassword,
                     obscureText: true,
                   ),
-                  ElevatedButton(
-                    onPressed: this._onFormSubmit,
-                    child: Text('Update Email Address'),
-                  )
+                  OfflineBuilder(
+                    connectivityBuilder: (
+                      BuildContext context,
+                      ConnectivityResult connectivity,
+                      Widget _,
+                    ) {
+                      final bool connected =
+                          connectivity != ConnectivityResult.none;
+                      return ElevatedButton(
+                        onPressed: connected ? this._onFormSubmit : null,
+                        child: Text(connected
+                            ? 'Update Email Address'
+                            : 'You are offline'),
+                      );
+                    },
+                    child: SizedBox(),
+                  ),
                 ],
               ),
             );

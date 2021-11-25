@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -225,15 +226,26 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
                       imageUrl: imageUrl,
                       size: 200,
                     ),
-                    TextButton(
-                      onPressed: this._onUploadImage,
-                      child: Text(
-                        'Upload New Image',
-                        style: TextStyle(
-                          fontSize: 15.0,
-                        ),
-                      ),
-                    )
+                    OfflineBuilder(
+                      connectivityBuilder: (
+                        BuildContext context,
+                        ConnectivityResult connectivity,
+                        Widget _,
+                      ) {
+                        final bool connected =
+                            connectivity != ConnectivityResult.none;
+                        return TextButton(
+                          onPressed: connected ? this._onUploadImage : null,
+                          child: Text(
+                            connected ? 'Upload New Image' : 'You are offline',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                            ),
+                          ),
+                        );
+                      },
+                      child: SizedBox(),
+                    ),
                   ],
                 ),
                 CustomField(
@@ -260,10 +272,22 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
                   ],
                   textInputType: TextInputType.multiline,
                 ),
-                ElevatedButton(
-                  onPressed: this._onFormSubmit,
-                  child: Text('Update Profile'),
-                )
+                OfflineBuilder(
+                  connectivityBuilder: (
+                    BuildContext context,
+                    ConnectivityResult connectivity,
+                    Widget _,
+                  ) {
+                    final bool connected =
+                        connectivity != ConnectivityResult.none;
+                    return ElevatedButton(
+                      onPressed: connected ? this._onFormSubmit : null,
+                      child: Text(
+                          connected ? 'Update Profile' : 'You are offline'),
+                    );
+                  },
+                  child: SizedBox(),
+                ),
               ],
             ),
           ),

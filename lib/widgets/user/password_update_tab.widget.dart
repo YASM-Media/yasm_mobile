@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/user/update_password/update_password.dto.dart';
@@ -152,10 +153,22 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
                 textInputType: TextInputType.visiblePassword,
                 obscureText: true,
               ),
-              ElevatedButton(
-                onPressed: this._onFormSubmit,
-                child: Text('Update Password'),
-              )
+              OfflineBuilder(
+                connectivityBuilder: (
+                  BuildContext context,
+                  ConnectivityResult connectivity,
+                  Widget _,
+                ) {
+                  final bool connected =
+                      connectivity != ConnectivityResult.none;
+                  return ElevatedButton(
+                    onPressed: connected ? this._onFormSubmit : null,
+                    child:
+                        Text(connected ? 'Update Password' : 'You are offline'),
+                  );
+                },
+                child: SizedBox(),
+              ),
             ],
           ),
         ),
