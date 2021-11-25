@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
@@ -276,18 +277,49 @@ class _AuthState extends State<Auth> {
               ),
               if (_authFormType == AuthFormType.Login ||
                   _authFormType == AuthFormType.Register)
-                ElevatedButton(
-                  onPressed: _onFormSubmit,
-                  child: Text(
-                    _authFormType == AuthFormType.Register
-                        ? 'Register'
-                        : 'Login',
-                  ),
+                OfflineBuilder(
+                  connectivityBuilder: (
+                    BuildContext context,
+                    ConnectivityResult connectivity,
+                    Widget _,
+                  ) {
+                    final bool connected =
+                        connectivity != ConnectivityResult.none;
+
+                    return connected
+                        ? ElevatedButton(
+                            onPressed: _onFormSubmit,
+                            child: Text(
+                              _authFormType == AuthFormType.Register
+                                  ? 'Register'
+                                  : 'Login',
+                            ),
+                          )
+                        : ElevatedButton(
+                            onPressed: null,
+                            child: Text('You are offline'),
+                          );
+                  },
+                  child: SizedBox(),
                 ),
               if (_authFormType == AuthFormType.ForgotPassword)
-                ElevatedButton(
-                  onPressed: _onFormSubmit,
-                  child: Text("Send Password Reset Mail"),
+                OfflineBuilder(
+                  connectivityBuilder: (
+                    BuildContext context,
+                    ConnectivityResult connectivity,
+                    Widget _,
+                  ) {
+                    final bool connected =
+                        connectivity != ConnectivityResult.none;
+
+                    return ElevatedButton(
+                      onPressed: connected ? _onFormSubmit : null,
+                      child: Text(connected
+                          ? "Send Password Reset Mail"
+                          : "You are offline"),
+                    );
+                  },
+                  child: SizedBox(),
                 ),
               if (_authFormType == AuthFormType.Login ||
                   _authFormType == AuthFormType.Register)

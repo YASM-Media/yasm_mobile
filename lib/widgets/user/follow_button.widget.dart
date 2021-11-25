@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
@@ -37,12 +38,26 @@ class _FollowButtonState extends State<FollowButton> {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (BuildContext context, AuthProvider authProvider, _) =>
-          TextButton(
-        onPressed: () async =>
-            await _handleFollowUnFollow(authProvider, context),
-        child: Text(
-          _checkFollowing(authProvider) ? 'UNFOLLOW' : 'FOLLOW',
-        ),
+          OfflineBuilder(
+        connectivityBuilder: (
+          BuildContext context,
+          ConnectivityResult connectivity,
+          Widget _,
+        ) {
+          final bool connected = connectivity != ConnectivityResult.none;
+
+          return TextButton(
+            onPressed: connected
+                ? () async => await _handleFollowUnFollow(authProvider, context)
+                : null,
+            child: connected
+                ? Text(
+                    _checkFollowing(authProvider) ? 'UNFOLLOW' : 'FOLLOW',
+                  )
+                : Text('YOU ARE OFFLINE'),
+          );
+        },
+        child: SizedBox(),
       ),
     );
   }
