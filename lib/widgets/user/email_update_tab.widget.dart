@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/user/update_email/update_email.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
@@ -55,9 +56,9 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
    * Form submission method for user email update.
    */
   Future<void> _onFormSubmit() async {
-    try {
-      // Validate the form.
-      if (this._formKey.currentState!.validate()) {
+    // Validate the form.
+    if (this._formKey.currentState!.validate()) {
+      try {
         // Prepare DTO for updating password.
         UpdateEmailDto updateEmailDto = new UpdateEmailDto(
           emailAddress: this._emailController.text,
@@ -74,17 +75,24 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
 
         // Display success snackbar.
         displaySnackBar("Email updated!", context);
+      } on ServerException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } on NotLoggedInException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } catch (error, stackTrace) {
+        log.e(error, error, stackTrace);
+
+        displaySnackBar(
+          "Something went wrong, please try again later.",
+          context,
+        );
       }
-    }
-    // Handle errors gracefully.
-    on ServerException catch (error) {
-      displaySnackBar(error.message, context);
-    } on UserAlreadyExistsException catch (error) {
-      displaySnackBar(error.message, context);
-    } on WrongPasswordException catch (error) {
-      displaySnackBar(error.message, context);
-    } on NotLoggedInException {
-      print("NOT LOGGED IN");
     }
   }
 

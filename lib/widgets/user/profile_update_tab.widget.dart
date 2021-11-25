@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/user/update_profile/update_profile.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
@@ -151,24 +152,43 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
     try {
       // Validate the form.
       if (this._formKey.currentState!.validate()) {
-        // Prepare DTO for updating profile.
-        UpdateProfileDto updateProfileDto = new UpdateProfileDto(
-          firstName: this._firstNameController.text,
-          lastName: this._lastNameController.text,
-          biography: this._biographyController.text,
-          imageUrl: this._authProvider.getUser()!.imageUrl,
-        );
+        try {
+          // Prepare DTO for updating profile.
+          UpdateProfileDto updateProfileDto = new UpdateProfileDto(
+            firstName: this._firstNameController.text,
+            lastName: this._lastNameController.text,
+            biography: this._biographyController.text,
+            imageUrl: this._authProvider.getUser()!.imageUrl,
+          );
 
-        // Update it on server and also update the state as well.
-        User user = await this._userService.updateUserProfile(
-              updateProfileDto,
-              this._authProvider.getUser()!,
-            );
+          // Update it on server and also update the state as well.
+          User user = await this._userService.updateUserProfile(
+                updateProfileDto,
+                this._authProvider.getUser()!,
+              );
 
-        this._authProvider.saveUser(user);
+          this._authProvider.saveUser(user);
 
-        // Display success snackbar.
-        displaySnackBar("Profile updated!", context);
+          // Display success snackbar.
+          displaySnackBar("Profile updated!", context);
+        } on ServerException catch (error) {
+          displaySnackBar(
+            error.message,
+            context,
+          );
+        } on NotLoggedInException catch (error) {
+          displaySnackBar(
+            error.message,
+            context,
+          );
+        } catch (error, stackTrace) {
+          log.e(error, error, stackTrace);
+
+          displaySnackBar(
+            "Something went wrong, please try again later.",
+            context,
+          );
+        }
       }
     }
     // Handle errors gracefully.
