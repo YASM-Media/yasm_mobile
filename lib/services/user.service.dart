@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:hive/hive.dart';
@@ -28,51 +30,67 @@ class UserService {
    * Method for fetching the user from server using firebase id token.
    */
   Future<User> getUser(String userId) async {
-    // Get the logged in user details.
-    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+    try {
+      // Get the logged in user details.
+      FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
-    // Check if user is not null.
-    if (firebaseUser == null) {
-      throw NotLoggedInException(message: "User not logged in.");
-    }
-    // Fetch the ID token for the user.
-    String firebaseAuthToken =
-        await this._firebaseAuth.currentUser!.getIdToken(true);
+      // Check if user is not null.
+      if (firebaseUser == null) {
+        throw NotLoggedInException(message: "User not logged in.");
+      }
+      // Fetch the ID token for the user.
+      String firebaseAuthToken =
+          await this._firebaseAuth.currentUser!.getIdToken(true);
 
-    // Prepare URL and the auth header.
-    Uri url = Uri.parse("$ENDPOINT/follow-api/get/$userId");
-    Map<String, String> headers = {
-      "Authorization": "Bearer $firebaseAuthToken",
-    };
+      // Prepare URL and the auth header.
+      Uri url = Uri.parse("$ENDPOINT/follow-api/get/$userId");
+      Map<String, String> headers = {
+        "Authorization": "Bearer $firebaseAuthToken",
+      };
 
-    // Fetch user details from the server
-    http.Response response = await http
-        .get(
-          url,
-          headers: headers,
-        )
-        .timeout(new Duration(seconds: 10));
+      // Fetch user details from the server
+      http.Response response = await http
+          .get(
+            url,
+            headers: headers,
+          )
+          .timeout(new Duration(seconds: 10));
 
-    // Check if the response does not contain any error.
-    if (response.statusCode >= 400 && response.statusCode < 500) {
+      // Check if the response does not contain any error.
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+        throw ServerException(message: body['message']);
+      } else if (response.statusCode >= 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+
+        log.e(body["message"]);
+
+        throw ServerException(
+          message: 'Something went wrong, please try again later.',
+        );
+      }
+
+      // Decode the JSON object and build the user object from JSON.
       Map<String, dynamic> body = json.decode(response.body);
-      throw ServerException(message: body['message']);
-    } else if (response.statusCode >= 500) {
-      Map<String, dynamic> body = json.decode(response.body);
+      User user = User.fromJson(body);
 
-      log.e(body["message"]);
+      this._saveUserDetailsToDevice(user, userId);
 
-      throw ServerException(
-        message: 'Something went wrong, please try again later.',
-      );
+      // Return the user details.
+      return user;
+    } on SocketException {
+      log.wtf("Dedicated Server Offline");
+      return this._fetchUserDetailsFromDevice(userId);
+    } on TimeoutException {
+      log.wtf("Dedicated Server Offline");
+      return this._fetchUserDetailsFromDevice(userId);
+    } on FA.FirebaseAuthException catch (error) {
+      if (error.code == "network-request-failed") {
+        return this._fetchUserDetailsFromDevice(userId);
+      } else {
+        throw error;
+      }
     }
-
-    // Decode the JSON object and build the user object from JSON.
-    Map<String, dynamic> body = json.decode(response.body);
-    User user = User.fromJson(body);
-
-    // Return the user details.
-    return user;
   }
 
   /*
@@ -360,5 +378,28 @@ class UserService {
 
     // Logout from firebase.
     await this._firebaseAuth.signOut();
+  }
+
+  void _saveUserDetailsToDevice(User user, String userId) {
+    log.i("Saving $userId to Hive DB");
+    this._yasmUserDb.put(userId, user);
+    log.i("Saved $userId to Hive DB");
+  }
+
+  User _fetchUserDetailsFromDevice(String userId) {
+    log.i("Fetching $userId from Hive DB");
+    return this._yasmUserDb.get(
+          userId,
+          defaultValue: new User(
+            id: "offline",
+            firstName: "",
+            lastName: "",
+            emailAddress: "",
+            biography: "",
+            imageUrl: "",
+            followers: [],
+            following: [],
+          ),
+        )!;
   }
 }
