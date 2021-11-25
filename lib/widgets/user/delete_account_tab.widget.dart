@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
@@ -50,9 +52,9 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
    * Form submission method for user delete.
    */
   Future<void> _onFormSubmit() async {
-    try {
-      // Validate the form.
-      if (this._formKey.currentState!.validate()) {
+    if (this._formKey.currentState!.validate()) {
+      try {
+        // Validate the form.
         // Delete the account from the server.
         await this
             ._userService
@@ -64,12 +66,25 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
         // Log out to the authentication page.
         Navigator.of(context).pushReplacementNamed(Auth.routeName);
       }
-    }
-    // Handle errors gracefully.
-    on ServerException catch (error) {
-      displaySnackBar(error.message, context);
-    } on NotLoggedInException {
-      print("NOT LOGGED IN");
+      // Handle errors gracefully.
+      on ServerException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } on NotLoggedInException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } catch (error, stackTrace) {
+        log.e(error, error, stackTrace);
+
+        displaySnackBar(
+          "Something went wrong, please try again later.",
+          context,
+        );
+      }
     }
   }
 
@@ -121,10 +136,22 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
                 textInputType: TextInputType.visiblePassword,
                 obscureText: true,
               ),
-              ElevatedButton(
-                onPressed: this._onFormSubmit,
-                child: Text('Delete Account'),
-              )
+              OfflineBuilder(
+                connectivityBuilder: (
+                  BuildContext context,
+                  ConnectivityResult connectivity,
+                  Widget _,
+                ) {
+                  final bool connected =
+                      connectivity != ConnectivityResult.none;
+                  return ElevatedButton(
+                    onPressed: connected ? this._onFormSubmit : null,
+                    child:
+                        Text(connected ? 'Delete Account' : 'You are offline'),
+                  );
+                },
+                child: SizedBox(),
+              ),
             ],
           ),
         ),

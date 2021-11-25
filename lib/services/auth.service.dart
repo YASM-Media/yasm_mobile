@@ -1,14 +1,20 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
 import 'package:yasm_mobile/dto/auth/register_user/register_user.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
-import 'package:yasm_mobile/exceptions/auth/user_already_exists.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/user_not_found.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
+import 'package:yasm_mobile/exceptions/common/general.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 
 /*
@@ -16,47 +22,85 @@ import 'package:yasm_mobile/models/user/user.model.dart';
  */
 class AuthService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+  final Box<User> _yasmUserDb = Hive.box<User>(YASM_USER_BOX);
 
   /*
    * Method for fetching the user from server using firebase id token.
    */
   Future<User> getLoggedInUser() async {
-    // Get the logged in user details.
-    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+    try {
+      // Get the logged in user details.
+      FA.User? firebaseUser = this._firebaseAuth.currentUser;
 
-    // Check if user is not null.
-    if (firebaseUser != null) {
+      // Check if user is not null.
+      if (firebaseUser == null) {
+        // If there is no user logged is using firebase, throw an exception.
+        throw NotLoggedInException(message: "User not logged in.");
+      }
       // Fetch the ID token for the user.
       String firebaseAuthToken =
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$endpoint/follow-api/get");
+      Uri url = Uri.parse("$ENDPOINT/follow-api/get");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };
 
       // Fetch user details from the server
-      http.Response response = await http.get(
-        url,
-        headers: headers,
-      );
+      http.Response response = await http
+          .get(
+            url,
+            headers: headers,
+          )
+          .timeout(new Duration(seconds: 10));
 
       // Check if the response does not contain any error.
-      if (response.statusCode >= 400) {
-        throw NotLoggedInException(message: "User not logged in.");
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+        throw ServerException(message: body['message']);
+      } else if (response.statusCode >= 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+
+        log.e(body["message"]);
+
+        throw ServerException(
+          message: 'Something went wrong, please try again later.',
+        );
       }
 
       // Decode the JSON object and build the user object from JSON.
       Map<String, dynamic> body = json.decode(response.body);
       User loggedInUser = User.fromJson(body);
 
+      log.i("Saving user to Hive DB");
+      this._yasmUserDb.put(LOGGED_IN_USER, loggedInUser);
+      log.i("Saved user to Hive DB");
+
       // Return the user details.
       return loggedInUser;
-    } else {
-      // If there is no user logged is using firebase, throw an exception.
-      throw NotLoggedInException(message: "User not logged in.");
+    } on SocketException {
+      log.wtf("Dedicated Server Offline");
+      User? loggedInUser = this.fetchOfflineUser();
+      if (loggedInUser == null) {
+        throw NotLoggedInException(message: "User not logged in.");
+      } else {
+        return loggedInUser;
+      }
+    } on TimeoutException {
+      log.wtf("Dedicated Server Offline");
+      User? loggedInUser = this.fetchOfflineUser();
+      if (loggedInUser == null) {
+        throw NotLoggedInException(message: "User not logged in.");
+      } else {
+        return loggedInUser;
+      }
     }
+  }
+
+  User? fetchOfflineUser() {
+    log.i("Fetching user from Hive DB");
+    return this._yasmUserDb.get(LOGGED_IN_USER);
   }
 
   /*
@@ -65,23 +109,32 @@ class AuthService {
    */
   Future<void> registerUser(RegisterUser registerUser) async {
     // Prepare URL and the content type header.
-    Uri url = Uri.parse("$endpoint/auth/register");
+    Uri url = Uri.parse("$ENDPOINT/auth/register");
     Map<String, String> headers = {
       "Content-Type": "application/json",
     };
 
     // Send details to server for user registration.
-    http.Response response = await http.post(
-      url,
-      headers: headers,
-      body: json.encode(registerUser.toJson()),
-    );
+    http.Response response = await http
+        .post(
+          url,
+          headers: headers,
+          body: json.encode(registerUser.toJson()),
+        )
+        .timeout(new Duration(seconds: 10));
 
-    // Check for errors and then throw an error.
-    if (response.statusCode == 422) {
-      // Get the server response decoded from JSON form.
+    // Check if the response does not contain any error.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
       Map<String, dynamic> body = json.decode(response.body);
-      throw UserAlreadyExistsException(message: body["message"]);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
     }
   }
 
@@ -89,7 +142,7 @@ class AuthService {
    * Method to log the user in the application.
    * @param loginUser DTO for user login
    */
-  Future<User?> login(LoginUser loginUser) async {
+  Future<User> login(LoginUser loginUser) async {
     try {
       // Log the user in with firebase using their credentials.
       await _firebaseAuth.signInWithEmailAndPassword(
@@ -99,7 +152,7 @@ class AuthService {
 
       // Return the user details from server.
       return await this.getLoggedInUser();
-    } on FA.FirebaseAuthException catch (error) {
+    } on FA.FirebaseAuthException catch (error, stackTrace) {
       // Firebase Error: If the user does not exist.
       if (error.code == 'user-not-found') {
         throw UserNotFoundException(
@@ -111,7 +164,16 @@ class AuthService {
         throw WrongPasswordException(
           message: 'Wrong password provided for the specified user account.',
         );
+      } else {
+        log.e(error.code, error.code, stackTrace);
+        throw GeneralException(
+            message: 'Something went wrong, please try again later.');
       }
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      throw GeneralException(
+          message: 'Something went wrong, please try again later.');
     }
   }
 
@@ -130,6 +192,11 @@ class AuthService {
           message: 'No user found for that email.',
         );
       }
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      throw GeneralException(
+          message: 'Something went wrong, please try again later.');
     }
   }
 
@@ -139,8 +206,11 @@ class AuthService {
   Future<void> logout() async {
     try {
       await _firebaseAuth.signOut();
-    } catch (error) {
-      print(error);
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      throw GeneralException(
+          message: 'Something went wrong, please try again later.');
     }
   }
 }

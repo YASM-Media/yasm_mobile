@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/user/update_password/update_password.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/auth/wrong_password.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/exceptions/user/weak_password.exception.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
@@ -51,9 +54,9 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
    * Form submission method for user password update.
    */
   Future<void> _onFormSubmit() async {
-    try {
-      // Validate the form.
-      if (this._formKey.currentState!.validate()) {
+    // Validate the form.
+    if (this._formKey.currentState!.validate()) {
+      try {
         // Prepare DTO for updating password.
         UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto(
           oldPassword: this._oldPasswordController.text,
@@ -65,15 +68,24 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
 
         // Display success snackbar.
         displaySnackBar("Password updated!", context);
+      } on ServerException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } on NotLoggedInException catch (error) {
+        displaySnackBar(
+          error.message,
+          context,
+        );
+      } catch (error, stackTrace) {
+        log.e(error, error, stackTrace);
+
+        displaySnackBar(
+          "Something went wrong, please try again later.",
+          context,
+        );
       }
-    }
-    // Handle errors gracefully.
-    on WrongPasswordException catch (error) {
-      displaySnackBar(error.message, context);
-    } on WeakPasswordException catch (error) {
-      displaySnackBar(error.message, context);
-    } on NotLoggedInException {
-      print("NOT LOGGED IN");
     }
   }
 
@@ -141,10 +153,22 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
                 textInputType: TextInputType.visiblePassword,
                 obscureText: true,
               ),
-              ElevatedButton(
-                onPressed: this._onFormSubmit,
-                child: Text('Update Password'),
-              )
+              OfflineBuilder(
+                connectivityBuilder: (
+                  BuildContext context,
+                  ConnectivityResult connectivity,
+                  Widget _,
+                ) {
+                  final bool connected =
+                      connectivity != ConnectivityResult.none;
+                  return ElevatedButton(
+                    onPressed: connected ? this._onFormSubmit : null,
+                    child:
+                        Text(connected ? 'Update Password' : 'You are offline'),
+                  );
+                },
+                child: SizedBox(),
+              ),
             ],
           ),
         ),

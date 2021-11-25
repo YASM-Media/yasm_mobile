@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/services/search.service.dart';
 import 'package:yasm_mobile/widgets/user/user_list.widget.dart';
@@ -33,7 +34,9 @@ class _UserSearchState extends State<UserSearch> {
       future: this._searchService.searchForUser(widget.searchQuery),
       builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
         if (snapshot.hasError) {
-          print("ERROR: ${snapshot.error}");
+          log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
+
+          return Text('Something went wrong, please try again later');
         }
 
         if (snapshot.connectionState == ConnectionState.done) {

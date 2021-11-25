@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/post/create_post/create_post.dto.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/services/post.service.dart';
@@ -62,7 +64,22 @@ class _PostDescriptionState extends State<PostDescription> {
 
       Navigator.of(context).pushReplacementNamed(Home.routeName);
     } on ServerException catch (error) {
-      print(error.message);
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } on NotLoggedInException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      displaySnackBar(
+        "Something went wrong, please try again later.",
+        context,
+      );
     }
   }
 

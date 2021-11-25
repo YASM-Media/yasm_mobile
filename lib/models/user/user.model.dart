@@ -1,24 +1,38 @@
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.model.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: 1)
 class User {
+
+  @HiveField(0)
   String id;
+
+  @HiveField(1)
   String firstName;
+
+  @HiveField(2)
   String lastName;
+
+  @HiveField(3)
   String emailAddress;
 
   @JsonKey(defaultValue: '')
+  @HiveField(4)
   String biography;
 
   @JsonKey(defaultValue: '')
+  @HiveField(5)
   String imageUrl;
 
   @JsonKey(defaultValue: [])
+  @HiveField(6)
   List<User> followers;
 
   @JsonKey(defaultValue: [])
+  @HiveField(7)
   List<User> following;
 
   User({

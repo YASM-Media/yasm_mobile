@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/comment_form_type.constant.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/comment/delete_comment/delete_comment.dto.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
@@ -36,11 +39,30 @@ class _FullPostState extends State<FullPost> {
   }
 
   Future<void> _refreshPost() async {
-    Post newPost = await this._postService.fetchPostById(_postId);
+    try {
+      Post newPost = await this._postService.fetchPostById(_postId);
 
-    setState(() {
-      this._post = newPost;
-    });
+      setState(() {
+        this._post = newPost;
+      });
+    } on ServerException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } on NotLoggedInException catch (error) {
+      displaySnackBar(
+        error.message,
+        context,
+      );
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+
+      displaySnackBar(
+        "Something went wrong, please try again later.",
+        context,
+      );
+    }
   }
 
   void _onEditComment(BuildContext context, Post comment) {
@@ -77,18 +99,7 @@ class _FullPostState extends State<FullPost> {
             children: [
               TextButton(
                 onPressed: () async {
-                  DeleteCommentDto deleteCommentDto = new DeleteCommentDto(
-                    postId: this._post.id,
-                    commentId: comment.id,
-                  );
-
-                  await this._commentService.deleteComment(deleteCommentDto);
-
-                  Navigator.of(context).pop();
-
-                  displaySnackBar("Comment Deleted!", context);
-
-                  await this._refreshPost();
+                  await _handleDeletingComment(comment, context);
                 },
                 child: Text('YES'),
               ),
@@ -105,6 +116,31 @@ class _FullPostState extends State<FullPost> {
     );
   }
 
+  Future<void> _handleDeletingComment(
+      Post comment, BuildContext context) async {
+    try {
+      DeleteCommentDto deleteCommentDto = new DeleteCommentDto(
+        postId: this._post.id,
+        commentId: comment.id,
+      );
+
+      await this._commentService.deleteComment(deleteCommentDto);
+
+      Navigator.of(context).pop();
+
+      displaySnackBar("Comment Deleted!", context);
+
+      await this._refreshPost();
+    } on ServerException catch (error) {
+      displaySnackBar(error.message, context);
+    } on NotLoggedInException catch (error) {
+      displaySnackBar(error.message, context);
+    } catch (error, stackTrace) {
+      log.e(error, error, stackTrace);
+      displaySnackBar("Something went wrong, please try again later.", context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     this._postId = ModalRoute.of(context)!.settings.arguments as String;
@@ -116,7 +152,9 @@ class _FullPostState extends State<FullPost> {
         future: this._postService.fetchPostById(this._postId),
         builder: (BuildContext context, AsyncSnapshot<Post> snapshot) {
           if (snapshot.hasError) {
-            print(snapshot.error);
+            log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
+
+            return Text("Something went wrong, please try again later.");
           }
 
           if (snapshot.connectionState == ConnectionState.done) {
