@@ -9,6 +9,8 @@ import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/posts/update_post.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
 import 'package:yasm_mobile/pages/search/search_results.page.dart';
+import 'package:yasm_mobile/pages/stories/create_story.page.dart';
+import 'package:yasm_mobile/pages/stories/create_story.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 
@@ -67,6 +69,7 @@ class App extends StatelessWidget {
         FullPost.routeName: (context) => FullPost(),
         Search.routeName: (context) => Search(),
         SearchResults.routeName: (context) => SearchResults(),
+        CreateStory.routeName: (context) => CreateStory(),
       },
     );
   }
