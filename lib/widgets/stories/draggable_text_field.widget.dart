@@ -10,9 +10,13 @@ class DraggableTextField extends StatefulWidget {
 }
 
 class _DraggableTextFieldState extends State<DraggableTextField> {
-  String text = 'Enter Text';
-  double xPosition = 0;
-  double yPosition = 0;
+  String _text = 'Enter Text';
+  double _xPosition = 0;
+  double _yPosition = 0;
+  double _scale = 1;
+  double _rotate = 0;
+  double _currentScale = 0;
+  double _currentRotate = 0;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _textEditingController =
@@ -27,20 +31,34 @@ class _DraggableTextFieldState extends State<DraggableTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Positioned(
-        top: yPosition,
-        left: xPosition,
-        child: GestureDetector(
-          onPanUpdate: this._handleGesturePanUpdate,
-          onTap: this._handleGestureTap,
-          child: Container(
-            color: Colors.pink,
-            padding: EdgeInsets.all(
-              20.0,
-            ),
-            child: Text(
-              this.text,
+    return Positioned(
+      top: _yPosition,
+      left: _xPosition,
+      child: Transform.rotate(
+        angle: this._rotate,
+        child: Transform.scale(
+          scale: this._scale,
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onScaleStart: _handleGestureScaleStart,
+            onScaleUpdate: _handleGestureScaleUpdate,
+            onTap: this._handleGestureTap,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.3,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              padding: EdgeInsets.all(
+                MediaQuery.of(context).size.height * 0.02,
+              ),
+              child: Text(
+                this._text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
             ),
           ),
         ),
@@ -48,40 +66,49 @@ class _DraggableTextFieldState extends State<DraggableTextField> {
     );
   }
 
-  void _handleGesturePanUpdate(tapData) {
+  void _handleGestureScaleStart(ScaleStartDetails details) {
     setState(() {
-      this.xPosition += tapData.delta.dx;
-      this.yPosition += tapData.delta.dy;
+      this._currentRotate = this._rotate;
+      this._currentScale = this._scale;
+    });
+  }
+
+  void _handleGestureScaleUpdate(ScaleUpdateDetails details) {
+    setState(() {
+      this._scale = details.scale * this._currentScale;
+      this._rotate = this._currentRotate + details.rotation;
+      this._xPosition =
+          details.focalPoint.dx - MediaQuery.of(context).size.height * 0.02 * 2;
+      this._yPosition =
+          details.focalPoint.dy - MediaQuery.of(context).size.height * 0.02 * 2;
     });
   }
 
   void _handleGestureTap() {
-    this._textEditingController.text = this.text;
+    this._textEditingController.text = this._text;
     showDialog(
       context: context,
-      builder: (BuildContext context) => Material(
-        color: Colors.transparent,
-        child: Container(
-          child: Center(
-            child: Form(
-              key: this._formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomField(
-                    textFieldController: this._textEditingController,
-                    label: "Edit Text",
-                    validators: [
-                      RequiredValidator(errorText: "Text is required."),
-                    ],
-                    textInputType: TextInputType.text,
-                  ),
-                  TextButton(
-                    onPressed: _handleTextChange,
-                    child: Text('OK'),
-                  ),
-                ],
-              ),
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: Center(
+          child: Form(
+            key: this._formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomField(
+                  textFieldController: this._textEditingController,
+                  label: "Edit Text",
+                  validators: [
+                    RequiredValidator(errorText: "Text is required."),
+                  ],
+                  textInputType: TextInputType.text,
+                ),
+                TextButton(
+                  onPressed: _handleTextChange,
+                  child: Text('OK'),
+                ),
+              ],
             ),
           ),
         ),
@@ -95,7 +122,7 @@ class _DraggableTextFieldState extends State<DraggableTextField> {
     }
 
     setState(() {
-      this.text = this._textEditingController.text;
+      this._text = this._textEditingController.text;
     });
 
     Navigator.of(context).pop();
