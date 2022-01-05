@@ -1,16 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:yasm_mobile/services/stories.service.dart';
-import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/utils/image_picker.util.dart';
 import 'package:yasm_mobile/widgets/stories/draggable_text_field.widget.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
-
 
 class CreateStory extends StatefulWidget {
   const CreateStory({Key? key}) : super(key: key);
@@ -47,13 +46,11 @@ class _CreateStoryState extends State<CreateStory> {
       // Prepare the file from the selected image.
       File imageFile = new File(imageXFile.path);
 
-      // Upload the image to firebase and generate a URL.
+      setState(() {
+        this.bgImage = imageFile;
+      });
 
-      // Display a success snackbar.
-      displaySnackBar(
-        "Image has been uploaded! Please click \"Update Profile\" to confirm your changes when you are done!",
-        context,
-      );
+      Navigator.of(context).pop();
     }
   }
 
@@ -69,11 +66,11 @@ class _CreateStoryState extends State<CreateStory> {
       // Prepare the file from the selected image.
       File imageFile = new File(imageXFile.path);
 
-      // Display a success snackbar.
-      displaySnackBar(
-        "Image has been uploaded! Please click \"Update Profile\" to confirm your changes when you are done!",
-        context,
-      );
+      setState(() {
+        this.bgImage = imageFile;
+      });
+
+      Navigator.of(context).pop();
     }
   }
 
@@ -108,14 +105,37 @@ class _CreateStoryState extends State<CreateStory> {
           controller: this._screenshotController,
           child: Container(
             child: Stack(
-              children: _textFields,
+              children: this.bgImage == null
+                  ? _textFields
+                  : [
+                      Image.file(
+                        this.bgImage!,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        fit: BoxFit.fill,
+                      ),
+                      ClipRRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                          child: Image.file(
+                            this.bgImage!,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                            fit: BoxFit.fitWidth,
+                          ),
+                        ),
+                      ),
+                      ..._textFields,
+                    ],
             ),
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (int index) {
-          if (index == 1) {
+          if (index == 0) {
+            this._onUploadImage();
+          } else if (index == 1) {
             setState(
               () {
                 this._textFields.add(
@@ -150,8 +170,9 @@ class _CreateStoryState extends State<CreateStory> {
   Future<void> _handleAddStory() async {
     Uint8List? screenshot = await this._screenshotController.capture();
 
-    if(screenshot != null) {
-      String url = await this._storiesService.uploadStoryAndGenerateUrl(screenshot);
+    if (screenshot != null) {
+      String url =
+          await this._storiesService.uploadStoryAndGenerateUrl(screenshot);
 
       print(url);
     }

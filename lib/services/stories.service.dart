@@ -21,7 +21,7 @@ class StoriesService {
 
     return await this
         ._firebaseStorage
-        .ref("stories/$imageUuid.png")
+        .ref("stories/$imageUuid.jpg")
         .getDownloadURL();
   }
 }
