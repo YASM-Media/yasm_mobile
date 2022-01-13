@@ -33,6 +33,7 @@ Future<void> main() async {
 
   await Hive.openBox<User>(YASM_USER_BOX);
   await Hive.openBox<List<dynamic>>(YASM_POSTS_BOX);
+  await Hive.openBox<List<dynamic>>(YASM_STORIES_BOX);
   runApp(Root());
 }
 
