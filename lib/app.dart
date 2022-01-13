@@ -11,6 +11,8 @@ import 'package:yasm_mobile/pages/search/search.page.dart';
 import 'package:yasm_mobile/pages/search/search_results.page.dart';
 import 'package:yasm_mobile/pages/stories/create_story.page.dart';
 import 'package:yasm_mobile/pages/stories/create_story.page.dart';
+import 'package:yasm_mobile/pages/stories/story.page.dart';
+import 'package:yasm_mobile/pages/stories/story.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 
@@ -69,6 +71,7 @@ class App extends StatelessWidget {
         FullPost.routeName: (context) => FullPost(),
         Search.routeName: (context) => Search(),
         SearchResults.routeName: (context) => SearchResults(),
+        Story.routeName: (context) => Story(),
         CreateStory.routeName: (context) => CreateStory(),
       },
     );

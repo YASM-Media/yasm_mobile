@@ -1,22 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/arguments/story.argument.dart';
+import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
 import 'package:yasm_mobile/pages/stories/create_story.page.dart';
+import 'package:yasm_mobile/pages/stories/story.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
+import 'package:yasm_mobile/services/stories.service.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   static const routeName = "/home";
 
   Home({Key? key}) : super(key: key);
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   final AuthService _authService = AuthService();
+  late final StoriesService _storiesService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this._storiesService = Provider.of<StoriesService>(context, listen: false);
+  }
 
   Future<void> logout(context) async {
     await _authService.logout();
@@ -78,6 +95,18 @@ class Home extends StatelessWidget {
                     Navigator.of(context).pushNamed(CreateStory.routeName);
                   },
                   child: Text('Create Story'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    List<User> stories =
+                        await this._storiesService.fetchAvailableStories();
+
+                    Navigator.of(context).pushNamed(
+                      Story.routeName,
+                      arguments: StoryArgument(stories: stories, index: 0),
+                    );
+                  },
+                  child: Text('Display Stories'),
                 ),
               ],
             ),
