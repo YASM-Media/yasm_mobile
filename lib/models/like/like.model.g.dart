@@ -47,12 +47,10 @@ class LikeAdapter extends TypeAdapter<Like> {
 // JsonSerializableGenerator
 // **************************************************************************
 
-Like _$LikeFromJson(Map<String, dynamic> json) {
-  return Like(
-    id: json['id'] as String,
-    user: User.fromJson(json['user'] as Map<String, dynamic>),
-  );
-}
+Like _$LikeFromJson(Map<String, dynamic> json) => Like(
+      id: json['id'] as String,
+      user: User.fromJson(json['user'] as Map<String, dynamic>),
+    );
 
 Map<String, dynamic> _$LikeToJson(Like instance) => <String, dynamic>{
       'id': instance.id,

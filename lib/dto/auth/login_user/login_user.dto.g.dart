@@ -6,12 +6,10 @@ part of 'login_user.dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-LoginUser _$LoginUserFromJson(Map<String, dynamic> json) {
-  return LoginUser(
-    email: json['email'] as String,
-    password: json['password'] as String,
-  );
-}
+LoginUser _$LoginUserFromJson(Map<String, dynamic> json) => LoginUser(
+      email: json['email'] as String,
+      password: json['password'] as String,
+    );
 
 Map<String, dynamic> _$LoginUserToJson(LoginUser instance) => <String, dynamic>{
       'email': instance.email,

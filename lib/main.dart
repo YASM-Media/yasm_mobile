@@ -8,6 +8,7 @@ import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/models/image/image.model.dart' as ImageModel;
 import 'package:yasm_mobile/models/like/like.model.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
+import 'package:yasm_mobile/models/story/story.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
@@ -28,9 +29,11 @@ Future<void> main() async {
   Hive.registerAdapter<Post>(new PostAdapter());
   Hive.registerAdapter<ImageModel.Image>(new ImageModel.ImageAdapter());
   Hive.registerAdapter<Like>(new LikeAdapter());
+  Hive.registerAdapter<Story>(new StoryAdapter());
 
   await Hive.openBox<User>(YASM_USER_BOX);
   await Hive.openBox<List<dynamic>>(YASM_POSTS_BOX);
+  await Hive.openBox<List<dynamic>>(YASM_STORIES_BOX);
   runApp(Root());
 }
 

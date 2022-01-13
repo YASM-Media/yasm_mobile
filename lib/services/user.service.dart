@@ -399,6 +399,7 @@ class UserService {
             imageUrl: "",
             followers: [],
             following: [],
+            stories: [],
           ),
         )!;
   }

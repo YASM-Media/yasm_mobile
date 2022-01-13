@@ -1,12 +1,12 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:yasm_mobile/models/story/story.model.dart';
 
 part 'user.model.g.dart';
 
 @JsonSerializable()
 @HiveType(typeId: 1)
 class User {
-
   @HiveField(0)
   String id;
 
@@ -35,6 +35,10 @@ class User {
   @HiveField(7)
   List<User> following;
 
+  @JsonKey(defaultValue: [])
+  @HiveField(8, defaultValue: [])
+  List<Story> stories;
+
   User({
     required this.id,
     required this.firstName,
@@ -44,14 +48,10 @@ class User {
     required this.imageUrl,
     required this.followers,
     required this.following,
+    required this.stories,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
-
-  @override
-  String toString() {
-    return 'User{id: $id, firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress, biography: $biography, imageUrl: $imageUrl, followers: $followers, following: $following}';
-  }
 }

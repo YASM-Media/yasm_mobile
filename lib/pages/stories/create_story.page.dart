@@ -6,7 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
+import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/services/stories.service.dart';
+import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/utils/image_picker.util.dart';
 import 'package:yasm_mobile/widgets/stories/draggable_text_field.widget.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
@@ -171,10 +175,21 @@ class _CreateStoryState extends State<CreateStory> {
     Uint8List? screenshot = await this._screenshotController.capture();
 
     if (screenshot != null) {
-      String url =
-          await this._storiesService.uploadStoryAndGenerateUrl(screenshot);
+      try {
+        await this._storiesService.createStory(screenshot);
 
-      print(url);
+        displaySnackBar("Story Posted!", context);
+
+        Navigator.of(context).pop();
+      } on ServerException catch (error) {
+        displaySnackBar(error.message, context);
+      } on NotLoggedInException catch (error) {
+        displaySnackBar(error.message, context);
+      } catch (error, stackTrace) {
+        log.e(error, error, stackTrace);
+        displaySnackBar(
+            "Something went wrong, please try again later.", context);
+      }
     }
   }
 }

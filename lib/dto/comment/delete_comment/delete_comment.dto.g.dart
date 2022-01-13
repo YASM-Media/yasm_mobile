@@ -6,12 +6,11 @@ part of 'delete_comment.dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-DeleteCommentDto _$DeleteCommentDtoFromJson(Map<String, dynamic> json) {
-  return DeleteCommentDto(
-    postId: json['postId'] as String,
-    commentId: json['commentId'] as String,
-  );
-}
+DeleteCommentDto _$DeleteCommentDtoFromJson(Map<String, dynamic> json) =>
+    DeleteCommentDto(
+      postId: json['postId'] as String,
+      commentId: json['commentId'] as String,
+    );
 
 Map<String, dynamic> _$DeleteCommentDtoToJson(DeleteCommentDto instance) =>
     <String, dynamic>{

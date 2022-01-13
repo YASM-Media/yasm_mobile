@@ -47,12 +47,10 @@ class ImageAdapter extends TypeAdapter<Image> {
 // JsonSerializableGenerator
 // **************************************************************************
 
-Image _$ImageFromJson(Map<String, dynamic> json) {
-  return Image(
-    id: json['id'] as String,
-    imageUrl: json['imageUrl'] as String,
-  );
-}
+Image _$ImageFromJson(Map<String, dynamic> json) => Image(
+      id: json['id'] as String,
+      imageUrl: json['imageUrl'] as String,
+    );
 
 Map<String, dynamic> _$ImageToJson(Image instance) => <String, dynamic>{
       'id': instance.id,
