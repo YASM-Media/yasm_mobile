@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/story/create_story/create_story.dto.dart';
+import 'package:yasm_mobile/dto/story/delete_story/delete_story.dto.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:http/http.dart' as http;
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
@@ -45,6 +46,51 @@ class StoriesService {
           url,
           headers: headers,
           body: createStoryDto.toJson(),
+        )
+        .timeout(new Duration(seconds: 10));
+
+    // Check if the response does not contain any error.
+    if (response.statusCode >= 400 && response.statusCode < 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+      log.e(body["message"]);
+      throw ServerException(message: body['message']);
+    } else if (response.statusCode >= 500) {
+      Map<String, dynamic> body = json.decode(response.body);
+
+      log.e(body["message"]);
+
+      throw ServerException(
+        message: 'Something went wrong, please try again later.',
+      );
+    }
+  }
+
+  Future<void> deleteStory(DeleteStoryDto deleteStoryDto) async {
+    // Fetch the currently logged in user.
+    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+
+    // Check is the user exists.
+    if (firebaseUser == null) {
+      throw NotLoggedInException(message: "User not logged in.");
+    }
+
+    // Fetching the ID token for authentication.
+    String firebaseAuthToken = await firebaseUser.getIdToken();
+
+    // Preparing the URL for the server request.
+    Uri url = Uri.parse("$ENDPOINT/story");
+
+    // Preparing the headers for the request.
+    Map<String, String> headers = {
+      "Authorization": "Bearer $firebaseAuthToken",
+    };
+
+    // POSTing to the server with new post details.
+    http.Response response = await http
+        .delete(
+          url,
+          headers: headers,
+          body: deleteStoryDto.toJson(),
         )
         .timeout(new Duration(seconds: 10));
 
