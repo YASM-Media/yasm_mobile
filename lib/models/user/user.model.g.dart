@@ -65,24 +65,22 @@ class UserAdapter extends TypeAdapter<User> {
 // JsonSerializableGenerator
 // **************************************************************************
 
-User _$UserFromJson(Map<String, dynamic> json) {
-  return User(
-    id: json['id'] as String,
-    firstName: json['firstName'] as String,
-    lastName: json['lastName'] as String,
-    emailAddress: json['emailAddress'] as String,
-    biography: json['biography'] as String? ?? '',
-    imageUrl: json['imageUrl'] as String? ?? '',
-    followers: (json['followers'] as List<dynamic>?)
-            ?.map((e) => User.fromJson(e as Map<String, dynamic>))
-            .toList() ??
-        [],
-    following: (json['following'] as List<dynamic>?)
-            ?.map((e) => User.fromJson(e as Map<String, dynamic>))
-            .toList() ??
-        [],
-  );
-}
+User _$UserFromJson(Map<String, dynamic> json) => User(
+      id: json['id'] as String,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String,
+      emailAddress: json['emailAddress'] as String,
+      biography: json['biography'] as String? ?? '',
+      imageUrl: json['imageUrl'] as String? ?? '',
+      followers: (json['followers'] as List<dynamic>?)
+              ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      following: (json['following'] as List<dynamic>?)
+              ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'id': instance.id,

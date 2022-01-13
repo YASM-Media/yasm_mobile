@@ -1,35 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'like.model.dart';
+part of 'story.model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class LikeAdapter extends TypeAdapter<Like> {
+class StoryAdapter extends TypeAdapter<Story> {
   @override
-  final int typeId = 4;
+  final int typeId = 5;
 
   @override
-  Like read(BinaryReader reader) {
+  Story read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Like(
+    return Story(
       id: fields[0] as String,
-      user: fields[1] as User,
+      storyUrl: fields[1] as String,
+      user: fields[2] as User,
+      createdAt: fields[3] as DateTime,
+      updatedAt: fields[4] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Like obj) {
+  void write(BinaryWriter writer, Story obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.user);
+      ..write(obj.storyUrl)
+      ..writeByte(2)
+      ..write(obj.user)
+      ..writeByte(3)
+      ..write(obj.createdAt)
+      ..writeByte(4)
+      ..write(obj.updatedAt);
   }
 
   @override
@@ -38,7 +47,7 @@ class LikeAdapter extends TypeAdapter<Like> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is LikeAdapter &&
+      other is StoryAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -47,12 +56,18 @@ class LikeAdapter extends TypeAdapter<Like> {
 // JsonSerializableGenerator
 // **************************************************************************
 
-Like _$LikeFromJson(Map<String, dynamic> json) => Like(
+Story _$StoryFromJson(Map<String, dynamic> json) => Story(
       id: json['id'] as String,
+      storyUrl: json['storyUrl'] as String,
       user: User.fromJson(json['user'] as Map<String, dynamic>),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$LikeToJson(Like instance) => <String, dynamic>{
+Map<String, dynamic> _$StoryToJson(Story instance) => <String, dynamic>{
       'id': instance.id,
+      'storyUrl': instance.storyUrl,
       'user': instance.user,
+      'createdAt': instance.createdAt.toIso8601String(),
+      'updatedAt': instance.updatedAt.toIso8601String(),
     };
