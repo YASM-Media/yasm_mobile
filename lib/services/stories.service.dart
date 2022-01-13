@@ -16,6 +16,7 @@ import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:http/http.dart' as http;
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/story/story.model.dart';
+import 'package:yasm_mobile/models/user/user.model.dart';
 
 class StoriesService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
@@ -23,6 +24,73 @@ class StoriesService {
   final Uuid uuid = new Uuid();
   final Box<List<dynamic>> _yasmStoriesBox =
       Hive.box<List<dynamic>>(YASM_STORIES_BOX);
+
+  Future<List<User>> fetchAvailableStories() async {
+    // Fetch the currently logged in user.
+    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+
+    try {
+      // Check is the user exists.
+      if (firebaseUser == null) {
+        throw NotLoggedInException(message: "User not logged in.");
+      }
+
+      // Fetching the ID token for authentication.
+      String firebaseAuthToken = await firebaseUser.getIdToken();
+
+      // Preparing the URL for the server request.
+      Uri url = Uri.parse("$ENDPOINT/story");
+
+      // Preparing the headers for the request.
+      Map<String, String> headers = {
+        "Authorization": "Bearer $firebaseAuthToken",
+      };
+
+      // POSTing to the server with new post details.
+      http.Response response = await http
+          .get(
+            url,
+            headers: headers,
+          )
+          .timeout(new Duration(seconds: 10));
+
+      // Check if the response does not contain any error.
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+        log.e(body["message"]);
+        throw ServerException(message: body['message']);
+      } else if (response.statusCode >= 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+
+        log.e(body["message"]);
+
+        throw ServerException(
+          message: 'Something went wrong, please try again later.',
+        );
+      }
+
+      List<dynamic> responseData = json.decode(response.body);
+      List<User> stories = responseData
+          .map((rawResponse) => User.fromJson(rawResponse))
+          .toList();
+
+      this._saveAvailableStoriesToDevice(stories);
+
+      return stories;
+    } on SocketException {
+      log.wtf("Dedicated Server Offline");
+      return this._fetchAvailableStoriesFromDevice();
+    } on TimeoutException {
+      log.wtf("Dedicated Server Offline");
+      return this._fetchAvailableStoriesFromDevice();
+    } on FA.FirebaseAuthException catch (error) {
+      if (error.code == "network-request-failed") {
+        return this._fetchAvailableStoriesFromDevice();
+      } else {
+        throw error;
+      }
+    }
+  }
 
   Future<List<Story>> fetchStoriesByUser(String userId) async {
     // Fetch the currently logged in user.
@@ -224,5 +292,17 @@ class StoriesService {
     return this
         ._yasmStoriesBox
         .get(LOGGED_IN_USER_STORIES, defaultValue: [])!.cast<Story>();
+  }
+
+  void _saveAvailableStoriesToDevice(List<User> stories) {
+    log.i("Saving AVAILABLE STORIES to Hive DB");
+    this._yasmStoriesBox.put(AVAILABLE_STORIES, stories);
+    log.i("Saved AVAILABLE STORIES to Hive DB");
+  }
+
+  List<User> _fetchAvailableStoriesFromDevice() {
+    return this
+        ._yasmStoriesBox
+        .get(AVAILABLE_STORIES, defaultValue: [])!.cast<User>();
   }
 }

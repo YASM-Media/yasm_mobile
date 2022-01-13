@@ -19,7 +19,7 @@ class StoryAdapter extends TypeAdapter<Story> {
     return Story(
       id: fields[0] as String,
       storyUrl: fields[1] as String,
-      user: fields[2] as User,
+      user: fields[2] as User?,
       createdAt: fields[3] as DateTime,
       updatedAt: fields[4] as DateTime,
     );
@@ -59,7 +59,9 @@ class StoryAdapter extends TypeAdapter<Story> {
 Story _$StoryFromJson(Map<String, dynamic> json) => Story(
       id: json['id'] as String,
       storyUrl: json['storyUrl'] as String,
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      user: json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );

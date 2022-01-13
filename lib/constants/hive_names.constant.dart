@@ -11,4 +11,7 @@ const NEW_POSTS = "new-posts";
 const SUGGESTED_POSTS = "suggested-posts";
 const BEST_POSTS = "best-posts";
 const USER_POSTS = "user-posts";
+
+// Stories Keys
 const LOGGED_IN_USER_STORIES = "logged-in-user-stories";
+const AVAILABLE_STORIES = "available-stories";

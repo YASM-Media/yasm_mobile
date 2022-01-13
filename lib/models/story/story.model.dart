@@ -7,15 +7,15 @@ part 'story.model.g.dart';
 @JsonSerializable()
 @HiveType(typeId: 5)
 class Story {
-
   @HiveField(0)
   final String id;
 
   @HiveField(1)
   final String storyUrl;
 
-  @HiveField(2)
-  final User user;
+  @HiveField(2, defaultValue: null)
+  @JsonKey(defaultValue: null)
+  final User? user;
 
   @HiveField(3)
   final DateTime createdAt;
@@ -26,13 +26,12 @@ class Story {
   Story({
     required this.id,
     required this.storyUrl,
-    required this.user,
+    this.user,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory Story.fromJson(Map<String, dynamic> json) =>
-      _$StoryFromJson(json);
+  factory Story.fromJson(Map<String, dynamic> json) => _$StoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$StoryToJson(this);
 }
