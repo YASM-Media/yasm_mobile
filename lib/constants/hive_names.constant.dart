@@ -15,3 +15,4 @@ const USER_POSTS = "user-posts";
 // Stories Keys
 const LOGGED_IN_USER_STORIES = "logged-in-user-stories";
 const AVAILABLE_STORIES = "available-stories";
+const ARCHIVED_STORIES = "archived-stories";

@@ -92,6 +92,73 @@ class StoriesService {
     }
   }
 
+  Future<List<Story>> fetchArchivedStories() async {
+    // Fetch the currently logged in user.
+    FA.User? firebaseUser = this._firebaseAuth.currentUser;
+
+    try {
+      // Check is the user exists.
+      if (firebaseUser == null) {
+        throw NotLoggedInException(message: "User not logged in.");
+      }
+
+      // Fetching the ID token for authentication.
+      String firebaseAuthToken = await firebaseUser.getIdToken();
+
+      // Preparing the URL for the server request.
+      Uri url = Uri.parse("$ENDPOINT/story/archive");
+
+      // Preparing the headers for the request.
+      Map<String, String> headers = {
+        "Authorization": "Bearer $firebaseAuthToken",
+      };
+
+      // POSTing to the server with new post details.
+      http.Response response = await http
+          .get(
+            url,
+            headers: headers,
+          )
+          .timeout(new Duration(seconds: 10));
+
+      // Check if the response does not contain any error.
+      if (response.statusCode >= 400 && response.statusCode < 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+        log.e(body["message"]);
+        throw ServerException(message: body['message']);
+      } else if (response.statusCode >= 500) {
+        Map<String, dynamic> body = json.decode(response.body);
+
+        log.e(body["message"]);
+
+        throw ServerException(
+          message: 'Something went wrong, please try again later.',
+        );
+      }
+
+      List<dynamic> responseData = json.decode(response.body);
+      List<Story> stories = responseData
+          .map((rawResponse) => Story.fromJson(rawResponse))
+          .toList();
+
+      this._saveArchivedStoriesToDevice(stories);
+
+      return stories;
+    } on SocketException {
+      log.wtf("Dedicated Server Offline");
+      return this._fetchArchivedStoriesFromDevice();
+    } on TimeoutException {
+      log.wtf("Dedicated Server Offline");
+      return this._fetchArchivedStoriesFromDevice();
+    } on FA.FirebaseAuthException catch (error) {
+      if (error.code == "network-request-failed") {
+        return this._fetchArchivedStoriesFromDevice();
+      } else {
+        throw error;
+      }
+    }
+  }
+
   Future<List<Story>> fetchStoriesByUser(String userId) async {
     // Fetch the currently logged in user.
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
@@ -304,5 +371,17 @@ class StoriesService {
     return this
         ._yasmStoriesBox
         .get(AVAILABLE_STORIES, defaultValue: [])!.cast<User>();
+  }
+
+  void _saveArchivedStoriesToDevice(List<Story> stories) {
+    log.i("Saving ARCHIVED STORIES to Hive DB");
+    this._yasmStoriesBox.put(ARCHIVED_STORIES, stories);
+    log.i("Saved ARCHIVED STORIES to Hive DB");
+  }
+
+  List<Story> _fetchArchivedStoriesFromDevice() {
+    return this
+        ._yasmStoriesBox
+        .get(ARCHIVED_STORIES, defaultValue: [])!.cast<Story>();
   }
 }
