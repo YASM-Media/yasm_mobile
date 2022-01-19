@@ -3,6 +3,8 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/post_options.constant.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/pages/stories/create_story.page.dart';
+import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
@@ -52,22 +54,36 @@ class StoryUserDisplay extends StatelessWidget {
                     ) {
                       final bool connected =
                           connectivity != ConnectivityResult.none;
-                      return PopupMenuButton(
-                        enabled: connected,
-                        child: Icon(Icons.more_vert),
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            child: Text("Delete Story"),
-                            value: PostOptionsType.DELETE,
+                      return Row(
+                        children: [
+                          IconButton(
+                            onPressed: connected
+                                ? () {
+                                    Navigator.of(context).pushReplacementNamed(
+                                      CreateStory.routeName,
+                                    );
+                                  }
+                                : null,
+                            icon: Icon(Icons.add),
+                          ),
+                          PopupMenuButton(
+                            enabled: connected,
+                            child: Icon(Icons.more_vert),
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                child: Text("Delete Story"),
+                                value: PostOptionsType.DELETE,
+                              ),
+                            ],
+                            onSelected: (PostOptionsType selectedData) {
+                              if (selectedData == PostOptionsType.DELETE) {
+                                this.deleteStory();
+
+                                Navigator.of(context).pop();
+                              }
+                            },
                           ),
                         ],
-                        onSelected: (PostOptionsType selectedData) {
-                          if (selectedData == PostOptionsType.DELETE) {
-                            this.deleteStory();
-
-                            Navigator.of(context).pop();
-                          }
-                        },
                       );
                     },
                     child: SizedBox(),
@@ -75,28 +91,36 @@ class StoryUserDisplay extends StatelessWidget {
               ],
             );
           },
-          child: Row(
-            children: [
-              Container(
-                margin: EdgeInsets.all(10.0),
-                child: ProfilePicture(
-                  imageUrl: this.user.imageUrl,
-                  size: 30,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed(
+                UserProfile.routeName,
+                arguments: this.user.id,
+              );
+            },
+            child: Row(
+              children: [
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  child: ProfilePicture(
+                    imageUrl: this.user.imageUrl,
+                    size: 30,
+                  ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.all(10.0),
-                child: Text(
-                  "${this.user.firstName} ${this.user.lastName}",
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  child: Text(
+                    "${this.user.firstName} ${this.user.lastName}",
+                  ),
                 ),
-              ),
-              if (duration.inSeconds < 60)
-                Text('${duration.inSeconds}s ago')
-              else if (duration.inSeconds < 3600)
-                Text('${duration.inMinutes}m ago')
-              else
-                Text('${duration.inHours}h ago')
-            ],
+                if (duration.inSeconds < 60)
+                  Text('${duration.inSeconds}s ago')
+                else if (duration.inSeconds < 3600)
+                  Text('${duration.inMinutes}m ago')
+                else
+                  Text('${duration.inHours}h ago')
+              ],
+            ),
           ),
         ));
   }
