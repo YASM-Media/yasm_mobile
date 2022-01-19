@@ -1,0 +1,95 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yasm_mobile/arguments/story.argument.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/pages/stories/story.page.dart';
+import 'package:yasm_mobile/services/stories.service.dart';
+import 'package:yasm_mobile/widgets/stories/story_item.widget.dart';
+
+class StoriesList extends StatefulWidget {
+  const StoriesList({Key? key}) : super(key: key);
+
+  @override
+  _StoriesListState createState() => _StoriesListState();
+}
+
+class _StoriesListState extends State<StoriesList> {
+  List<User>? _stories;
+
+  late final StoriesService _storiesService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this._storiesService = Provider.of<StoriesService>(context, listen: false);
+  }
+
+  void _handleStoryPress(int index) {
+    Navigator.of(context).pushNamed(
+      Story.routeName,
+      arguments: StoryArgument(
+        stories: this._stories!,
+        index: index,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.1,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            FutureBuilder(
+              future: this._storiesService.fetchAvailableStories(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<User>> snapshot) {
+                if (snapshot.hasError) {
+                  log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
+
+                  return Text("Something went wrong, please try again later.");
+                }
+
+                if (snapshot.connectionState == ConnectionState.done) {
+                  this._stories = snapshot.data!;
+
+                  return Flexible(
+                    fit: FlexFit.loose,
+                    child: ListView.builder(
+                      itemCount: this._stories!.length,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (BuildContext context, int index) {
+                        User userStory = this._stories![index];
+
+                        return StoryItem(
+                          userStory: userStory,
+                          index: index,
+                          handleStoryPress: this._handleStoryPress,
+                        );
+                      },
+                    ),
+                  );
+                }
+
+                return Row(
+                  children: [
+                    CircularProgressIndicator(),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

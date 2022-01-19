@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
 import 'package:yasm_mobile/widgets/posts/post_list.widget.dart';
+import 'package:yasm_mobile/widgets/stories/stories_list.widget.dart';
 
 class Posts extends StatefulWidget {
   const Posts({Key? key}) : super(key: key);
@@ -22,7 +23,13 @@ class _PostsState extends State<Posts> {
       ),
       body: SingleChildScrollView(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Flexible(
+              fit: FlexFit.loose,
+              child: StoriesList(),
+            ),
             _buildSorter(),
             PostList(
               postFetchType: this._postFetchType,
