@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yasm_mobile/arguments/story.argument.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/dto/story/delete_story/delete_story.dto.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/services/stories.service.dart';
 import 'package:yasm_mobile/widgets/stories/story_user_display.widget.dart';
 
 class Story extends StatefulWidget {
@@ -23,6 +26,26 @@ class _StoryState extends State<Story> {
   int storyIndex = 0;
 
   Timer? _timer;
+
+  late final StoriesService _storiesService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this._storiesService = Provider.of<StoriesService>(
+      context,
+      listen: false,
+    );
+  }
+
+  Future<void> _deleteStory(String storyId) async {
+    await this._storiesService.deleteStory(
+          new DeleteStoryDto(
+            storyId: storyId,
+          ),
+        );
+  }
 
   void _startTimer() {
     this._timer = Timer(new Duration(seconds: 5), () {
@@ -168,6 +191,14 @@ class _StoryState extends State<Story> {
                             .stories![this.index!]
                             .stories[this.storyIndex]
                             .createdAt,
+                        deleteStory: () {
+                          this._deleteStory(
+                            this
+                                .stories![this.index!]
+                                .stories[this.storyIndex]
+                                .id,
+                          );
+                        },
                       ),
                     ],
                   ),
