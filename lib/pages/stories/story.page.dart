@@ -109,6 +109,10 @@ class _StoryState extends State<Story> {
 
       this.stories = argument.stories;
       this.index = argument.index;
+
+      if (this.stories!.length == 0) {
+        Navigator.of(context).pop();
+      }
     }
 
     return Scaffold(
