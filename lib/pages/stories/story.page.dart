@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:yasm_mobile/arguments/story.argument.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
-import 'package:yasm_mobile/widgets/story/story_user_display.widget.dart';
+import 'package:yasm_mobile/widgets/stories/story_user_display.widget.dart';
 
 class Story extends StatefulWidget {
   const Story({Key? key}) : super(key: key);
