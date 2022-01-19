@@ -73,6 +73,7 @@ class _StoriesListState extends State<StoriesList> {
                         return StoryItem(
                           userStory: userStory,
                           index: index,
+                          size: MediaQuery.of(context).size.height * 0.09,
                           handleStoryPress: this._handleStoryPress,
                         );
                       },

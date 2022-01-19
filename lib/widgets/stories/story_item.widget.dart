@@ -5,12 +5,14 @@ import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 class StoryItem extends StatelessWidget {
   final User userStory;
   final int index;
+  final double size;
   final Function handleStoryPress;
 
   const StoryItem({
     Key? key,
     required this.userStory,
     required this.index,
+    required this.size,
     required this.handleStoryPress,
   }) : super(key: key);
 
@@ -27,7 +29,7 @@ class StoryItem extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(
-            100.0,
+            this.size,
           ),
           border: Border.all(
             color: Colors.pink,
@@ -36,7 +38,7 @@ class StoryItem extends StatelessWidget {
         ),
         child: ProfilePicture(
           imageUrl: userStory.imageUrl,
-          size: 60,
+          size: this.size,
         ),
       ),
     );

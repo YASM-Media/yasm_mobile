@@ -12,6 +12,7 @@ import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 import 'package:yasm_mobile/widgets/user/follow_button.widget.dart';
 import 'package:yasm_mobile/widgets/user/follow_count.widget.dart';
 import 'package:yasm_mobile/widgets/user/user_name_biography.widget.dart';
+import 'package:yasm_mobile/widgets/user/user_profile_picture.widget.dart';
 
 class UserDetails extends StatefulWidget {
   final String userId;
@@ -116,9 +117,8 @@ class _UserDetailsState extends State<UserDetails> {
                   children: [
                     Container(
                       margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-                      child: ProfilePicture(
-                        imageUrl: snapshot.data!.imageUrl,
-                        size: MediaQuery.of(context).size.height * 0.2,
+                      child: UserProfilePicture(
+                        user: this._user,
                       ),
                     ),
                     UserNameBiography(user: this._user),
