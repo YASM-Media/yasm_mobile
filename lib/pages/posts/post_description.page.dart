@@ -31,6 +31,8 @@ class _PostDescriptionState extends State<PostDescription> {
   late List<File> images;
   late final PostService _postService;
 
+  bool loading = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,10 @@ class _PostDescriptionState extends State<PostDescription> {
       return;
     }
 
+    setState(() {
+      loading = true;
+    });
+
     try {
       Iterable<Future<String>> iterableList = this.images.map(
           (imageFile) async =>
@@ -60,21 +66,37 @@ class _PostDescriptionState extends State<PostDescription> {
 
       this._postService.createPost(createPostDto);
 
+      setState(() {
+        loading = false;
+      });
+
       displaySnackBar("Post created!", context);
 
       Navigator.of(context).pushReplacementNamed(Home.routeName);
     } on ServerException catch (error) {
+      setState(() {
+        loading = false;
+      });
+
       displaySnackBar(
         error.message,
         context,
       );
     } on NotLoggedInException catch (error) {
+      setState(() {
+        loading = false;
+      });
+
       displaySnackBar(
         error.message,
         context,
       );
     } catch (error, stackTrace) {
       log.e(error, error, stackTrace);
+
+      setState(() {
+        loading = false;
+      });
 
       displaySnackBar(
         "Something went wrong, please try again later.",
@@ -103,8 +125,9 @@ class _PostDescriptionState extends State<PostDescription> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.check),
-        onPressed: this._onFormSubmit,
+        backgroundColor: this.loading ? Colors.grey[900] : Colors.pink,
+        child: this.loading ? CircularProgressIndicator() : Icon(Icons.check),
+        onPressed: this.loading ? null : this._onFormSubmit,
       ),
     );
   }
