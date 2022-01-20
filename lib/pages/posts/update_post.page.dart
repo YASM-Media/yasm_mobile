@@ -27,7 +27,9 @@ class _UpdatePostState extends State<UpdatePost> {
   final GlobalKey<FormState> _formKey = new GlobalKey();
 
   late final PostService _postService;
-  late final Post post;
+  Post? post;
+
+  bool loading = false;
 
   @override
   void initState() {
@@ -44,10 +46,14 @@ class _UpdatePostState extends State<UpdatePost> {
       return;
     }
 
+    setState(() {
+      loading = true;
+    });
+
     try {
       UpdatePostDto updatePostDto = new UpdatePostDto(
-        id: this.post.id,
-        images: this.post.images.map((e) => e.imageUrl).toList(),
+        id: this.post!.id,
+        images: this.post!.images.map((e) => e.imageUrl).toList(),
         text: this._descriptionController.text,
       );
 
@@ -55,19 +61,35 @@ class _UpdatePostState extends State<UpdatePost> {
 
       displaySnackBar("Post Updated!", context);
 
+      setState(() {
+        loading = false;
+      });
+
       Navigator.of(context).pushReplacementNamed(Home.routeName);
     } on ServerException catch (error) {
+      setState(() {
+        loading = false;
+      });
+
       displaySnackBar(
         error.message,
         context,
       );
     } on NotLoggedInException catch (error) {
+      setState(() {
+        loading = false;
+      });
+
       displaySnackBar(
         error.message,
         context,
       );
     } catch (error, stackTrace) {
       log.e(error, error, stackTrace);
+
+      setState(() {
+        loading = false;
+      });
 
       displaySnackBar(
         "Something went wrong, please try again later.",
@@ -78,8 +100,10 @@ class _UpdatePostState extends State<UpdatePost> {
 
   @override
   Widget build(BuildContext context) {
-    this.post = ModalRoute.of(context)!.settings.arguments as Post;
-    this._descriptionController.text = this.post.text;
+    if (this.post == null) {
+      this.post = ModalRoute.of(context)!.settings.arguments as Post;
+      this._descriptionController.text = this.post!.text;
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Update Post'),
@@ -92,13 +116,14 @@ class _UpdatePostState extends State<UpdatePost> {
           validators: [
             RequiredValidator(errorText: 'Description is required.')
           ],
-          minLines: 3,
+          minLines: 1,
           textInputType: TextInputType.text,
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.check),
-        onPressed: this._onFormSubmit,
+        backgroundColor: this.loading ? Colors.grey[900] : Colors.pink,
+        child: this.loading ? CircularProgressIndicator() : Icon(Icons.check),
+        onPressed: this.loading ? null : this._onFormSubmit,
       ),
     );
   }
