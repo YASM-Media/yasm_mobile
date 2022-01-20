@@ -8,7 +8,6 @@ import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
-import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 import 'package:yasm_mobile/widgets/user/follow_button.widget.dart';
 import 'package:yasm_mobile/widgets/user/follow_count.widget.dart';
 import 'package:yasm_mobile/widgets/user/user_name_biography.widget.dart';
