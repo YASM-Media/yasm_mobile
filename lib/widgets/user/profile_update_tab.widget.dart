@@ -38,6 +38,8 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
 
   late UserService _userService;
 
+  bool loading = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -73,6 +75,10 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
       // Prepare the file from the selected image.
       File imageFile = new File(imageXFile.path);
 
+      setState(() {
+        loading = true;
+      });
+
       // Upload the image to firebase and generate a URL.
       String uploadedUrl =
           await uploadImageAndGenerateUrl(imageFile, "profile-pictures");
@@ -83,6 +89,10 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
 
       // Save the updated state.
       this._authProvider.saveUser(user);
+
+      setState(() {
+        loading = false;
+      });
 
       // Display a success snackbar.
       displaySnackBar(
@@ -104,6 +114,10 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
       // Prepare the file from the selected image.
       File imageFile = new File(imageXFile.path);
 
+      setState(() {
+        loading = true;
+      });
+
       // Upload the image to firebase and generate a URL.
       String uploadedUrl =
           await uploadImageAndGenerateUrl(imageFile, "profile-pictures");
@@ -114,6 +128,10 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
 
       // Save the updated state.
       this._authProvider.saveUser(user);
+
+      setState(() {
+        loading = false;
+      });
 
       // Display a success snackbar.
       displaySnackBar(
@@ -153,6 +171,10 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
     try {
       // Validate the form.
       if (this._formKey.currentState!.validate()) {
+        setState(() {
+          loading = true;
+        });
+
         try {
           // Prepare DTO for updating profile.
           UpdateProfileDto updateProfileDto = new UpdateProfileDto(
@@ -170,20 +192,34 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
 
           this._authProvider.saveUser(user);
 
+          setState(() {
+            loading = false;
+          });
+
           // Display success snackbar.
           displaySnackBar("Profile updated!", context);
         } on ServerException catch (error) {
+          setState(() {
+            loading = false;
+          });
           displaySnackBar(
             error.message,
             context,
           );
         } on NotLoggedInException catch (error) {
+          setState(() {
+            loading = false;
+          });
           displaySnackBar(
             error.message,
             context,
           );
         } catch (error, stackTrace) {
           log.e(error, error, stackTrace);
+
+          setState(() {
+            loading = false;
+          });
 
           displaySnackBar(
             "Something went wrong, please try again later.",
@@ -194,8 +230,14 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
     }
     // Handle errors gracefully.
     on ServerException catch (error) {
+      setState(() {
+        loading = false;
+      });
       displaySnackBar(error.message, context);
     } on NotLoggedInException {
+      setState(() {
+        loading = false;
+      });
       print("NOT LOGGED IN");
     }
   }
@@ -280,10 +322,42 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
                   ) {
                     final bool connected =
                         connectivity != ConnectivityResult.none;
-                    return ElevatedButton(
-                      onPressed: connected ? this._onFormSubmit : null,
-                      child: Text(
-                          connected ? 'Update Profile' : 'You are offline'),
+                    return ElevatedButton.icon(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          this.loading ? Colors.grey[900]! : Colors.pink,
+                        ),
+                      ),
+                      onPressed: connected
+                          ? !this.loading
+                          ? this._onFormSubmit
+                          : null
+                          : null,
+                      label: Text(
+                        connected
+                            ? !this.loading
+                            ? 'Update Profile'
+                            : 'Updating'
+                            : 'You are offline',
+                      ),
+                      icon: connected
+                          ? !this.loading
+                          ? Icon(
+                        Icons.edit,
+                      )
+                          : SizedBox(
+                        height:
+                        MediaQuery.of(context).size.longestSide *
+                            0.025,
+                        width: MediaQuery.of(context).size.longestSide *
+                            0.025,
+                        child: CircularProgressIndicator(
+                          color: Colors.grey,
+                        ),
+                      )
+                          : Icon(
+                        Icons.offline_bolt_outlined,
+                      ),
                     );
                   },
                   child: SizedBox(),
