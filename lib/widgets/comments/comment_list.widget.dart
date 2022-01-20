@@ -4,14 +4,14 @@ import 'package:yasm_mobile/widgets/comments/comment.widget.dart';
 
 class CommentList extends StatelessWidget {
   final List<Post> comments;
-  final Function onEditComment;
-  final Function onDeleteComment;
+  final Function refreshPost;
+  final String postId;
 
   CommentList({
     Key? key,
     required this.comments,
-    required this.onEditComment,
-    required this.onDeleteComment,
+    required this.refreshPost,
+    required this.postId,
   }) : super(key: key);
 
   @override
@@ -25,8 +25,8 @@ class CommentList extends StatelessWidget {
 
         return Comment(
           comment: comment,
-          onEditComment: this.onEditComment,
-          onDeleteComment: this.onDeleteComment,
+          postId: this.postId,
+          refreshPost: this.refreshPost,
         );
       },
     );
