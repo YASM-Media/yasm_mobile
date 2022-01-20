@@ -68,43 +68,50 @@ class _StoriesListState extends State<StoriesList> {
                     log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
 
                     return Text(
-                        "Something went wrong, please try again later.");
+                      "Something went wrong, please try again later.",
+                    );
                   }
 
                   if (snapshot.connectionState == ConnectionState.done) {
                     this._stories = snapshot.data!;
 
-                    return Flexible(
-                      fit: FlexFit.loose,
-                      child: ListView.builder(
-                        itemCount: this._stories!.length,
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (BuildContext context, int index) {
-                          User userStory = this._stories![index];
-
-                          return StoryItem(
-                            userStory: userStory,
-                            index: index,
-                            size: MediaQuery.of(context).size.height * 0.09,
-                            handleStoryPress: this._handleStoryPress,
-                          );
-                        },
-                      ),
-                    );
+                    return _buildStoriesList();
                   }
 
-                  return Row(
-                    children: [
-                      CircularProgressIndicator(),
-                    ],
-                  );
+                  return this._stories == null
+                      ? Row(
+                          children: [
+                            CircularProgressIndicator(),
+                          ],
+                        )
+                      : _buildStoriesList();
                 },
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildStoriesList() {
+    return Flexible(
+      fit: FlexFit.loose,
+      child: ListView.builder(
+        itemCount: this._stories!.length,
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (BuildContext context, int index) {
+          User userStory = this._stories![index];
+
+          return StoryItem(
+            userStory: userStory,
+            index: index,
+            size: MediaQuery.of(context).size.height * 0.09,
+            handleStoryPress: this._handleStoryPress,
+          );
+        },
       ),
     );
   }

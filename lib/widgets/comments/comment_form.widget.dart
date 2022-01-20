@@ -14,7 +14,6 @@ import 'package:yasm_mobile/widgets/common/custom_text_area.widget.dart';
 class CommentForm extends StatefulWidget {
   final Function refreshPost;
   final String postId;
-  final CommentFormType commentFormType;
   final String commentId;
   final String text;
 
@@ -22,7 +21,6 @@ class CommentForm extends StatefulWidget {
     Key? key,
     required this.refreshPost,
     required this.postId,
-    required this.commentFormType,
     this.commentId = '',
     this.text = '',
   }) : super(key: key);
@@ -43,29 +41,15 @@ class _CommentFormState extends State<CommentForm> {
     }
 
     try {
-      if (widget.commentFormType == CommentFormType.CREATE) {
-        CreateCommentDto createCommentDto = new CreateCommentDto(
-          text: this._commentController.text,
-          postId: widget.postId,
-        );
+      CreateCommentDto createCommentDto = new CreateCommentDto(
+        text: this._commentController.text,
+        postId: widget.postId,
+      );
 
-        await this._commentService.createComment(createCommentDto);
-        await widget.refreshPost();
+      await this._commentService.createComment(createCommentDto);
+      await widget.refreshPost();
 
-        displaySnackBar("Comment created!", context);
-      } else {
-        UpdateCommentDto updateCommentDto = new UpdateCommentDto(
-          id: widget.commentId,
-          text: this._commentController.text,
-        );
-
-        await this._commentService.updateComment(updateCommentDto);
-        await widget.refreshPost();
-
-        Navigator.of(context).pop();
-
-        displaySnackBar("Comment updated!", context);
-      }
+      displaySnackBar("Comment created!", context);
     } on ServerException catch (error) {
       displaySnackBar(error.message, context);
     } on NotLoggedInException catch (error) {

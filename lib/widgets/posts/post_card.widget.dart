@@ -42,14 +42,14 @@ class _PostCardState extends State<PostCard> {
 
     this._postService = Provider.of<PostService>(context, listen: false);
     this._likeService = Provider.of<LikeService>(context, listen: false);
-
-    this._isLiked = !(this._checkIfNotLiked(
-      Provider.of<AuthProvider>(context, listen: false),
-    ));
   }
 
   @override
   Widget build(BuildContext context) {
+    this._isLiked = !(this._checkIfNotLiked(
+      Provider.of<AuthProvider>(context, listen: false),
+    ));
+
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -65,35 +65,26 @@ class _PostCardState extends State<PostCard> {
   }
 
   void _onDeletePost(BuildContext context) {
-    SBS.showBottomSheet(
-      context,
-      Wrap(
-        children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Text('Are you sure you want to delete this post?'),
-            ),
+    showDialog(
+      builder: (BuildContext context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        content: Text('Are you sure you want to delete this post?'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await _confirmPostDeletion(context);
+            },
+            child: Text('YES'),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: () async {
-                  await _confirmPostDeletion(context);
-                },
-                child: Text('YES'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('NO'),
-              ),
-            ],
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('NO'),
           ),
         ],
       ),
+      context: context,
     );
   }
 
@@ -164,9 +155,7 @@ class _PostCardState extends State<PostCard> {
                         await this._likeService.likePost(widget.post.id);
                       }
 
-                      setState(() {
-                        this._isLiked = !this._isLiked;
-                      });
+                      widget.refreshPosts();
                     }
                   : null,
               icon: Icon(

@@ -27,6 +27,8 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
 
   late AuthProvider _authProvider;
 
+  bool loading = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -53,6 +55,10 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
    */
   Future<void> _onFormSubmit() async {
     if (this._formKey.currentState!.validate()) {
+      setState(() {
+        loading = true;
+      });
+
       try {
         // Validate the form.
         // Delete the account from the server.
@@ -63,21 +69,37 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
         // Clear off the provider state.
         this._authProvider.removeUser();
 
+        setState(() {
+          loading = false;
+        });
+
         // Log out to the authentication page.
         Navigator.of(context).pushReplacementNamed(Auth.routeName);
       }
       // Handle errors gracefully.
       on ServerException catch (error) {
+        setState(() {
+          loading = false;
+        });
+
         displaySnackBar(
           error.message,
           context,
         );
       } on NotLoggedInException catch (error) {
+        setState(() {
+          loading = false;
+        });
+
         displaySnackBar(
           error.message,
           context,
         );
       } catch (error, stackTrace) {
+        setState(() {
+          loading = false;
+        });
+
         log.e(error, error, stackTrace);
 
         displaySnackBar(
@@ -144,10 +166,42 @@ class _DeleteAccountTabState extends State<DeleteAccountTab> {
                 ) {
                   final bool connected =
                       connectivity != ConnectivityResult.none;
-                  return ElevatedButton(
-                    onPressed: connected ? this._onFormSubmit : null,
-                    child:
-                        Text(connected ? 'Delete Account' : 'You are offline'),
+                  return ElevatedButton.icon(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        this.loading ? Colors.grey[900]! : Colors.pink,
+                      ),
+                    ),
+                    onPressed: connected
+                        ? !this.loading
+                            ? this._onFormSubmit
+                            : null
+                        : null,
+                    label: Text(
+                      connected
+                          ? !this.loading
+                              ? 'Delete Account'
+                              : 'Deleting'
+                          : 'You are offline',
+                    ),
+                    icon: connected
+                        ? !this.loading
+                            ? Icon(
+                                Icons.edit,
+                              )
+                            : SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.longestSide *
+                                        0.025,
+                                width: MediaQuery.of(context).size.longestSide *
+                                    0.025,
+                                child: CircularProgressIndicator(
+                                  color: Colors.grey,
+                                ),
+                              )
+                        : Icon(
+                            Icons.offline_bolt_outlined,
+                          ),
                   );
                 },
                 child: SizedBox(),

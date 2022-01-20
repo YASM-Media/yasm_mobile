@@ -30,6 +30,8 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
 
   late UserService _userService;
 
+  bool loading = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -56,6 +58,10 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
   Future<void> _onFormSubmit() async {
     // Validate the form.
     if (this._formKey.currentState!.validate()) {
+      setState(() {
+        loading = true;
+      });
+
       try {
         // Prepare DTO for updating password.
         UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto(
@@ -66,20 +72,34 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
         // Update it on the server.
         await this._userService.updateUserPassword(updatePasswordDto);
 
+        setState(() {
+          loading = false;
+        });
+
         // Display success snackbar.
         displaySnackBar("Password updated!", context);
       } on ServerException catch (error) {
+        setState(() {
+          loading = false;
+        });
         displaySnackBar(
           error.message,
           context,
         );
       } on NotLoggedInException catch (error) {
+        setState(() {
+          loading = false;
+        });
         displaySnackBar(
           error.message,
           context,
         );
       } catch (error, stackTrace) {
         log.e(error, error, stackTrace);
+
+        setState(() {
+          loading = false;
+        });
 
         displaySnackBar(
           "Something went wrong, please try again later.",
@@ -161,10 +181,42 @@ class _PasswordUpdateTabState extends State<PasswordUpdateTab> {
                 ) {
                   final bool connected =
                       connectivity != ConnectivityResult.none;
-                  return ElevatedButton(
-                    onPressed: connected ? this._onFormSubmit : null,
-                    child:
-                        Text(connected ? 'Update Password' : 'You are offline'),
+                  return ElevatedButton.icon(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        this.loading ? Colors.grey[900]! : Colors.pink,
+                      ),
+                    ),
+                    onPressed: connected
+                        ? !this.loading
+                        ? this._onFormSubmit
+                        : null
+                        : null,
+                    label: Text(
+                      connected
+                          ? !this.loading
+                          ? 'Update Password'
+                          : 'Updating'
+                          : 'You are offline',
+                    ),
+                    icon: connected
+                        ? !this.loading
+                        ? Icon(
+                      Icons.edit,
+                    )
+                        : SizedBox(
+                      height:
+                      MediaQuery.of(context).size.longestSide *
+                          0.025,
+                      width: MediaQuery.of(context).size.longestSide *
+                          0.025,
+                      child: CircularProgressIndicator(
+                        color: Colors.grey,
+                      ),
+                    )
+                        : Icon(
+                      Icons.offline_bolt_outlined,
+                    ),
                   );
                 },
                 child: SizedBox(),

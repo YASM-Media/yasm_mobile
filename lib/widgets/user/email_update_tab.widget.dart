@@ -31,6 +31,8 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
 
   late UserService _userService;
 
+  bool loading = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -59,6 +61,10 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
   Future<void> _onFormSubmit() async {
     // Validate the form.
     if (this._formKey.currentState!.validate()) {
+      setState(() {
+        loading = true;
+      });
+
       try {
         // Prepare DTO for updating password.
         UpdateEmailDto updateEmailDto = new UpdateEmailDto(
@@ -74,20 +80,34 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
 
         this._authProvider.saveUser(user);
 
+        setState(() {
+          loading = false;
+        });
+
         // Display success snackbar.
         displaySnackBar("Email updated!", context);
       } on ServerException catch (error) {
+        setState(() {
+          loading = false;
+        });
         displaySnackBar(
           error.message,
           context,
         );
       } on NotLoggedInException catch (error) {
+        setState(() {
+          loading = false;
+        });
         displaySnackBar(
           error.message,
           context,
         );
       } catch (error, stackTrace) {
         log.e(error, error, stackTrace);
+
+        setState(() {
+          loading = false;
+        });
 
         displaySnackBar(
           "Something went wrong, please try again later.",
@@ -150,11 +170,42 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
                     ) {
                       final bool connected =
                           connectivity != ConnectivityResult.none;
-                      return ElevatedButton(
-                        onPressed: connected ? this._onFormSubmit : null,
-                        child: Text(connected
-                            ? 'Update Email Address'
-                            : 'You are offline'),
+                      return ElevatedButton.icon(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            this.loading ? Colors.grey[900]! : Colors.pink,
+                          ),
+                        ),
+                        onPressed: connected
+                            ? !this.loading
+                            ? this._onFormSubmit
+                            : null
+                            : null,
+                        label: Text(
+                          connected
+                              ? !this.loading
+                              ? 'Update Email Address'
+                              : 'Updating'
+                              : 'You are offline',
+                        ),
+                        icon: connected
+                            ? !this.loading
+                            ? Icon(
+                          Icons.edit,
+                        )
+                            : SizedBox(
+                          height:
+                          MediaQuery.of(context).size.longestSide *
+                              0.025,
+                          width: MediaQuery.of(context).size.longestSide *
+                              0.025,
+                          child: CircularProgressIndicator(
+                            color: Colors.grey,
+                          ),
+                        )
+                            : Icon(
+                          Icons.offline_bolt_outlined,
+                        ),
                       );
                     },
                     child: SizedBox(),
