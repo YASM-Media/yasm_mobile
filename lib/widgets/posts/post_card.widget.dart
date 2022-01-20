@@ -42,14 +42,15 @@ class _PostCardState extends State<PostCard> {
 
     this._postService = Provider.of<PostService>(context, listen: false);
     this._likeService = Provider.of<LikeService>(context, listen: false);
-
-    this._isLiked = !(this._checkIfNotLiked(
-      Provider.of<AuthProvider>(context, listen: false),
-    ));
   }
 
   @override
   Widget build(BuildContext context) {
+
+    this._isLiked = !(this._checkIfNotLiked(
+      Provider.of<AuthProvider>(context, listen: false),
+    ));
+
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -164,9 +165,7 @@ class _PostCardState extends State<PostCard> {
                         await this._likeService.likePost(widget.post.id);
                       }
 
-                      setState(() {
-                        this._isLiked = !this._isLiked;
-                      });
+                      widget.refreshPosts();
                     }
                   : null,
               icon: Icon(

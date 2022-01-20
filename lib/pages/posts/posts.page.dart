@@ -21,20 +21,26 @@ class _PostsState extends State<Posts> {
       appBar: AppBar(
         title: Text('Posts'),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              fit: FlexFit.loose,
-              child: StoriesList(),
-            ),
-            _buildSorter(),
-            PostList(
-              postFetchType: this._postFetchType,
-            ),
-          ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {});
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                fit: FlexFit.loose,
+                child: StoriesList(),
+              ),
+              _buildSorter(),
+              PostList(
+                postFetchType: this._postFetchType,
+              ),
+            ],
+          ),
         ),
       ),
     );

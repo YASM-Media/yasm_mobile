@@ -24,7 +24,7 @@ class FullPost extends StatefulWidget {
 }
 
 class _FullPostState extends State<FullPost> {
-  late Post _post;
+  Post? _post;
   late final PostService _postService;
   late final CommentService _commentService;
 
@@ -74,7 +74,7 @@ class _FullPostState extends State<FullPost> {
         ),
         child: CommentForm(
           refreshPost: this._refreshPost,
-          postId: this._post.id,
+          postId: this._post!.id,
           commentFormType: CommentFormType.UPDATE,
           text: comment.text,
           commentId: comment.id,
@@ -120,7 +120,7 @@ class _FullPostState extends State<FullPost> {
       Post comment, BuildContext context) async {
     try {
       DeleteCommentDto deleteCommentDto = new DeleteCommentDto(
-        postId: this._post.id,
+        postId: this._post!.id,
         commentId: comment.id,
       );
 
@@ -159,30 +159,42 @@ class _FullPostState extends State<FullPost> {
 
           if (snapshot.connectionState == ConnectionState.done) {
             this._post = snapshot.data!;
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  PostCard(
-                    post: this._post,
-                    refreshPosts: this._refreshPost,
-                  ),
-                  CommentForm(
-                    postId: this._post.id,
-                    refreshPost: this._refreshPost,
-                    commentFormType: CommentFormType.CREATE,
-                  ),
-                  CommentList(
-                    comments: this._post.comments,
-                    onEditComment: this._onEditComment,
-                    onDeleteComment: this._onDeleteComment,
-                  ),
-                ],
-              ),
-            );
+            return _buildFullPostBody();
           }
 
-          return CircularProgressIndicator();
+          return this._post == null
+              ? CircularProgressIndicator()
+              : _buildFullPostBody();
         },
+      ),
+    );
+  }
+
+  Widget _buildFullPostBody() {
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            PostCard(
+              post: this._post!,
+              refreshPosts: this._refreshPost,
+            ),
+            CommentForm(
+              postId: this._post!.id,
+              refreshPost: this._refreshPost,
+              commentFormType: CommentFormType.CREATE,
+            ),
+            CommentList(
+              comments: this._post!.comments,
+              onEditComment: this._onEditComment,
+              onDeleteComment: this._onDeleteComment,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -26,6 +26,7 @@ class LoggedInUserStory extends StatefulWidget {
 
 class _LoggedInUserStoryState extends State<LoggedInUserStory> {
   late final StoriesService _storiesService;
+  List<SM.Story>? _stories;
 
   @override
   void initState() {
@@ -55,63 +56,64 @@ class _LoggedInUserStoryState extends State<LoggedInUserStory> {
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
-          List<SM.Story> stories = snapshot.data!;
+          this._stories = snapshot.data!;
 
-          stories.forEach((element) {
+          this._stories!.forEach((element) {
             widget.user.stories.add(element);
           });
 
-          return stories.length > 0
+          return this._stories!.length > 0
               ? StoryItem(
                   userStory: widget.user,
                   index: 0,
                   size: widget.size,
                   handleStoryPress: this._handleStoryPress,
                 )
-              : GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushNamed(CreateStory.routeName);
-                  },
-                  child: Stack(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.01,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                            widget.size,
-                          ),
-                          border: Border.all(
-                            color: Colors.grey[900]!,
-                            width: 4,
-                          ),
-                        ),
-                        child: ProfilePicture(
-                          imageUrl: widget.user.imageUrl,
-                          size: widget.size,
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: CircleAvatar(
-                          radius: MediaQuery.of(context).size.width * 0.04,
-                          backgroundColor: Colors.grey[900],
-                          child: Icon(
-                            Icons.add,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
+              : _buildNoUserStoriesIndicator();
         }
 
-        return ProfilePicture(
-          imageUrl: widget.user.imageUrl,
-          size: widget.size,
-        );
+        return this._buildNoUserStoriesIndicator();
       },
+    );
+  }
+
+  Widget _buildNoUserStoriesIndicator() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed(CreateStory.routeName);
+      },
+      child: Stack(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.01,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(
+                widget.size,
+              ),
+              border: Border.all(
+                color: Colors.grey[900]!,
+                width: 4,
+              ),
+            ),
+            child: ProfilePicture(
+              imageUrl: widget.user.imageUrl,
+              size: widget.size,
+            ),
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: CircleAvatar(
+              radius: MediaQuery.of(context).size.width * 0.04,
+              backgroundColor: Colors.grey[900],
+              child: Icon(
+                Icons.add,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
