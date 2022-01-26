@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/arguments/story.argument.dart';
+import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
@@ -13,6 +14,7 @@ import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
+import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/stories.service.dart';
 
 class Home extends StatefulWidget {
@@ -27,12 +29,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final AuthService _authService = AuthService();
   late final StoriesService _storiesService;
+  late final ChatService _chatService;
 
   @override
   void initState() {
     super.initState();
 
     this._storiesService = Provider.of<StoriesService>(context, listen: false);
+    this._chatService = Provider.of<ChatService>(context, listen: false);
   }
 
   Future<void> logout(context) async {
@@ -98,15 +102,16 @@ class _HomeState extends State<Home> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    List<User> stories =
-                        await this._storiesService.fetchAvailableStories();
-
-                    Navigator.of(context).pushNamed(
-                      Story.routeName,
-                      arguments: StoryArgument(stories: stories, index: 0),
-                    );
+                    await this._chatService.createChatThread(
+                          new CreateThreadDto(
+                            participants: [
+                              '2e0533fa-2166-4832-93fc-a6f2ae24a3c2',
+                              '87cea7a7-ffb2-43cb-b965-afc8e7c749b7',
+                            ],
+                          ),
+                        );
                   },
-                  child: Text('Display Stories'),
+                  child: Text('Dummy Chat'),
                 ),
               ],
             ),
