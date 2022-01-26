@@ -1,19 +1,23 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
-import 'package:yasm_mobile/arguments/story.argument.dart';
-import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
+import 'package:yasm_mobile/firebase_notifications_handler.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/chat/threads.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
 import 'package:yasm_mobile/pages/stories/create_story.page.dart';
-import 'package:yasm_mobile/pages/stories/story.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
-import 'package:yasm_mobile/services/stories.service.dart';
+import 'package:yasm_mobile/services/chat.service.dart';
+import 'package:yasm_mobile/services/tokens.service.dart';
+import 'package:yasm_mobile/utils/check_connectivity.util.dart';
 
 class Home extends StatefulWidget {
   static const routeName = "/home";
@@ -25,14 +29,30 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final AuthService _authService = AuthService();
-  late final StoriesService _storiesService;
+  late final ChatService _chatService;
+  late final TokensService _tokensService;
+  late final AuthService _authService;
 
   @override
   void initState() {
     super.initState();
 
-    this._storiesService = Provider.of<StoriesService>(context, listen: false);
+    this._chatService = Provider.of<ChatService>(context, listen: false);
+    this._tokensService = Provider.of<TokensService>(context, listen: false);
+    this._authService = Provider.of<AuthService>(context, listen: false);
+
+    checkConnectivity().then((value) {
+      if (value) {
+        this._tokensService.generateAndSaveTokenToDatabase();
+        FirebaseMessaging.instance.onTokenRefresh
+            .listen(this._tokensService.saveTokenToDatabase);
+      } else {
+        log.i(
+            "Device offline, suspending FCM Token Generation and Topic Subscription");
+      }
+    }).catchError((error, stackTrace) {
+      log.e("HomePage Error", error, stackTrace);
+    });
   }
 
   Future<void> logout(context) async {
@@ -47,70 +67,72 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text('YASM!!🌟'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Consumer<AuthProvider>(
-              builder: (context, auth, _) => Text(
-                auth.getUser() != null
-                    ? auth.getUser()!.emailAddress
-                    : "You are not logged in.",
+      body: FirebaseNotificationsHandler(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Consumer<AuthProvider>(
+                builder: (context, auth, _) => Text(
+                  auth.getUser() != null
+                      ? auth.getUser()!.emailAddress
+                      : "You are not logged in.",
+                ),
               ),
-            ),
-            Column(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(UserUpdate.routeName);
-                  },
-                  child: Text('User Update'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      UserProfile.routeName,
-                      arguments:
-                          Provider.of<AuthProvider>(context, listen: false)
-                              .getUser()!
-                              .id,
-                    );
-                  },
-                  child: Text('User Profile'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(Posts.routeName);
-                  },
-                  child: Text('Posts'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(Search.routeName);
-                  },
-                  child: Text('Search'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(CreateStory.routeName);
-                  },
-                  child: Text('Create Story'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    List<User> stories =
-                        await this._storiesService.fetchAvailableStories();
-
-                    Navigator.of(context).pushNamed(
-                      Story.routeName,
-                      arguments: StoryArgument(stories: stories, index: 0),
-                    );
-                  },
-                  child: Text('Display Stories'),
-                ),
-              ],
-            ),
-          ],
+              Column(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(UserUpdate.routeName);
+                    },
+                    child: Text('User Update'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        UserProfile.routeName,
+                        arguments:
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .getUser()!
+                                .id,
+                      );
+                    },
+                    child: Text('User Profile'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(Posts.routeName);
+                    },
+                    child: Text('Posts'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(Search.routeName);
+                    },
+                    child: Text('Search'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(CreateStory.routeName);
+                    },
+                    child: Text('Create Story'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(Threads.routeName);
+                    },
+                    child: Text('Chat Threads'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await this._authService.logout();
+                    },
+                    child: Text('Log Out'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: OfflineBuilder(

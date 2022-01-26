@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
@@ -22,6 +23,7 @@ import 'package:yasm_mobile/models/user/user.model.dart';
  */
 class AuthService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final Box<User> _yasmUserDb = Hive.box<User>(YASM_USER_BOX);
 
   /*
@@ -205,12 +207,16 @@ class AuthService {
    */
   Future<void> logout() async {
     try {
+      String userId = this._firebaseAuth.currentUser!.uid;
+      await this._firebaseFirestore.collection('tokens').doc(userId).delete();
+
       await _firebaseAuth.signOut();
     } catch (error, stackTrace) {
       log.e(error, error, stackTrace);
 
       throw GeneralException(
-          message: 'Something went wrong, please try again later.');
+        message: 'Something went wrong, please try again later.',
+      );
     }
   }
 }
