@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
+import 'package:yasm_mobile/dto/chat/delete_thread/delete_thread.dto.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 
 class ChatService {
@@ -23,4 +24,11 @@ class ChatService {
 
     return chatThread.id;
   }
+
+  Future<void> deleteChatThread(DeleteThreadDto deleteThreadDto) async =>
+      await this
+          ._firestore
+          .collection('threads')
+          .doc(deleteThreadDto.threadId)
+          .delete();
 }
