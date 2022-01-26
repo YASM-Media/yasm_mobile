@@ -8,6 +8,7 @@ part of 'create_chat.dto.dart';
 
 CreateChatDto _$CreateChatDtoFromJson(Map<String, dynamic> json) =>
     CreateChatDto(
+      threadId: json['threadId'] as String? ?? '',
       message: json['message'] as String? ?? '',
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
@@ -15,5 +16,6 @@ CreateChatDto _$CreateChatDtoFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$CreateChatDtoToJson(CreateChatDto instance) =>
     <String, dynamic>{
       'message': instance.message,
+      'threadId': instance.threadId,
       'createdAt': instance.createdAt.toIso8601String(),
     };

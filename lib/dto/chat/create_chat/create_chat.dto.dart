@@ -6,9 +6,14 @@ part 'create_chat.dto.g.dart';
 class CreateChatDto {
   @JsonKey(defaultValue: '')
   final String message;
+
+  @JsonKey(defaultValue: '')
+  final String threadId;
+
   final DateTime createdAt;
 
   CreateChatDto({
+    required this.threadId,
     required this.message,
     required this.createdAt,
   });
