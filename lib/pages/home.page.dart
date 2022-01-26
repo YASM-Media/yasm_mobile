@@ -5,6 +5,7 @@ import 'package:yasm_mobile/arguments/story.argument.dart';
 import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/chat/threads.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
@@ -99,6 +100,12 @@ class _HomeState extends State<Home> {
                     Navigator.of(context).pushNamed(CreateStory.routeName);
                   },
                   child: Text('Create Story'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(Threads.routeName);
+                  },
+                  child: Text('Chat Threads'),
                 ),
                 TextButton(
                   onPressed: () async {

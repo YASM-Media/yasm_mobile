@@ -74,6 +74,7 @@ class App extends StatelessWidget {
         Story.routeName: (context) => Story(),
         CreateStory.routeName: (context) => CreateStory(),
         Chat.routeName: (context) => Chat(),
+        Threads.routeName: (context) => Threads(),
       },
     );
   }
