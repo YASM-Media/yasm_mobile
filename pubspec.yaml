@@ -28,6 +28,7 @@ dependencies:
   flutter_offline: ^2.0.0
   screenshot: ^1.2.3
   intl: ^0.17.0
+  skeleton_loader: ^2.0.0+4
 
 dev_dependencies:
   flutter_test:
