@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
-import 'package:yasm_mobile/pages/chat/chat.page.dart';
 import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/widgets/chat/thread.widget.dart';
 

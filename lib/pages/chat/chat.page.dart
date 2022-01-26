@@ -5,16 +5,20 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/dto/chat/chat_arguments/chat_arguments.dto.dart';
 import 'package:yasm_mobile/dto/chat/create_chat/create_chat.dto.dart';
 import 'package:yasm_mobile/dto/chat/delete_chat/delete_chat.dto.dart';
 import 'package:yasm_mobile/dto/chat/delete_thread/delete_thread.dto.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/chat/chat_message/chat_message.model.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
+import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/chat/chat_bubble.widget.dart';
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
+import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
 class Chat extends StatefulWidget {
   const Chat({Key? key}) : super(key: key);
@@ -28,6 +32,7 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   late final ChatService _chatService;
   ChatThread? _chatThread;
+  User? _user;
   List<Chat> _chats = [];
 
   final TextEditingController _chatController = new TextEditingController();
@@ -116,10 +121,28 @@ class _ChatState extends State<Chat> {
 
   @override
   Widget build(BuildContext context) {
-    String id = ModalRoute.of(context)!.settings.arguments as String;
+    if (this._chatThread == null || this._user == null) {
+      ChatArguments chatArguments =
+          ModalRoute.of(context)!.settings.arguments as ChatArguments;
+
+      this._chatThread = chatArguments.chatThread;
+      this._user = chatArguments.user;
+    }
 
     AppBar appBar = AppBar(
-      title: Text('Chat'),
+      title: ListTile(
+        leading: ProfilePicture(
+          imageUrl: this._user!.imageUrl,
+          size: MediaQuery.of(context).size.width * 0.1,
+        ),
+        title: Text('${this._user!.firstName} ${this._user!.lastName}'),
+        onTap: () {
+          Navigator.of(context).pushNamed(
+            UserProfile.routeName,
+            arguments: this._user!.id,
+          );
+        },
+      ),
       actions: [
         TextButton(
           onPressed: this.onThreadClose,
@@ -136,7 +159,7 @@ class _ChatState extends State<Chat> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-            stream: this._chatService.listenToThread(id),
+            stream: this._chatService.listenToThread(this._chatThread!.id),
             builder: (
               BuildContext context,
               AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot,
