@@ -29,6 +29,8 @@ dependencies:
   screenshot: ^1.2.3
   intl: ^0.17.0
   skeleton_loader: ^2.0.0+4
+  firebase_messaging: ^11.2.5
+  firebase_analytics: ^9.0.5
 
 dev_dependencies:
   flutter_test:
