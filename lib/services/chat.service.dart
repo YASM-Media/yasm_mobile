@@ -13,6 +13,12 @@ class ChatService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
   final Uuid _uuid = new Uuid();
 
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchAllThreads() => this
+      ._firestore
+      .collection('threads')
+      .where("participants", arrayContains: this._firebaseAuth.currentUser!.uid)
+      .snapshots();
+
   Future<String> createChatThread(CreateThreadDto createThreadDto) async {
     ChatThread chatThread = new ChatThread(
       id: this._uuid.v4(),
