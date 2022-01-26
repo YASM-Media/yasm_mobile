@@ -12,6 +12,7 @@ import 'package:yasm_mobile/models/story/story.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
+import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/follow.service.dart';
 import 'package:yasm_mobile/services/like.service.dart';
@@ -73,6 +74,9 @@ class _RootState extends State<Root> {
         ),
         Provider<StoriesService>(
           create: (context) => StoriesService(),
+        ),
+        Provider<ChatService>(
+          create: (context) => ChatService(),
         ),
       ],
       child: App(),
