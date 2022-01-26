@@ -1,7 +1,9 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/arguments/story.argument.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
 import 'package:yasm_mobile/firebase_notifications_handler.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
@@ -18,6 +20,8 @@ import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/stories.service.dart';
+import 'package:yasm_mobile/services/tokens.service.dart';
+import 'package:yasm_mobile/utils/check_connectivity.util.dart';
 
 class Home extends StatefulWidget {
   static const routeName = "/home";
@@ -30,15 +34,28 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final AuthService _authService = AuthService();
-  late final StoriesService _storiesService;
   late final ChatService _chatService;
+  late final TokensService _tokensService;
 
   @override
   void initState() {
     super.initState();
 
-    this._storiesService = Provider.of<StoriesService>(context, listen: false);
     this._chatService = Provider.of<ChatService>(context, listen: false);
+    this._tokensService = Provider.of<TokensService>(context, listen: false);
+
+    checkConnectivity().then((value) {
+      if (value) {
+        this._tokensService.generateAndSaveTokenToDatabase();
+        FirebaseMessaging.instance.onTokenRefresh
+            .listen(this._tokensService.saveTokenToDatabase);
+      } else {
+        log.i(
+            "Device offline, suspending FCM Token Generation and Topic Subscription");
+      }
+    }).catchError((error, stackTrace) {
+      log.e("HomePage Error", error, stackTrace);
+    });
   }
 
   Future<void> logout(context) async {

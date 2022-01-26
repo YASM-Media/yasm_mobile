@@ -21,6 +21,7 @@ import 'package:yasm_mobile/services/like.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
 import 'package:yasm_mobile/services/search.service.dart';
 import 'package:yasm_mobile/services/stories.service.dart';
+import 'package:yasm_mobile/services/tokens.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 
 /*
@@ -102,6 +103,9 @@ class _RootState extends State<Root> {
         ),
         Provider<ChatService>(
           create: (context) => ChatService(),
+        ),
+        Provider<TokensService>(
+          create: (context) => TokensService(),
         ),
       ],
       child: App(),
