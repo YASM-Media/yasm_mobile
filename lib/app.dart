@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/chat/chat.page.dart';
+import 'package:yasm_mobile/pages/chat/threads.page.dart';
 import 'package:yasm_mobile/pages/common/splash.page.dart';
 import 'package:yasm_mobile/pages/home.page.dart';
 import 'package:yasm_mobile/pages/posts/full_post.page.dart';
@@ -71,6 +73,7 @@ class App extends StatelessWidget {
         SearchResults.routeName: (context) => SearchResults(),
         Story.routeName: (context) => Story(),
         CreateStory.routeName: (context) => CreateStory(),
+        Chat.routeName: (context) => Chat(),
       },
     );
   }
