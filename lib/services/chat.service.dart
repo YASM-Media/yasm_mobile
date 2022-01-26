@@ -19,6 +19,11 @@ class ChatService {
       .where("participants", arrayContains: this._firebaseAuth.currentUser!.uid)
       .snapshots();
 
+  Stream<DocumentSnapshot<Map<String, dynamic>>> listenToThread(
+    String threadId,
+  ) =>
+      this._firestore.collection('threads').doc(threadId).snapshots();
+
   Future<String> createChatThread(CreateThreadDto createThreadDto) async {
     ChatThread chatThread = new ChatThread(
       id: this._uuid.v4(),
