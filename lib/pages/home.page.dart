@@ -3,6 +3,7 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/arguments/story.argument.dart';
 import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
+import 'package:yasm_mobile/firebase_notifications_handler.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/chat/threads.page.dart';
@@ -52,77 +53,79 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text('YASM!!🌟'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Consumer<AuthProvider>(
-              builder: (context, auth, _) => Text(
-                auth.getUser() != null
-                    ? auth.getUser()!.emailAddress
-                    : "You are not logged in.",
+      body: FirebaseNotificationsHandler(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Consumer<AuthProvider>(
+                builder: (context, auth, _) => Text(
+                  auth.getUser() != null
+                      ? auth.getUser()!.emailAddress
+                      : "You are not logged in.",
+                ),
               ),
-            ),
-            Column(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(UserUpdate.routeName);
-                  },
-                  child: Text('User Update'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      UserProfile.routeName,
-                      arguments:
-                          Provider.of<AuthProvider>(context, listen: false)
-                              .getUser()!
-                              .id,
-                    );
-                  },
-                  child: Text('User Profile'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(Posts.routeName);
-                  },
-                  child: Text('Posts'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(Search.routeName);
-                  },
-                  child: Text('Search'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(CreateStory.routeName);
-                  },
-                  child: Text('Create Story'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(Threads.routeName);
-                  },
-                  child: Text('Chat Threads'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await this._chatService.createChatThread(
-                          new CreateThreadDto(
-                            participants: [
-                              '2e0533fa-2166-4832-93fc-a6f2ae24a3c2',
-                              '87cea7a7-ffb2-43cb-b965-afc8e7c749b7',
-                            ],
-                          ),
-                        );
-                  },
-                  child: Text('Dummy Chat'),
-                ),
-              ],
-            ),
-          ],
+              Column(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(UserUpdate.routeName);
+                    },
+                    child: Text('User Update'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        UserProfile.routeName,
+                        arguments:
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .getUser()!
+                                .id,
+                      );
+                    },
+                    child: Text('User Profile'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(Posts.routeName);
+                    },
+                    child: Text('Posts'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(Search.routeName);
+                    },
+                    child: Text('Search'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(CreateStory.routeName);
+                    },
+                    child: Text('Create Story'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(Threads.routeName);
+                    },
+                    child: Text('Chat Threads'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await this._chatService.createChatThread(
+                            new CreateThreadDto(
+                              participants: [
+                                '2e0533fa-2166-4832-93fc-a6f2ae24a3c2',
+                                '87cea7a7-ffb2-43cb-b965-afc8e7c749b7',
+                              ],
+                            ),
+                          );
+                    },
+                    child: Text('Dummy Chat'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: OfflineBuilder(
