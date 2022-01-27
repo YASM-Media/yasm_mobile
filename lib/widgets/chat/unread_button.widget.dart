@@ -71,20 +71,21 @@ class _UnreadButtonState extends State<UnreadButton> {
             Icons.chat,
           ),
         ),
-        Align(
-          alignment: Alignment.topLeft,
-          child: CircleAvatar(
-            radius: MediaQuery.of(context).size.width * 0.025,
-            backgroundColor: Colors.red,
-            child: Text(
-              unreadCount.toString(),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: MediaQuery.of(context).size.width * 0.025,
+        if (unreadCount != 0)
+          Align(
+            alignment: Alignment.topLeft,
+            child: CircleAvatar(
+              radius: MediaQuery.of(context).size.width * 0.025,
+              backgroundColor: Colors.red,
+              child: Text(
+                unreadCount.toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: MediaQuery.of(context).size.width * 0.025,
+                ),
               ),
             ),
-          ),
-        )
+          )
       ],
     );
   }

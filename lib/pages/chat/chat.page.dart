@@ -72,6 +72,9 @@ class _ChatState extends State<Chat> {
               createdAt: DateTime.now(),
             ),
           );
+
+      this._chatController.text = '';
+
     } on ServerException catch (error) {
       displaySnackBar(error.message, context);
     } catch (error, stackTrace) {
@@ -127,6 +130,20 @@ class _ChatState extends State<Chat> {
 
       this._chatThread = chatArguments.chatThread;
       this._user = chatArguments.user;
+
+      this
+          ._chatService
+          .markSeenMessages(this._chatThread!)
+          .then(
+            (value) => log.i("Mark Read Operation Complete"),
+          )
+          .catchError(
+            (error, stackTrace) => log.e(
+              "ChatPage Error",
+              error,
+              stackTrace,
+            ),
+          );
     }
 
     AppBar appBar = AppBar(
