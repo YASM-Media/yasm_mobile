@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
+import 'package:yasm_mobile/widgets/chat/unread_button.widget.dart';
 import 'package:yasm_mobile/widgets/posts/post_list.widget.dart';
 import 'package:yasm_mobile/widgets/stories/stories_list.widget.dart';
 
@@ -13,13 +14,16 @@ class Posts extends StatefulWidget {
 }
 
 class _PostsState extends State<Posts> {
-  PostFetchType _postFetchType = PostFetchType.BEST;
+  PostFetchType _postFetchType = PostFetchType.NEW;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Posts'),
+        actions: [
+          UnreadButton(),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
