@@ -105,6 +105,28 @@ class ChatService {
     );
   }
 
+  Future<void> markSeenMessages(ChatThread chatThread) async {
+    String userId = this._firebaseAuth.currentUser!.uid;
+
+    if (chatThread.seen.where((id) => id == userId).isNotEmpty) {
+      log.i("Message Already Read");
+      return;
+    }
+
+    chatThread.seen.add(userId);
+
+    Map<String, dynamic> threadJson = chatThread.toJson();
+    threadJson['messages'] = threadJson['messages']
+        .map((ChatMessage message) => message.toJson())
+        .toList();
+
+    await this
+        ._firestore
+        .collection('threads')
+        .doc(chatThread.id)
+        .set(threadJson);
+  }
+
   Future<void> deleteChatThread(DeleteThreadDto deleteThreadDto) async =>
       await this
           ._firestore

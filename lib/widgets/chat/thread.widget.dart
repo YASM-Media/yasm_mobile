@@ -41,6 +41,7 @@ class _ThreadState extends State<Thread> {
         AuthProvider authProvider,
         Widget? child,
       ) {
+        String loggedInUserId = authProvider.getUser()!.id;
         String userId = this
             .widget
             .chatThread
@@ -59,30 +60,47 @@ class _ThreadState extends State<Thread> {
             if (snapshot.connectionState == ConnectionState.done) {
               this._user = snapshot.data!;
 
-              return _buildThreadTile();
+              return _buildThreadTile(loggedInUserId);
             }
 
             return this._user == null
                 ? _buildThreadLoader()
-                : _buildThreadTile();
+                : _buildThreadTile(loggedInUserId);
           },
         );
       },
     );
   }
 
-  Widget _buildThreadTile() {
+  Widget _buildThreadTile(String userId) {
     return ListTile(
       leading: ProfilePicture(
         imageUrl: this._user!.imageUrl,
         size: MediaQuery.of(context).size.width * 0.16,
       ),
-      title: Text('${this._user!.firstName} ${this._user!.lastName}'),
+      title: Text(
+        '${this._user!.firstName} ${this._user!.lastName}',
+        style: TextStyle(
+          fontWeight:
+              this._isUnread(userId) ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
       subtitle: Text(
         this.widget.chatThread.messages.length > 0
             ? this.widget.chatThread.messages.last.message
             : '',
+        style: TextStyle(
+          fontWeight:
+              this._isUnread(userId) ? FontWeight.bold : FontWeight.normal,
+          color: this._isUnread(userId) ? Colors.white : Colors.grey,
+        ),
       ),
+      trailing: this._isUnread(userId)
+          ? CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: MediaQuery.of(context).size.width * 0.01,
+            )
+          : null,
       onTap: () {
         Navigator.of(context).pushNamed(
           Chat.routeName,
@@ -93,6 +111,15 @@ class _ThreadState extends State<Thread> {
         );
       },
     );
+  }
+
+  bool _isUnread(String loggedInUserId) {
+    return this
+        .widget
+        .chatThread
+        .seen
+        .where((id) => id == loggedInUserId)
+        .isEmpty;
   }
 
   Widget _buildThreadLoader() {
