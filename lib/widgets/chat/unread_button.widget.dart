@@ -50,7 +50,7 @@ class _UnreadButtonState extends State<UnreadButton> {
             snapshot.data!.docs.forEach((thread) {
               ChatThread chatThread = ChatThread.fromJson(thread.data());
 
-              if (chatThread.seen.where((id) => id != user.id).isNotEmpty) {
+              if (chatThread.seen.where((id) => id == user.id).isEmpty) {
                 unreadCount += 1;
               }
             });
