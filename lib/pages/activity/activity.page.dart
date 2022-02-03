@@ -30,6 +30,9 @@ class _ActivityState extends State<Activity> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Activity'),
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {});
