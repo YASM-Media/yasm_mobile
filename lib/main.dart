@@ -15,6 +15,7 @@ import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/models/story/story.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/services/activity.service.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
@@ -110,6 +111,9 @@ class _RootState extends State<Root> {
         ),
         Provider<TokensService>(
           create: (context) => TokensService(),
+        ),
+        Provider<ActivityService>(
+          create: (context) => ActivityService(),
         ),
       ],
       child: App(),
