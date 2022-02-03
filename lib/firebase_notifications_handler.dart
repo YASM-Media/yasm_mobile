@@ -7,6 +7,7 @@ import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/chat/chat_arguments/chat_arguments.dto.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/pages/activity/activity.page.dart';
 import 'package:yasm_mobile/pages/chat/chat.page.dart';
 import 'package:yasm_mobile/pages/chat/threads.page.dart';
 import 'package:yasm_mobile/pages/common/loading.page.dart';
@@ -74,6 +75,13 @@ class _FirebaseNotificationsHandlerState
           chatThread: chatThread,
           user: user,
         ),
+      );
+    }
+
+    if (message.data['type'] == 'activity') {
+      Navigator.pushNamed(
+        context,
+        Activity.routeName,
       );
     }
   }

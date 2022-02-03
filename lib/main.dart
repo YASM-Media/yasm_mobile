@@ -7,12 +7,15 @@ import 'package:yasm_mobile/app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/enum/activity_type.enum.dart';
+import 'package:yasm_mobile/models/activity/activity.model.dart';
 import 'package:yasm_mobile/models/image/image.model.dart' as ImageModel;
 import 'package:yasm_mobile/models/like/like.model.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/models/story/story.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/services/activity.service.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/comment.service.dart';
@@ -54,10 +57,13 @@ Future<void> main() async {
   Hive.registerAdapter<ImageModel.Image>(new ImageModel.ImageAdapter());
   Hive.registerAdapter<Like>(new LikeAdapter());
   Hive.registerAdapter<Story>(new StoryAdapter());
+  Hive.registerAdapter<ActivityType>(new ActivityTypeAdapter());
+  Hive.registerAdapter<Activity>(new ActivityAdapter());
 
   await Hive.openBox<User>(YASM_USER_BOX);
   await Hive.openBox<List<dynamic>>(YASM_POSTS_BOX);
   await Hive.openBox<List<dynamic>>(YASM_STORIES_BOX);
+  await Hive.openBox<List<dynamic>>(YASM_ACTIVITY_BOX);
 
   await setupFCM();
 
@@ -106,6 +112,9 @@ class _RootState extends State<Root> {
         ),
         Provider<TokensService>(
           create: (context) => TokensService(),
+        ),
+        Provider<ActivityService>(
+          create: (context) => ActivityService(),
         ),
       ],
       child: App(),

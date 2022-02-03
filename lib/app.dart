@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yasm_mobile/pages/activity/activity.page.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/chat/chat.page.dart';
 import 'package:yasm_mobile/pages/chat/threads.page.dart';
@@ -75,6 +76,7 @@ class App extends StatelessWidget {
         CreateStory.routeName: (context) => CreateStory(),
         Chat.routeName: (context) => Chat(),
         Threads.routeName: (context) => Threads(),
+        Activity.routeName: (context) => Activity(),
       },
     );
   }
