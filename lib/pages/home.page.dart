@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
 import 'package:yasm_mobile/firebase_notifications_handler.dart';
+import 'package:yasm_mobile/pages/activity/activity.page.dart';
 import 'package:yasm_mobile/pages/auth/auth.page.dart';
 import 'package:yasm_mobile/pages/chat/threads.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
@@ -122,6 +123,12 @@ class _HomeState extends State<Home> {
                       Navigator.of(context).pushNamed(Threads.routeName);
                     },
                     child: Text('Chat Threads'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(Activity.routeName);
+                    },
+                    child: Text('Activity'),
                   ),
                   TextButton(
                     onPressed: () async {
