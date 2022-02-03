@@ -2,6 +2,7 @@
 const YASM_USER_BOX = "yasm-user";
 const YASM_POSTS_BOX = "yasm-posts";
 const YASM_STORIES_BOX = "yasm-stories";
+const YASM_ACTIVITY_BOX = "yasm-activities";
 
 // User Keys.
 const LOGGED_IN_USER = "logged-in-user";
@@ -16,3 +17,6 @@ const USER_POSTS = "user-posts";
 const LOGGED_IN_USER_STORIES = "logged-in-user-stories";
 const AVAILABLE_STORIES = "available-stories";
 const ARCHIVED_STORIES = "archived-stories";
+
+// Activity Keys
+const ACTIVITIES = "activity";
