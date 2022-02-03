@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/enum/activity_type.enum.dart';
+import 'package:yasm_mobile/models/activity/activity.model.dart';
 import 'package:yasm_mobile/models/image/image.model.dart' as ImageModel;
 import 'package:yasm_mobile/models/like/like.model.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
@@ -56,6 +57,7 @@ Future<void> main() async {
   Hive.registerAdapter<Like>(new LikeAdapter());
   Hive.registerAdapter<Story>(new StoryAdapter());
   Hive.registerAdapter<ActivityType>(new ActivityTypeAdapter());
+  Hive.registerAdapter<Activity>(new ActivityAdapter());
 
   await Hive.openBox<User>(YASM_USER_BOX);
   await Hive.openBox<List<dynamic>>(YASM_POSTS_BOX);
