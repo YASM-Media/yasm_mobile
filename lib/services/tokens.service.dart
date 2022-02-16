@@ -8,6 +8,20 @@ class TokensService {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
+  Future<bool> toggleReceiveNotifications() async {
+    String userId = this._firebaseAuth.currentUser!.uid;
+    DocumentSnapshot<Map<String, dynamic>> tokenReference =
+        await this._firebaseFirestore.collection('tokens').doc(userId).get();
+
+    if (tokenReference.exists) {
+      await this._firebaseFirestore.collection('tokens').doc(userId).delete();
+      return false;
+    } else {
+      await this.generateAndSaveTokenToDatabase();
+      return true;
+    }
+  }
+
   /*
    * Save FCM token to database on each update.
    * @param token FCM Token to be saved.
