@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeleton_loader/skeleton_loader.dart';
-import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/arguments/chat.argument.dart';
+import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/chat/chat.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
-class Thread extends StatefulWidget {
-  final ChatThread chatThread;
+class UserThread extends StatefulWidget {
+  final String userId;
 
-  const Thread({
+  const UserThread({
     Key? key,
-    required this.chatThread,
+    required this.userId,
   }) : super(key: key);
 
   @override
-  _ThreadState createState() => _ThreadState();
+  _UserThreadState createState() => _UserThreadState();
 }
 
-class _ThreadState extends State<Thread> {
+class _UserThreadState extends State<UserThread> {
   late final UserService _userService;
+  late final ChatService _chatService;
   User? _user;
 
   @override
@@ -31,6 +34,7 @@ class _ThreadState extends State<Thread> {
     super.initState();
 
     this._userService = Provider.of<UserService>(context, listen: false);
+    this._chatService = Provider.of<ChatService>(context, listen: false);
   }
 
   @override
@@ -42,14 +46,11 @@ class _ThreadState extends State<Thread> {
         Widget? child,
       ) {
         String loggedInUserId = authProvider.getUser()!.id;
-        String userId = this
-            .widget
-            .chatThread
-            .participants
-            .firstWhere((id) => id != authProvider.getUser()!.id);
 
         return FutureBuilder(
-          future: this._userService.getUser(userId),
+          future: this._userService.getUser(
+                this.widget.userId,
+              ),
           builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
             if (snapshot.hasError) {
               log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
@@ -72,7 +73,7 @@ class _ThreadState extends State<Thread> {
     );
   }
 
-  Widget _buildThreadTile(String userId) {
+  Widget _buildThreadTile(String loggedInUserId) {
     return ListTile(
       leading: ProfilePicture(
         imageUrl: this._user!.imageUrl,
@@ -81,45 +82,32 @@ class _ThreadState extends State<Thread> {
       title: Text(
         '${this._user!.firstName} ${this._user!.lastName}',
         style: TextStyle(
-          fontWeight:
-              this._isUnread(userId) ? FontWeight.bold : FontWeight.normal,
+          fontWeight: FontWeight.normal,
         ),
       ),
-      subtitle: Text(
-        this.widget.chatThread.messages.length > 0
-            ? this.widget.chatThread.messages.last.message
-            : '',
-        style: TextStyle(
-          fontWeight:
-              this._isUnread(userId) ? FontWeight.bold : FontWeight.normal,
-          color: this._isUnread(userId) ? Colors.white : Colors.grey,
-        ),
-      ),
-      trailing: this._isUnread(userId)
-          ? CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: MediaQuery.of(context).size.width * 0.01,
-            )
-          : null,
-      onTap: () {
+      subtitle: Text(''),
+      onTap: () async {
+        String threadId = await this._chatService.createChatThread(
+              new CreateThreadDto(
+                participants: [
+                  loggedInUserId,
+                  this._user!.id,
+                ],
+              ),
+            );
+
+        ChatThread chatThread =
+            await this._chatService.fetchThreadData(threadId);
+
         Navigator.of(context).pushNamed(
           Chat.routeName,
           arguments: new ChatArgument(
-            chatThread: this.widget.chatThread,
+            chatThread: chatThread,
             user: this._user!,
           ),
         );
       },
     );
-  }
-
-  bool _isUnread(String loggedInUserId) {
-    return this
-        .widget
-        .chatThread
-        .seen
-        .where((id) => id == loggedInUserId)
-        .isEmpty;
   }
 
   Widget _buildThreadLoader() {

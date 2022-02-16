@@ -47,6 +47,13 @@ class ChatService {
   }
 
   Future<String> createChatThread(CreateThreadDto createThreadDto) async {
+    String checkDuplicateThread =
+        await this._checkForDuplicateChats(createThreadDto.participants);
+
+    if (checkDuplicateThread != 'EMPTY') {
+      return checkDuplicateThread;
+    }
+
     ChatThread chatThread = new ChatThread(
       id: this._uuid.v4(),
       participants: createThreadDto.participants,
@@ -205,6 +212,29 @@ class ChatService {
       throw ServerException(
         message: 'Something went wrong, please try again later.',
       );
+    }
+  }
+
+  Future<String> _checkForDuplicateChats(List<String> participants) async {
+    QuerySnapshot<Map<String, dynamic>> firstDocumentReference = await this
+        ._firestore
+        .collection('threads')
+        .where("participants", whereIn: [participants]).get();
+
+    QuerySnapshot<Map<String, dynamic>> secondDocumentReference = await this
+        ._firestore
+        .collection('threads')
+        .where("participants", whereIn: [participants.reversed.toList()]).get();
+
+    List<DocumentSnapshot> firstChatSnapshot = firstDocumentReference.docs;
+    List<DocumentSnapshot> secondChatSnapshot = secondDocumentReference.docs;
+
+    if (firstChatSnapshot.isNotEmpty && firstChatSnapshot[0].exists) {
+      return firstChatSnapshot[0].id;
+    } else if (secondChatSnapshot.isNotEmpty && secondChatSnapshot[0].exists) {
+      return secondChatSnapshot[0].id;
+    } else {
+      return 'EMPTY';
     }
   }
 }

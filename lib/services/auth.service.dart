@@ -25,6 +25,12 @@ class AuthService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   final Box<User> _yasmUserDb = Hive.box<User>(YASM_USER_BOX);
+  final Box<List<dynamic>> _yasmPostsDb =
+      Hive.box<List<dynamic>>(YASM_POSTS_BOX);
+  final Box<List<dynamic>> _yasmActivitiesDb =
+      Hive.box<List<dynamic>>(YASM_ACTIVITY_BOX);
+  final Box<List<dynamic>> _yasmStoriesDb =
+      Hive.box<List<dynamic>>(YASM_STORIES_BOX);
 
   /*
    * Method for fetching the user from server using firebase id token.
@@ -209,6 +215,7 @@ class AuthService {
     try {
       String userId = this._firebaseAuth.currentUser!.uid;
       await this._firebaseFirestore.collection('tokens').doc(userId).delete();
+      await this._clearAllHiveBoxes();
 
       await _firebaseAuth.signOut();
     } catch (error, stackTrace) {
@@ -218,5 +225,12 @@ class AuthService {
         message: 'Something went wrong, please try again later.',
       );
     }
+  }
+
+  Future<void> _clearAllHiveBoxes() async {
+    await this._yasmUserDb.clear();
+    await this._yasmStoriesDb.clear();
+    await this._yasmPostsDb.clear();
+    await this._yasmActivitiesDb.clear();
   }
 }
