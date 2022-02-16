@@ -4,7 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
-import 'package:yasm_mobile/dto/chat/chat_arguments/chat_arguments.dto.dart';
+import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/activity/activity.page.dart';
@@ -71,7 +71,7 @@ class _FirebaseNotificationsHandlerState
       Navigator.pushNamed(
         context,
         Chat.routeName,
-        arguments: ChatArguments(
+        arguments: ChatArgument(
           chatThread: chatThread,
           user: user,
         ),

@@ -5,7 +5,7 @@ import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
-import 'package:yasm_mobile/dto/chat/chat_arguments/chat_arguments.dto.dart';
+import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/dto/chat/create_chat/create_chat.dto.dart';
 import 'package:yasm_mobile/dto/chat/delete_chat/delete_chat.dto.dart';
 import 'package:yasm_mobile/dto/chat/delete_thread/delete_thread.dto.dart';
@@ -125,8 +125,8 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     if (this._chatThread == null || this._user == null) {
-      ChatArguments chatArguments =
-          ModalRoute.of(context)!.settings.arguments as ChatArguments;
+      ChatArgument chatArguments =
+          ModalRoute.of(context)!.settings.arguments as ChatArgument;
 
       this._chatThread = chatArguments.chatThread;
       this._user = chatArguments.user;

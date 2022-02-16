@@ -1,11 +1,11 @@
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 
-class ChatArguments {
+class ChatArgument {
   final ChatThread chatThread;
   final User user;
 
-  ChatArguments({
+  ChatArgument({
     required this.chatThread,
     required this.user,
   });

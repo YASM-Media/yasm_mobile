@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeleton_loader/skeleton_loader.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
-import 'package:yasm_mobile/dto/chat/chat_arguments/chat_arguments.dto.dart';
+import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/pages/chat/chat.page.dart';
@@ -104,7 +104,7 @@ class _ThreadState extends State<Thread> {
       onTap: () {
         Navigator.of(context).pushNamed(
           Chat.routeName,
-          arguments: new ChatArguments(
+          arguments: new ChatArgument(
             chatThread: this.widget.chatThread,
             user: this._user!,
           ),
