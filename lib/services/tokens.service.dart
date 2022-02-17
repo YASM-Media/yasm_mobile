@@ -22,6 +22,14 @@ class TokensService {
     }
   }
 
+  Future<bool> checkNotificationsAvailibility() async {
+    String userId = this._firebaseAuth.currentUser!.uid;
+    DocumentSnapshot<Map<String, dynamic>> tokenReference =
+        await this._firebaseFirestore.collection('tokens').doc(userId).get();
+
+    return tokenReference.exists;
+  }
+
   /*
    * Save FCM token to database on each update.
    * @param token FCM Token to be saved.
