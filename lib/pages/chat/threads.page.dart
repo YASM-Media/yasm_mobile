@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
+import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
 import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/pages/chat/chat.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/chat.service.dart';
+import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/widgets/chat/thread.widget.dart';
 import 'package:yasm_mobile/widgets/chat/user_thread.widget.dart';
 
@@ -20,6 +24,7 @@ class Threads extends StatefulWidget {
 
 class _ThreadsState extends State<Threads> {
   late final ChatService _chatService;
+  late final UserService _userService;
   List<ChatThread> _threads = [];
 
   @override
@@ -28,6 +33,29 @@ class _ThreadsState extends State<Threads> {
 
     // Injecting required services from context.
     this._chatService = Provider.of<ChatService>(context, listen: false);
+    this._userService = Provider.of<UserService>(context, listen: false);
+  }
+
+  Future<void> _createChatThread(String loggedInUserId, String userId) async {
+    User user = await this._userService.getUser(userId);
+    String threadId = await this._chatService.createChatThread(
+          new CreateThreadDto(
+            participants: [
+              loggedInUserId,
+              userId,
+            ],
+          ),
+        );
+
+    ChatThread chatThread = await this._chatService.fetchThreadData(threadId);
+
+    Navigator.of(context).pushNamed(
+      Chat.routeName,
+      arguments: new ChatArgument(
+        chatThread: chatThread,
+        user: user,
+      ),
+    );
   }
 
   @override
@@ -120,8 +148,16 @@ class _ThreadsState extends State<Threads> {
                           itemCount: followingUsers.length,
                           itemBuilder: (context, index) {
                             String userId = followingUsers[index].id;
-                            return UserThread(
-                              userId: userId,
+                            return GestureDetector(
+                              onTap: () async {
+                                await this._createChatThread(
+                                  loggedInUser.id,
+                                  userId,
+                                );
+                              },
+                              child: UserThread(
+                                userId: userId,
+                              ),
                             );
                           },
                         ),
