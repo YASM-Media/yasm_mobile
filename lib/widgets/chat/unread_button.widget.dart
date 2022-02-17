@@ -63,30 +63,35 @@ class _UnreadButtonState extends State<UnreadButton> {
   }
 
   Widget _buildUnreadChatButton(int unreadCount) {
-    return Stack(
-      children: [
-        IconButton(
-          onPressed: this._handleChatButtonPress,
-          icon: Icon(
-            Icons.chat,
+    return Container(
+      margin: EdgeInsets.only(
+        top: MediaQuery.of(context).size.height * 0.018,
+      ),
+      child: Stack(
+        children: [
+          IconButton(
+            onPressed: this._handleChatButtonPress,
+            icon: Icon(
+              Icons.chat,
+            ),
           ),
-        ),
-        if (unreadCount != 0)
-          Align(
-            alignment: Alignment.topLeft,
-            child: CircleAvatar(
-              radius: MediaQuery.of(context).size.width * 0.025,
-              backgroundColor: Colors.red,
-              child: Text(
-                unreadCount.toString(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: MediaQuery.of(context).size.width * 0.025,
+          if (unreadCount != 0)
+            Align(
+              alignment: Alignment.topLeft,
+              child: CircleAvatar(
+                radius: MediaQuery.of(context).size.width * 0.025,
+                backgroundColor: Colors.red,
+                child: Text(
+                  unreadCount.toString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: MediaQuery.of(context).size.width * 0.025,
+                  ),
                 ),
               ),
-            ),
-          )
-      ],
+            )
+        ],
+      ),
     );
   }
 

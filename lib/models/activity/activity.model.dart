@@ -9,8 +9,8 @@ part 'activity.model.g.dart';
 @HiveType(typeId: 7)
 @JsonSerializable()
 class Activity {
-  @HiveField(0, defaultValue: '')
-  final String id;
+  @HiveField(0, defaultValue: 0)
+  final int id;
 
   @HiveField(1)
   final User mainUser;
