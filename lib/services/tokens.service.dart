@@ -22,7 +22,7 @@ class TokensService {
     }
   }
 
-  Future<bool> checkNotificationsAvailibility() async {
+  Future<bool> checkNotificationsAvailability() async {
     String userId = this._firebaseAuth.currentUser!.uid;
     DocumentSnapshot<Map<String, dynamic>> tokenReference =
         await this._firebaseFirestore.collection('tokens').doc(userId).get();
