@@ -86,27 +86,6 @@ class _UserThreadState extends State<UserThread> {
         ),
       ),
       subtitle: Text(''),
-      onTap: () async {
-        String threadId = await this._chatService.createChatThread(
-              new CreateThreadDto(
-                participants: [
-                  loggedInUserId,
-                  this._user!.id,
-                ],
-              ),
-            );
-
-        ChatThread chatThread =
-            await this._chatService.fetchThreadData(threadId);
-
-        Navigator.of(context).pushNamed(
-          Chat.routeName,
-          arguments: new ChatArgument(
-            chatThread: chatThread,
-            user: this._user!,
-          ),
-        );
-      },
     );
   }
 

@@ -17,7 +17,7 @@ class ActivityAdapter extends TypeAdapter<Activity> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Activity(
-      id: fields[0] == null ? '' : fields[0] as String,
+      id: fields[0] == null ? 0 : fields[0] as int,
       mainUser: fields[1] as User,
       triggeredByUser: fields[2] as User,
       activityType: fields[3] as ActivityType,
@@ -63,7 +63,7 @@ class ActivityAdapter extends TypeAdapter<Activity> {
 // **************************************************************************
 
 Activity _$ActivityFromJson(Map<String, dynamic> json) => Activity(
-      id: json['id'] as String,
+      id: json['id'] as int,
       mainUser: User.fromJson(json['mainUser'] as Map<String, dynamic>),
       triggeredByUser:
           User.fromJson(json['triggeredByUser'] as Map<String, dynamic>),

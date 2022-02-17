@@ -11,6 +11,7 @@ import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
+import 'package:yasm_mobile/services/tokens.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/utils/image_picker.util.dart';
@@ -32,13 +33,16 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
   TextEditingController _lastNameController = new TextEditingController();
   TextEditingController _biographyController = new TextEditingController();
 
-  late AuthProvider _authProvider;
+  late final AuthProvider _authProvider;
+  late final TokensService _tokensService;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   late UserService _userService;
 
   bool loading = false;
+  bool _notifications = false;
+  bool _notificationsLoading = false;
 
   @override
   void initState() {
@@ -50,6 +54,22 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
 
     // Initializing the authentication provider.
     this._authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    this._tokensService = Provider.of<TokensService>(context, listen: false);
+
+    this
+        ._tokensService
+        .checkNotificationsAvailability()
+        .then((bool availability) => setState(() {
+              this._notifications = availability;
+            }))
+        .catchError(
+          (error, stackTrace) => log.i(
+            "ProfileUpdateTab error",
+            error,
+            stackTrace,
+          ),
+        );
   }
 
   @override
@@ -314,6 +334,30 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
                   ],
                   textInputType: TextInputType.multiline,
                 ),
+                ListTile(
+                  leading: Text('Toggle Notifications'),
+                  trailing: !this._notificationsLoading
+                      ? Switch(
+                          value: this._notifications,
+                          onChanged: (_) async {
+                            setState(() {
+                              this._notificationsLoading = true;
+                            });
+                            await this
+                                ._tokensService
+                                .toggleReceiveNotifications();
+                            bool newValue = await this
+                                ._tokensService
+                                .checkNotificationsAvailability();
+
+                            setState(() {
+                              this._notifications = newValue;
+                              this._notificationsLoading = false;
+                            });
+                          },
+                        )
+                      : CircularProgressIndicator(),
+                ),
                 OfflineBuilder(
                   connectivityBuilder: (
                     BuildContext context,
@@ -330,34 +374,35 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
                       ),
                       onPressed: connected
                           ? !this.loading
-                          ? this._onFormSubmit
-                          : null
+                              ? this._onFormSubmit
+                              : null
                           : null,
                       label: Text(
                         connected
                             ? !this.loading
-                            ? 'Update Profile'
-                            : 'Updating'
+                                ? 'Update Profile'
+                                : 'Updating'
                             : 'You are offline',
                       ),
                       icon: connected
                           ? !this.loading
-                          ? Icon(
-                        Icons.edit,
-                      )
-                          : SizedBox(
-                        height:
-                        MediaQuery.of(context).size.longestSide *
-                            0.025,
-                        width: MediaQuery.of(context).size.longestSide *
-                            0.025,
-                        child: CircularProgressIndicator(
-                          color: Colors.grey,
-                        ),
-                      )
+                              ? Icon(
+                                  Icons.edit,
+                                )
+                              : SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.longestSide *
+                                          0.025,
+                                  width:
+                                      MediaQuery.of(context).size.longestSide *
+                                          0.025,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.grey,
+                                  ),
+                                )
                           : Icon(
-                        Icons.offline_bolt_outlined,
-                      ),
+                              Icons.offline_bolt_outlined,
+                            ),
                     );
                   },
                   child: SizedBox(),

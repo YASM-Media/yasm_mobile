@@ -4,6 +4,8 @@ import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
+import 'package:yasm_mobile/pages/auth/auth.page.dart';
+import 'package:yasm_mobile/pages/user/user_update.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
@@ -125,6 +127,31 @@ class _UserDetailsState extends State<UserDetails> {
               user: this._user!,
               refreshUsers: this._refreshUsers,
             ),
+          if (this._user!.id == authProvider.getUser()!.id)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  child: Text('SETTINGS'),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      UserUpdate.routeName,
+                    );
+                  },
+                ),
+                TextButton(
+                  child: Text('LOG OUT'),
+                  onPressed: () async {
+                    await this._authService.logout();
+                    Provider.of<AuthProvider>(context, listen: false)
+                        .removeUser();
+                    Navigator.of(context).pushReplacementNamed(
+                      Auth.routeName,
+                    );
+                  },
+                ),
+              ],
+            )
         ],
       ),
       child: Column(
