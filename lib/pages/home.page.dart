@@ -3,20 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
-import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
 import 'package:yasm_mobile/firebase_notifications_handler.dart';
 import 'package:yasm_mobile/pages/activity/activity.page.dart';
-import 'package:yasm_mobile/pages/auth/auth.page.dart';
-import 'package:yasm_mobile/pages/chat/threads.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
-import 'package:yasm_mobile/pages/stories/create_story.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
-import 'package:yasm_mobile/pages/user/user_update.page.dart';
-import 'package:yasm_mobile/providers/auth/auth.provider.dart';
-import 'package:yasm_mobile/services/auth.service.dart';
-import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/tokens.service.dart';
 import 'package:yasm_mobile/utils/check_connectivity.util.dart';
 
@@ -30,17 +22,21 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late final ChatService _chatService;
   late final TokensService _tokensService;
-  late final AuthService _authService;
+
+  List<Widget> _pages = [
+    Posts(),
+    Search(),
+    Activity(),
+    UserProfile(),
+  ];
+  int _page = 0;
 
   @override
   void initState() {
     super.initState();
 
-    this._chatService = Provider.of<ChatService>(context, listen: false);
     this._tokensService = Provider.of<TokensService>(context, listen: false);
-    this._authService = Provider.of<AuthService>(context, listen: false);
 
     checkConnectivity().then((value) {
       if (value) {
@@ -56,92 +52,78 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future<void> logout(context) async {
-    await _authService.logout();
-    Provider.of<AuthProvider>(context, listen: false).removeUser();
-    Navigator.of(context).pushReplacementNamed(Auth.routeName);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('YASM!!🌟'),
-      ),
       body: FirebaseNotificationsHandler(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Consumer<AuthProvider>(
-                builder: (context, auth, _) => Text(
-                  auth.getUser() != null
-                      ? auth.getUser()!.emailAddress
-                      : "You are not logged in.",
-                ),
-              ),
-              Column(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(UserUpdate.routeName);
-                    },
-                    child: Text('User Update'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(
-                        UserProfile.routeName,
-                        arguments:
-                            Provider.of<AuthProvider>(context, listen: false)
-                                .getUser()!
-                                .id,
-                      );
-                    },
-                    child: Text('User Profile'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(Posts.routeName);
-                    },
-                    child: Text('Posts'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(Search.routeName);
-                    },
-                    child: Text('Search'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(CreateStory.routeName);
-                    },
-                    child: Text('Create Story'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(Threads.routeName);
-                    },
-                    child: Text('Chat Threads'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(Activity.routeName);
-                    },
-                    child: Text('Activity'),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      await this._authService.logout();
-                    },
-                    child: Text('Log Out'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        child: IndexedStack(
+          index: this._page,
+          children: this._pages,
         ),
       ),
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.04,
+              ),
+              child: IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {
+                  setState(() {
+                    this._page = 0;
+                  });
+                },
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(
+                right: MediaQuery.of(context).size.width * 0.1,
+                left: MediaQuery.of(context).size.width * 0.05,
+              ),
+              child: IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  setState(() {
+                    this._page = 1;
+                  });
+                },
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.1,
+                right: MediaQuery.of(context).size.width * 0.05,
+              ),
+              child: IconButton(
+                icon: Icon(Icons.favorite),
+                onPressed: () {
+                  setState(() {
+                    this._page = 2;
+                  });
+                },
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.04,
+              ),
+              child: IconButton(
+                icon: Icon(Icons.person),
+                onPressed: () {
+                  setState(() {
+                    this._page = 3;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: OfflineBuilder(
         connectivityBuilder: (
           BuildContext context,
