@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
-import 'package:yasm_mobile/constants/comment_form_type.constant.dart';
+import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
-import 'package:yasm_mobile/dto/comment/delete_comment/delete_comment.dto.dart';
-import 'package:yasm_mobile/dto/comment/update_comment/update_comment.dto.dart';
-import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
-import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
-import 'package:yasm_mobile/services/comment.service.dart';
 import 'package:yasm_mobile/services/post.service.dart';
-import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/comments/comment_form.widget.dart';
 import 'package:yasm_mobile/widgets/comments/comment_list.widget.dart';
-import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
 import 'package:yasm_mobile/widgets/posts/post_card.widget.dart';
-import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 
 class FullPost extends StatefulWidget {
   const FullPost({Key? key}) : super(key: key);
@@ -65,7 +56,9 @@ class _FullPostState extends State<FullPost> {
           }
 
           return this._post == null
-              ? CircularProgressIndicator()
+              ? Loading(
+                  message: 'Loading Post',
+                )
               : _buildFullPostBody();
         },
       ),

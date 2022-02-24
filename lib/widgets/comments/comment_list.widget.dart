@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yasm_mobile/animations/data_not_found.animation.dart';
 import 'package:yasm_mobile/models/post/post.model.dart';
 import 'package:yasm_mobile/widgets/comments/comment.widget.dart';
 
@@ -16,19 +17,21 @@ class CommentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: this.comments.length,
-      itemBuilder: (BuildContext context, int index) {
-        Post comment = this.comments[index];
+    return this.comments.length == 0
+        ? DataNotFound(message: 'No comments for this post')
+        : ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: this.comments.length,
+            itemBuilder: (BuildContext context, int index) {
+              Post comment = this.comments[index];
 
-        return Comment(
-          comment: comment,
-          postId: this.postId,
-          refreshPost: this.refreshPost,
-        );
-      },
-    );
+              return Comment(
+                comment: comment,
+                postId: this.postId,
+                refreshPost: this.refreshPost,
+              );
+            },
+          );
   }
 }
