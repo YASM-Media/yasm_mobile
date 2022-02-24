@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/animations/loading_list.animation.dart';
+import 'package:yasm_mobile/animations/data_not_found.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/activity/activity.model.dart' as AM;
 import 'package:yasm_mobile/services/activity.service.dart';
@@ -66,27 +68,25 @@ class _ActivityState extends State<Activity> {
     }
 
     return this._activities == null
-        ? Column(
-            children: [
-              CircularProgressIndicator(),
-            ],
-          )
+        ? LoadingList(message: 'Loading Activities')
         : _buildActivitiesList();
   }
 
   Widget _buildActivitiesList() {
-    return ListView.builder(
-      itemCount: this._activities!.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (
-        BuildContext context,
-        int index,
-      ) {
-        AM.Activity activity = this._activities![index];
+    return this._activities!.length == 0
+        ? DataNotFound(message: 'No Activity Found')
+        : ListView.builder(
+            itemCount: this._activities!.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (
+              BuildContext context,
+              int index,
+            ) {
+              AM.Activity activity = this._activities![index];
 
-        return ActivityTile(activity: activity);
-      },
-    );
+              return ActivityTile(activity: activity);
+            },
+          );
   }
 }
