@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/animations/loading_list.animation.dart';
-import 'package:yasm_mobile/animations/no_data_found.animation.dart';
+import 'package:yasm_mobile/animations/data_not_found.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
 import 'package:yasm_mobile/constants/post_list_type.constant.dart';
