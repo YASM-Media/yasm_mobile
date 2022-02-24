@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/animations/search.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/services/search.service.dart';
@@ -19,7 +20,7 @@ class UserSearch extends StatefulWidget {
 
 class _UserSearchState extends State<UserSearch> {
   late final SearchService _searchService;
-  late List<User> users;
+  List<User>? _users;
 
   @override
   void initState() {
@@ -40,19 +41,21 @@ class _UserSearchState extends State<UserSearch> {
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
-          this.users = snapshot.data!;
+          this._users = snapshot.data!;
 
-          return UserList(
-            users: users,
-          );
+          return _buildUserList();
         }
 
-        return Column(
-          children: [
-            CircularProgressIndicator(),
-          ],
-        );
+        return this._users == null
+            ? Search(message: 'Searching for users')
+            : this._buildUserList();
       },
+    );
+  }
+
+  Widget _buildUserList() {
+    return UserList(
+      users: _users!,
     );
   }
 }

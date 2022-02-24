@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
@@ -102,9 +103,7 @@ class _UserDetailsState extends State<UserDetails> {
             }
 
             return this._user == null
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
+                ? Loading(message: 'Loading user profile')
                 : _buildUserProfile();
           },
         ),
@@ -112,7 +111,7 @@ class _UserDetailsState extends State<UserDetails> {
     );
   }
 
-  Consumer<AuthProvider> _buildUserProfile() {
+  Widget _buildUserProfile() {
     return Consumer<AuthProvider>(
       builder: (
         BuildContext context,
