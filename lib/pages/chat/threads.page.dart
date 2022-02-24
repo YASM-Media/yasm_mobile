@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/animations/data_not_found.animation.dart';
+import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
@@ -70,8 +72,6 @@ class _ThreadsState extends State<Threads> {
           User loggedInUser = authProvider.getUser()!;
 
           List<User> followingUsers = [...loggedInUser.following];
-
-          log.i(followingUsers);
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
@@ -92,7 +92,9 @@ class _ThreadsState extends State<Threads> {
                     }
 
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text("Loading");
+                      return Loading(
+                        message: 'Loading Chats',
+                      );
                     }
 
                     this._threads.clear();
@@ -105,8 +107,6 @@ class _ThreadsState extends State<Threads> {
                             .removeWhere((user) => user.id == participantId);
                       });
 
-                      log.i(followingUsers);
-
                       this._threads.add(chatThread);
                     });
 
@@ -114,17 +114,19 @@ class _ThreadsState extends State<Threads> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: this._threads.length,
-                          itemBuilder: (context, index) {
-                            ChatThread thread = this._threads[index];
-                            return Thread(
-                              chatThread: thread,
-                            );
-                          },
-                        ),
+                        this._threads!.length == 0
+                            ? DataNotFound(message: 'No Chats Found')
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: this._threads.length,
+                                itemBuilder: (context, index) {
+                                  ChatThread thread = this._threads[index];
+                                  return Thread(
+                                    chatThread: thread,
+                                  );
+                                },
+                              ),
                         if (followingUsers.isNotEmpty)
                           Padding(
                             padding: EdgeInsets.symmetric(
