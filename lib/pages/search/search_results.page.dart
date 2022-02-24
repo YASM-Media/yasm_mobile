@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:yasm_mobile/animations/offline.animation.dart';
 import 'package:yasm_mobile/constants/post_list_type.constant.dart';
 import 'package:yasm_mobile/widgets/posts/post_list.widget.dart';
 import 'package:yasm_mobile/widgets/search/user_search.widget.dart';
@@ -92,12 +93,8 @@ class _SearchResultsState extends State<SearchResults>
               : TabBarView(
                   controller: this._tabController,
                   children: [
-                    Center(
-                      child: Text('You are offline'),
-                    ),
-                    Center(
-                      child: Text('You are offline'),
-                    ),
+                    Offline(message: 'You are offline'),
+                    Offline(message: 'You are offline'),
                   ],
                 );
         },
