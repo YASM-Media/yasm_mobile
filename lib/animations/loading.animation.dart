@@ -11,6 +11,7 @@ class Loading extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.5,
       repeat: true,
+      animate: true,
     );
   }
 }
