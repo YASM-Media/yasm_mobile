@@ -114,7 +114,7 @@ class _ThreadsState extends State<Threads> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        this._threads!.length == 0
+                        this._threads.length == 0
                             ? DataNotFound(message: 'No Chats Found')
                             : ListView.builder(
                                 shrinkWrap: true,
