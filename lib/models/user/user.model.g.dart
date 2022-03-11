@@ -20,7 +20,7 @@ class UserAdapter extends TypeAdapter<User> {
       id: fields[0] as String,
       firstName: fields[1] as String,
       lastName: fields[2] as String,
-      emailAddress: fields[3] as String,
+      emailAddress: fields[3] == null ? '' : fields[3] as String,
       biography: fields[4] as String,
       imageUrl: fields[5] as String,
       followers: (fields[6] as List).cast<User>(),
@@ -72,7 +72,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       id: json['id'] as String,
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
-      emailAddress: json['emailAddress'] as String,
+      emailAddress: json['emailAddress'] as String? ?? '',
       biography: json['biography'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? '',
       followers: (json['followers'] as List<dynamic>?)
