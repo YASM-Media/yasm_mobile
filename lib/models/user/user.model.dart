@@ -16,7 +16,8 @@ class User {
   @HiveField(2)
   String lastName;
 
-  @HiveField(3)
+  @HiveField(3, defaultValue: '')
+  @JsonKey(defaultValue: '')
   String emailAddress;
 
   @JsonKey(defaultValue: '')
