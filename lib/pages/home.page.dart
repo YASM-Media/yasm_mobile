@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/firebase_notifications_handler.dart';
 import 'package:yasm_mobile/pages/activity/activity.page.dart';
+import 'package:yasm_mobile/pages/posts/new_post.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
 import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
@@ -103,7 +104,7 @@ class _HomeState extends State<Home> {
           return FloatingActionButton(
             onPressed: connected
                 ? () {
-                    Navigator.of(context).pushNamed(SelectImages.routeName);
+                    Navigator.of(context).pushNamed(NewPost.routeName);
                   }
                 : null,
             child: Icon(Icons.add),
