@@ -7,7 +7,6 @@ import 'package:yasm_mobile/firebase_notifications_handler.dart';
 import 'package:yasm_mobile/pages/activity/activity.page.dart';
 import 'package:yasm_mobile/pages/posts/new_post.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
-import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/services/tokens.service.dart';
