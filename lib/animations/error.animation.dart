@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-class LoadingList extends StatelessWidget {
+class Error extends StatelessWidget {
   final String message;
 
-  const LoadingList({
+  const Error({
     Key? key,
     required this.message,
   }) : super(key: key);
@@ -18,7 +17,7 @@ class LoadingList extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Lottie.asset(
-            'assets/json/loading_list.json',
+            'assets/json/error.json',
             width: MediaQuery.of(context).size.width * 0.9,
             height: MediaQuery.of(context).size.height * 0.5,
             repeat: true,

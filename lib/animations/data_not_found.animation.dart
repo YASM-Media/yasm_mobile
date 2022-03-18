@@ -17,7 +17,7 @@ class DataNotFound extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Lottie.asset(
-            'assets/json/data_not_found.json',
+            'assets/json/no_data.json',
             width: MediaQuery.of(context).size.width * 0.9,
             height: MediaQuery.of(context).size.height * 0.5,
             repeat: true,
