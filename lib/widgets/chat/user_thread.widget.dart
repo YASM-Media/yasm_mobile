@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skeleton_loader/skeleton_loader.dart';
-import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
-import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
-import 'package:yasm_mobile/models/chat/chat_thread/chat_thread.model.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
-import 'package:yasm_mobile/pages/chat/chat.page.dart';
 import 'package:yasm_mobile/providers/auth/auth.provider.dart';
-import 'package:yasm_mobile/services/chat.service.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
@@ -26,7 +20,6 @@ class UserThread extends StatefulWidget {
 
 class _UserThreadState extends State<UserThread> {
   late final UserService _userService;
-  late final ChatService _chatService;
   User? _user;
 
   @override
@@ -34,7 +27,6 @@ class _UserThreadState extends State<UserThread> {
     super.initState();
 
     this._userService = Provider.of<UserService>(context, listen: false);
-    this._chatService = Provider.of<ChatService>(context, listen: false);
   }
 
   @override
@@ -90,46 +82,40 @@ class _UserThreadState extends State<UserThread> {
   }
 
   Widget _buildThreadLoader() {
-    return SkeletonLoader(
-      builder: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: MediaQuery.of(context).size.width * 0.08,
+    return ListTile(
+      leading: ProfilePicture(
+        imageUrl: '',
+        size: MediaQuery.of(context).size.width * 0.16,
+      ),
+      title: Container(
+        height: MediaQuery.of(context).size.height * 0.06,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.01,
+              width: MediaQuery.of(context).size.width * 0.2,
+              color: Colors.grey[800],
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.02,
+            Container(
+              height: MediaQuery.of(context).size.height * 0.01,
+              width: MediaQuery.of(context).size.width * 0.5,
+              color: Colors.grey[800],
             ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.02,
-                    color: Colors.white,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.02,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.01,
+              width: MediaQuery.of(context).size.width * 0.5,
+              color: Colors.grey[800],
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.01,
+              width: MediaQuery.of(context).size.width * 0.5,
+              color: Colors.grey[800],
             ),
           ],
         ),
       ),
-      items: 1,
-      period: Duration(
-        seconds: 2,
-      ),
-      highlightColor: Colors.grey,
-      direction: SkeletonDirection.ltr,
     );
   }
 }

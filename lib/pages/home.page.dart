@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/firebase_notifications_handler.dart';
 import 'package:yasm_mobile/pages/activity/activity.page.dart';
+import 'package:yasm_mobile/pages/posts/new_post.page.dart';
 import 'package:yasm_mobile/pages/posts/posts.page.dart';
-import 'package:yasm_mobile/pages/posts/select_images.page.dart';
 import 'package:yasm_mobile/pages/search/search.page.dart';
 import 'package:yasm_mobile/pages/user/user_profile.page.dart';
 import 'package:yasm_mobile/services/tokens.service.dart';
@@ -56,74 +56,42 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FirebaseNotificationsHandler(
-        child: IndexedStack(
-          index: this._page,
-          children: this._pages,
-        ),
+        child: this._pages.elementAt(this._page),
       ),
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.04,
-              ),
-              child: IconButton(
-                icon: Icon(Icons.home),
-                onPressed: () {
-                  setState(() {
-                    this._page = 0;
-                  });
-                },
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(
-                right: MediaQuery.of(context).size.width * 0.1,
-                left: MediaQuery.of(context).size.width * 0.05,
-              ),
-              child: IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  setState(() {
-                    this._page = 1;
-                  });
-                },
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width * 0.1,
-                right: MediaQuery.of(context).size.width * 0.05,
-              ),
-              child: IconButton(
-                icon: Icon(Icons.favorite),
-                onPressed: () {
-                  setState(() {
-                    this._page = 2;
-                  });
-                },
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.04,
-              ),
-              child: IconButton(
-                icon: Icon(Icons.person),
-                onPressed: () {
-                  setState(() {
-                    this._page = 3;
-                  });
-                },
-              ),
-            ),
-          ],
+      bottomNavigationBar: BottomNavigationBar(
+        // selectedFontSize: 20,
+        selectedIconTheme: IconThemeData(color: Colors.white),
+        selectedItemColor: Colors.white,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+        unselectedIconTheme: IconThemeData(
+          color: Colors.grey[600],
         ),
+        unselectedItemColor: Colors.grey[600],
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Activity',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'User',
+          ),
+        ],
+        currentIndex: this._page,
+        onTap: (int index) {
+          setState(() {
+            this._page = index;
+          });
+        },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: OfflineBuilder(
         connectivityBuilder: (
           BuildContext context,
@@ -135,7 +103,7 @@ class _HomeState extends State<Home> {
           return FloatingActionButton(
             onPressed: connected
                 ? () {
-                    Navigator.of(context).pushNamed(SelectImages.routeName);
+                    Navigator.of(context).pushNamed(NewPost.routeName);
                   }
                 : null,
             child: Icon(Icons.add),

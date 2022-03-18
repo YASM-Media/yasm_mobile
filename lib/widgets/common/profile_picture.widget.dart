@@ -11,10 +11,12 @@ class ProfilePicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
+      backgroundColor: Colors.pink,
       child: imageUrl.length == 0
           ? Icon(
               Icons.person,
               size: size / 2,
+              color: Colors.white,
             )
           : ClipRRect(
               borderRadius: BorderRadius.circular(100.0),
@@ -22,6 +24,7 @@ class ProfilePicture extends StatelessWidget {
                 imageUrl: imageUrl,
                 height: size,
                 width: size,
+                fit: BoxFit.fitHeight,
                 progressIndicatorBuilder: (context, url, downloadProgress) {
                   return Center(
                     child: CircularProgressIndicator(

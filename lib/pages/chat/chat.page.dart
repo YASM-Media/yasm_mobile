@@ -4,6 +4,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/animations/error.animation.dart';
+import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/dto/chat/create_chat/create_chat.dto.dart';
@@ -183,11 +185,11 @@ class _ChatState extends State<Chat> {
             ) {
               if (snapshot.hasError) {
                 log.e("Chat Error", snapshot.error, snapshot.stackTrace);
-                return Text('Something went wrong');
+                return Error(message: 'Something went wrong');
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Text("Loading");
+                return Loading(message: 'Loading Chat');
               }
 
               this._chats.clear();
