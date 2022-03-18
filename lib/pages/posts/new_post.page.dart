@@ -112,6 +112,12 @@ class _NewPostState extends State<NewPost> {
       return;
     }
 
+    if (this._imageFiles.length == 0) {
+      displaySnackBar("Please upload some images.", context);
+
+      return;
+    }
+
     setState(() {
       _loading = true;
     });
@@ -221,7 +227,7 @@ class _NewPostState extends State<NewPost> {
                   MinLengthValidator(
                     10,
                     errorText:
-                        'At least 5 characters are required for the body of the post',
+                        'At least 10 characters are required for the body of the post',
                   ),
                 ],
                 textInputType: TextInputType.text,

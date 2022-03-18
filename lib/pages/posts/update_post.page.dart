@@ -19,7 +19,6 @@ import 'package:yasm_mobile/utils/image_upload.util.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 import 'package:yasm_mobile/widgets/posts/mixed_image_carousel.widget.dart';
 
-
 class UpdatePost extends StatefulWidget {
   const UpdatePost({Key? key}) : super(key: key);
 
@@ -31,7 +30,7 @@ class UpdatePost extends StatefulWidget {
 
 class _UpdatePostState extends State<UpdatePost> {
   final TextEditingController _descriptionController =
-  new TextEditingController();
+      new TextEditingController();
 
   final GlobalKey<FormState> _formKey = new GlobalKey();
 
@@ -121,13 +120,19 @@ class _UpdatePostState extends State<UpdatePost> {
       return;
     }
 
+    if (this._postImages.length == 0) {
+      displaySnackBar("Please upload some images.", context);
+
+      return;
+    }
+
     setState(() {
       _loading = true;
     });
 
     try {
       List<String> updatedImages =
-      await Future.wait(this._postImages.map((image) async {
+          await Future.wait(this._postImages.map((image) async {
         if (image.startsWith("http")) {
           return image;
         } else {
@@ -185,10 +190,7 @@ class _UpdatePostState extends State<UpdatePost> {
   @override
   Widget build(BuildContext context) {
     if (this.post == null) {
-      this.post = ModalRoute
-          .of(context)!
-          .settings
-          .arguments as Post;
+      this.post = ModalRoute.of(context)!.settings.arguments as Post;
       this._descriptionController.text = this.post!.text;
       this._postImages =
           this.post!.images.map((e) => e.imageUrl).toList(growable: true);
@@ -205,10 +207,7 @@ class _UpdatePostState extends State<UpdatePost> {
               GestureDetector(
                 onTap: this._onUploadImage,
                 child: Container(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.5,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   decoration: BoxDecoration(color: Colors.black26),
                   child: Center(
                     child: Column(
@@ -216,20 +215,12 @@ class _UpdatePostState extends State<UpdatePost> {
                       children: [
                         Icon(
                           Icons.photo_camera_back,
-                          size: MediaQuery
-                              .of(context)
-                              .size
-                              .height *
-                              0.2,
+                          size: MediaQuery.of(context).size.height * 0.2,
                           color: Colors.grey,
                         ),
                         Text(
                           'Click to add image.',
-                          style:
-                          Theme
-                              .of(context)
-                              .textTheme
-                              .subtitle1,
+                          style: Theme.of(context).textTheme.subtitle1,
                         )
                       ],
                     ),
@@ -254,16 +245,18 @@ class _UpdatePostState extends State<UpdatePost> {
                 MinLengthValidator(
                   10,
                   errorText:
-                  'At least 10 characters required for the body of the post',
+                      'At least 10 characters required for the body of the post',
                 ),
               ],
               minLines: 5,
               textInputType: TextInputType.text,
             ),
             OfflineBuilder(
-              connectivityBuilder: (BuildContext context,
-                  ConnectivityResult connectivity,
-                  Widget _,) {
+              connectivityBuilder: (
+                BuildContext context,
+                ConnectivityResult connectivity,
+                Widget _,
+              ) {
                 final bool connected = connectivity != ConnectivityResult.none;
                 return ElevatedButton.icon(
                   style: ButtonStyle(
@@ -273,39 +266,33 @@ class _UpdatePostState extends State<UpdatePost> {
                   ),
                   onPressed: connected
                       ? !this._loading
-                      ? this._onFormSubmit
-                      : null
+                          ? this._onFormSubmit
+                          : null
                       : null,
                   label: Text(
                     connected
                         ? !this._loading
-                        ? 'Update'
-                        : 'Updating'
+                            ? 'Update'
+                            : 'Updating'
                         : 'You are offline',
                   ),
                   icon: connected
                       ? !this._loading
-                      ? Icon(
-                    Icons.photo,
-                  )
-                      : SizedBox(
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .longestSide *
-                        0.025,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .longestSide *
-                        0.025,
-                    child: CircularProgressIndicator(
-                      color: Colors.grey,
-                    ),
-                  )
+                          ? Icon(
+                              Icons.photo,
+                            )
+                          : SizedBox(
+                              height: MediaQuery.of(context).size.longestSide *
+                                  0.025,
+                              width: MediaQuery.of(context).size.longestSide *
+                                  0.025,
+                              child: CircularProgressIndicator(
+                                color: Colors.grey,
+                              ),
+                            )
                       : Icon(
-                    Icons.offline_bolt_outlined,
-                  ),
+                          Icons.offline_bolt_outlined,
+                        ),
                 );
               },
               child: SizedBox(),
