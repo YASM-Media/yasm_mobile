@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yasm_mobile/animations/search.animation.dart';
+import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
 import 'package:yasm_mobile/services/search.service.dart';
@@ -47,7 +47,7 @@ class _UserSearchState extends State<UserSearch> {
         }
 
         return this._users == null
-            ? Search(message: 'Searching for users')
+            ? Loading(message: 'Searching for users')
             : this._buildUserList();
       },
     );

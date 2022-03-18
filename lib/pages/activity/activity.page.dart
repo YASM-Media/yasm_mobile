@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yasm_mobile/animations/loading_list.animation.dart';
 import 'package:yasm_mobile/animations/data_not_found.animation.dart';
+import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/activity/activity.model.dart' as AM;
 import 'package:yasm_mobile/services/activity.service.dart';
@@ -68,7 +68,7 @@ class _ActivityState extends State<Activity> {
     }
 
     return this._activities == null
-        ? LoadingList(message: 'Loading Activities')
+        ? Loading(message: 'Loading Activities')
         : _buildActivitiesList();
   }
 

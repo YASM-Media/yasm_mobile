@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:yasm_mobile/animations/loading_list.animation.dart';
 import 'package:yasm_mobile/animations/data_not_found.animation.dart';
-import 'package:yasm_mobile/animations/search.animation.dart';
+import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
 import 'package:yasm_mobile/constants/post_list_type.constant.dart';
@@ -65,8 +64,8 @@ class _PostListState extends State<PostList> {
 
         return this.posts == null
             ? this.widget.postListType == PostListType.SEARCH
-                ? Search(message: 'Searching for posts')
-                : LoadingList(
+                ? Loading(message: 'Searching for posts')
+                : Loading(
                     message: 'Loading Posts',
                   )
             : _buildPostList();
