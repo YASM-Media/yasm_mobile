@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:yasm_mobile/animations/error.animation.dart';
 import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/models/user/user.model.dart';
@@ -37,7 +38,7 @@ class _UserSearchState extends State<UserSearch> {
         if (snapshot.hasError) {
           log.e(snapshot.error, snapshot.error, snapshot.stackTrace);
 
-          return Text('Something went wrong, please try again later');
+          return Error(message: 'Something went wrong, please try again later');
         }
 
         if (snapshot.connectionState == ConnectionState.done) {

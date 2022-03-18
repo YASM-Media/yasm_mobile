@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/animations/data_not_found.animation.dart';
+import 'package:yasm_mobile/animations/error.animation.dart';
 import 'package:yasm_mobile/animations/loading.animation.dart';
 import 'package:yasm_mobile/arguments/chat.argument.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
@@ -87,8 +88,10 @@ class _ThreadsState extends State<Threads> {
                     if (snapshot.hasError) {
                       log.e(
                           "Threads Error", snapshot.error, snapshot.stackTrace);
-                      return Text(
-                          'Something went wrong, please try again later.');
+                      return Error(
+                        message:
+                            'Something went wrong, please try again later.',
+                      );
                     }
 
                     if (snapshot.connectionState == ConnectionState.waiting) {
