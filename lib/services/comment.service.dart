@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/comment/create_comment/create_comment.dto.dart';
@@ -12,6 +11,14 @@ import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 
 class CommentService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+
+  final String apiUrl;
+  final String rawApiUrl;
+
+  CommentService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
 
   Future<void> createComment(CreateCommentDto createCommentDto) async {
     // Fetch the currently logged in user.
@@ -26,7 +33,7 @@ class CommentService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/comments/create");
+    Uri url = Uri.parse("$apiUrl/comments/create");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -73,7 +80,7 @@ class CommentService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/comments/update");
+    Uri url = Uri.parse("$apiUrl/comments/update");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -119,7 +126,7 @@ class CommentService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/comments/delete");
+    Uri url = Uri.parse("$apiUrl/comments/delete");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {

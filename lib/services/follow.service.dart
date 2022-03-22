@@ -2,13 +2,20 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart' as FA;
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 
 class FollowService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+
+  final String apiUrl;
+  final String rawApiUrl;
+
+  FollowService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
 
   Future<void> followUser(String userId) async {
     // Get the logged in user details.
@@ -23,7 +30,7 @@ class FollowService {
         await this._firebaseAuth.currentUser!.getIdToken(true);
 
     // Prepare URL and the auth header.
-    Uri url = Uri.parse("$ENDPOINT/follow-api/follow/$userId");
+    Uri url = Uri.parse("$apiUrl/follow-api/follow/$userId");
     Map<String, String> headers = {
       "Authorization": "Bearer $firebaseAuthToken",
     };
@@ -64,7 +71,7 @@ class FollowService {
         await this._firebaseAuth.currentUser!.getIdToken(true);
 
     // Prepare URL and the auth header.
-    Uri url = Uri.parse("$ENDPOINT/follow-api/unfollow/$userId");
+    Uri url = Uri.parse("$apiUrl/follow-api/unfollow/$userId");
     Map<String, String> headers = {
       "Authorization": "Bearer $firebaseAuthToken",
     };

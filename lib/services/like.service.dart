@@ -2,13 +2,20 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:http/http.dart' as http;
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
 import 'package:yasm_mobile/exceptions/common/server.exception.dart';
 
 class LikeService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+
+  final String apiUrl;
+  final String rawApiUrl;
+
+  LikeService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
 
   Future<void> likePost(String postId) async {
     // Fetch the currently logged in user.
@@ -22,7 +29,7 @@ class LikeService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/like-api/like");
+    Uri url = Uri.parse("$apiUrl/like-api/like");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -69,7 +76,7 @@ class LikeService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/like-api/unlike");
+    Uri url = Uri.parse("$apiUrl/like-api/unlike");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {

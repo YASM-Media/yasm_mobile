@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:uuid/uuid.dart';
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/chat/create_chat/create_chat.dto.dart';
 import 'package:yasm_mobile/dto/chat/create_thread/create_thread.dto.dart';
@@ -20,6 +19,14 @@ class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
   final Uuid _uuid = new Uuid();
+
+  final String apiUrl;
+  final String rawApiUrl;
+
+  ChatService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
 
   Stream<QuerySnapshot<Map<String, dynamic>>> fetchAllThreads() => this
       ._firestore
@@ -184,7 +191,7 @@ class ChatService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/notification/chat");
+    Uri url = Uri.parse("$apiUrl/notification/chat");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {

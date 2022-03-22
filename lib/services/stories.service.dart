@@ -7,7 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/story/create_story/create_story.dto.dart';
@@ -25,6 +24,14 @@ class StoriesService {
   final Box<List<dynamic>> _yasmStoriesBox =
       Hive.box<List<dynamic>>(YASM_STORIES_BOX);
 
+  final String apiUrl;
+  final String rawApiUrl;
+
+  StoriesService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
+
   Future<List<User>> fetchAvailableStories() async {
     // Fetch the currently logged in user.
     FA.User? firebaseUser = this._firebaseAuth.currentUser;
@@ -39,7 +46,7 @@ class StoriesService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/story");
+      Uri url = Uri.parse("$apiUrl/story");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -106,7 +113,7 @@ class StoriesService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/story/archive");
+      Uri url = Uri.parse("$apiUrl/story/archive");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -174,7 +181,7 @@ class StoriesService {
 
       // Preparing the URL for the server request.
       Uri url = Uri.http(
-        RAW_ENDPOINT,
+        rawApiUrl,
         "/v1/api/story/user",
         {
           "userId": userId,
@@ -256,7 +263,7 @@ class StoriesService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/story");
+    Uri url = Uri.parse("$apiUrl/story");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -301,7 +308,7 @@ class StoriesService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/story");
+    Uri url = Uri.parse("$apiUrl/story");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {

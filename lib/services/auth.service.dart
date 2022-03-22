@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
@@ -32,6 +31,14 @@ class AuthService {
   final Box<List<dynamic>> _yasmStoriesDb =
       Hive.box<List<dynamic>>(YASM_STORIES_BOX);
 
+  final String apiUrl;
+  final String rawApiUrl;
+
+  AuthService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
+
   /*
    * Method for fetching the user from server using firebase id token.
    */
@@ -50,7 +57,7 @@ class AuthService {
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$ENDPOINT/follow-api/get");
+      Uri url = Uri.parse("$apiUrl/follow-api/get");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };
@@ -117,7 +124,7 @@ class AuthService {
    */
   Future<void> registerUser(RegisterUser registerUser) async {
     // Prepare URL and the content type header.
-    Uri url = Uri.parse("$ENDPOINT/auth/register");
+    Uri url = Uri.parse("$apiUrl/auth/register");
     Map<String, String> headers = {
       "Content-Type": "application/json",
     };

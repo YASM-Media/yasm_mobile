@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart' as FA;
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/constants/post_fetch_type.constant.dart';
@@ -23,13 +22,21 @@ class PostService {
   final Box<List<dynamic>> _yasmPostsDb =
       Hive.box<List<dynamic>>(YASM_POSTS_BOX);
 
+  final String apiUrl;
+  final String rawApiUrl;
+
+  PostService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
+
   /*
    * Helper method to generate the url for
    * the type of category of posts to fetch.
    * @param postFetchType Enum for post fetching type.
    */
   String _generatePostFetchingUrl(PostFetchType postFetchType) {
-    String url = ENDPOINT;
+    String url = apiUrl;
 
     switch (postFetchType) {
       case PostFetchType.SUGGESTED:
@@ -143,7 +150,7 @@ class PostService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/posts/get/user/$userId");
+      Uri url = Uri.parse("$apiUrl/posts/get/user/$userId");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {
@@ -207,7 +214,7 @@ class PostService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/posts/get/post/$postId");
+    Uri url = Uri.parse("$apiUrl/posts/get/post/$postId");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -260,7 +267,7 @@ class PostService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/posts/create");
+    Uri url = Uri.parse("$apiUrl/posts/create");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -311,7 +318,7 @@ class PostService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/posts/update");
+    Uri url = Uri.parse("$apiUrl/posts/update");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -362,7 +369,7 @@ class PostService {
     String firebaseAuthToken = await firebaseUser.getIdToken();
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/posts/delete");
+    Uri url = Uri.parse("$apiUrl/posts/delete");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
