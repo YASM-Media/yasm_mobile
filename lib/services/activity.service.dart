@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:hive/hive.dart';
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
@@ -16,6 +15,14 @@ class ActivityService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
   final Box<List<dynamic>> _yasmActivityDb =
       Hive.box<List<dynamic>>(YASM_ACTIVITY_BOX);
+
+  final String apiUrl;
+  final String rawApiUrl;
+
+  ActivityService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
 
   Future<List<Activity>> fetchActivity() async {
     try {
@@ -30,7 +37,7 @@ class ActivityService {
       String firebaseAuthToken = await firebaseUser.getIdToken();
 
       // Preparing the URL for the server request.
-      Uri url = Uri.parse("$ENDPOINT/activity");
+      Uri url = Uri.parse("$apiUrl/activity");
 
       // Preparing the headers for the request.
       Map<String, String> headers = {

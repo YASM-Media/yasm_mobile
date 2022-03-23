@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/exceptions/auth/not_logged_in.exception.dart';
@@ -11,6 +10,14 @@ import 'package:yasm_mobile/models/user/user.model.dart';
 
 class SearchService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
+
+  final String apiUrl;
+  final String rawApiUrl;
+
+  SearchService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
 
   Future<List<User>> searchForUser(String searchQuery) async {
     if (searchQuery.length == 0) {
@@ -34,7 +41,7 @@ class SearchService {
     String queryString = Uri(queryParameters: queryParams).query;
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/search/user?$queryString");
+    Uri url = Uri.parse("$apiUrl/search/user?$queryString");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {
@@ -93,7 +100,7 @@ class SearchService {
     String queryString = Uri(queryParameters: queryParams).query;
 
     // Preparing the URL for the server request.
-    Uri url = Uri.parse("$ENDPOINT/search/post?$queryString");
+    Uri url = Uri.parse("$apiUrl/search/post?$queryString");
 
     // Preparing the headers for the request.
     Map<String, String> headers = {

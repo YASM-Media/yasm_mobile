@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' as FA;
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:yasm_mobile/constants/endpoint.constant.dart';
 import 'package:yasm_mobile/constants/hive_names.constant.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/user/update_email/update_email.dto.dart';
@@ -26,6 +25,14 @@ class UserService {
   final FA.FirebaseAuth _firebaseAuth = FA.FirebaseAuth.instance;
   final Box<User> _yasmUserDb = Hive.box<User>("yasm-user");
 
+  final String apiUrl;
+  final String rawApiUrl;
+
+  UserService({
+    required this.rawApiUrl,
+    required this.apiUrl,
+  });
+
   /*
    * Method for fetching the user from server using firebase id token.
    */
@@ -43,7 +50,7 @@ class UserService {
           await this._firebaseAuth.currentUser!.getIdToken(true);
 
       // Prepare URL and the auth header.
-      Uri url = Uri.parse("$ENDPOINT/follow-api/get/$userId");
+      Uri url = Uri.parse("$apiUrl/follow-api/get/$userId");
       Map<String, String> headers = {
         "Authorization": "Bearer $firebaseAuthToken",
       };
@@ -109,7 +116,7 @@ class UserService {
       throw NotLoggedInException(message: "User not logged in.");
     }
     // Preparing the URL for the server request.
-    Uri uri = Uri.parse("$ENDPOINT/user/update/profile");
+    Uri uri = Uri.parse("$apiUrl/user/update/profile");
 
     // Fetching the ID token for authentication.
     String firebaseAuthToken = await loggedInUser.getIdToken();
@@ -224,7 +231,7 @@ class UserService {
       throw NotLoggedInException(message: "User not logged in.");
     }
     // Preparing the URL for the server request.
-    Uri uri = Uri.parse("$ENDPOINT/user/update/email");
+    Uri uri = Uri.parse("$apiUrl/user/update/email");
 
     // Fetching the ID token for authentication.
     String firebaseAuthToken = await loggedInUser.getIdToken();
@@ -339,7 +346,7 @@ class UserService {
       throw NotLoggedInException(message: "User not logged in.");
     }
     // Preparing the URL for the server request.
-    Uri uri = Uri.parse("$ENDPOINT/auth/delete");
+    Uri uri = Uri.parse("$apiUrl/auth/delete");
 
     // Fetching the ID token for authentication.
     String firebaseAuthToken = await loggedInUser.getIdToken();
