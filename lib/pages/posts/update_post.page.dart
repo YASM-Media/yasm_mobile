@@ -17,6 +17,7 @@ import 'package:yasm_mobile/utils/image_picker.util.dart';
 import 'package:yasm_mobile/widgets/common/custom_text_area.widget.dart';
 import 'package:yasm_mobile/utils/image_upload.util.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
+import 'package:yasm_mobile/widgets/common/loading_icon_button.widget.dart';
 import 'package:yasm_mobile/widgets/posts/mixed_image_carousel.widget.dart';
 
 class UpdatePost extends StatefulWidget {
@@ -251,52 +252,13 @@ class _UpdatePostState extends State<UpdatePost> {
               minLines: 5,
               textInputType: TextInputType.text,
             ),
-            OfflineBuilder(
-              connectivityBuilder: (
-                BuildContext context,
-                ConnectivityResult connectivity,
-                Widget _,
-              ) {
-                final bool connected = connectivity != ConnectivityResult.none;
-                return ElevatedButton.icon(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                      this._loading ? Colors.grey[900]! : Colors.pink,
-                    ),
-                  ),
-                  onPressed: connected
-                      ? !this._loading
-                          ? this._onFormSubmit
-                          : null
-                      : null,
-                  label: Text(
-                    connected
-                        ? !this._loading
-                            ? 'Update'
-                            : 'Updating'
-                        : 'You are offline',
-                  ),
-                  icon: connected
-                      ? !this._loading
-                          ? Icon(
-                              Icons.photo,
-                            )
-                          : SizedBox(
-                              height: MediaQuery.of(context).size.longestSide *
-                                  0.025,
-                              width: MediaQuery.of(context).size.longestSide *
-                                  0.025,
-                              child: CircularProgressIndicator(
-                                color: Colors.grey,
-                              ),
-                            )
-                      : Icon(
-                          Icons.offline_bolt_outlined,
-                        ),
-                );
-              },
-              child: SizedBox(),
-            )
+            LoadingIconButton(
+              loading: this._loading,
+              iconData: Icons.edit,
+              onPress: this._onFormSubmit,
+              normalText: 'Edit Post',
+              loadingText: 'Editing Post',
+            ),
           ],
         ),
       ),

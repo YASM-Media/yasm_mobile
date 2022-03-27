@@ -19,6 +19,7 @@ import 'package:yasm_mobile/utils/image_upload.util.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
 import 'package:yasm_mobile/widgets/common/custom_text_area.widget.dart';
+import 'package:yasm_mobile/widgets/common/loading_icon_button.widget.dart';
 import 'package:yasm_mobile/widgets/common/profile_picture.widget.dart';
 
 class ProfileUpdateTab extends StatefulWidget {
@@ -358,54 +359,12 @@ class _ProfileUpdateTabState extends State<ProfileUpdateTab> {
                         )
                       : CircularProgressIndicator(),
                 ),
-                OfflineBuilder(
-                  connectivityBuilder: (
-                    BuildContext context,
-                    ConnectivityResult connectivity,
-                    Widget _,
-                  ) {
-                    final bool connected =
-                        connectivity != ConnectivityResult.none;
-                    return ElevatedButton.icon(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          this.loading ? Colors.grey[900]! : Colors.pink,
-                        ),
-                      ),
-                      onPressed: connected
-                          ? !this.loading
-                              ? this._onFormSubmit
-                              : null
-                          : null,
-                      label: Text(
-                        connected
-                            ? !this.loading
-                                ? 'Update Profile'
-                                : 'Updating'
-                            : 'You are offline',
-                      ),
-                      icon: connected
-                          ? !this.loading
-                              ? Icon(
-                                  Icons.edit,
-                                )
-                              : SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.longestSide *
-                                          0.025,
-                                  width:
-                                      MediaQuery.of(context).size.longestSide *
-                                          0.025,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.grey,
-                                  ),
-                                )
-                          : Icon(
-                              Icons.offline_bolt_outlined,
-                            ),
-                    );
-                  },
-                  child: SizedBox(),
+                LoadingIconButton(
+                  loading: this.loading,
+                  iconData: Icons.edit,
+                  onPress: this._onFormSubmit,
+                  normalText: 'Update Profile',
+                  loadingText: 'Updating Profile',
                 ),
               ],
             ),

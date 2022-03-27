@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_offline/flutter_offline.dart';
 import 'package:provider/provider.dart';
 import 'package:yasm_mobile/constants/logger.constant.dart';
 import 'package:yasm_mobile/dto/auth/login_user/login_user.dto.dart';
@@ -15,6 +14,7 @@ import 'package:yasm_mobile/services/auth.service.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
+import 'package:yasm_mobile/widgets/common/loading_icon_button.widget.dart';
 
 enum AuthFormType {
   Register,
@@ -42,6 +42,8 @@ class _AuthState extends State<Auth> {
   final _emailAddressController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  bool _loading = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -67,6 +69,10 @@ class _AuthState extends State<Auth> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    setState(() {
+      this._loading = true;
+    });
 
     // CASE 1: Submitting details for registering a user.
     if (_authFormType == AuthFormType.Register) {
@@ -171,6 +177,10 @@ class _AuthState extends State<Auth> {
         );
       }
     }
+
+    setState(() {
+      this._loading = false;
+    });
   }
 
   /*
@@ -277,49 +287,26 @@ class _AuthState extends State<Auth> {
               ),
               if (_authFormType == AuthFormType.Login ||
                   _authFormType == AuthFormType.Register)
-                OfflineBuilder(
-                  connectivityBuilder: (
-                    BuildContext context,
-                    ConnectivityResult connectivity,
-                    Widget _,
-                  ) {
-                    final bool connected =
-                        connectivity != ConnectivityResult.none;
-
-                    return connected
-                        ? ElevatedButton(
-                            onPressed: _onFormSubmit,
-                            child: Text(
-                              _authFormType == AuthFormType.Register
-                                  ? 'Register'
-                                  : 'Login',
-                            ),
-                          )
-                        : ElevatedButton(
-                            onPressed: null,
-                            child: Text('You are offline'),
-                          );
-                  },
-                  child: SizedBox(),
+                LoadingIconButton(
+                  loading: this._loading,
+                  iconData: _authFormType == AuthFormType.Login
+                      ? Icons.login
+                      : Icons.app_registration,
+                  onPress: this._onFormSubmit,
+                  normalText: _authFormType == AuthFormType.Login
+                      ? 'Login'
+                      : 'Register',
+                  loadingText: _authFormType == AuthFormType.Login
+                      ? 'Logging In'
+                      : 'Registering',
                 ),
               if (_authFormType == AuthFormType.ForgotPassword)
-                OfflineBuilder(
-                  connectivityBuilder: (
-                    BuildContext context,
-                    ConnectivityResult connectivity,
-                    Widget _,
-                  ) {
-                    final bool connected =
-                        connectivity != ConnectivityResult.none;
-
-                    return ElevatedButton(
-                      onPressed: connected ? _onFormSubmit : null,
-                      child: Text(connected
-                          ? "Send Password Reset Mail"
-                          : "You are offline"),
-                    );
-                  },
-                  child: SizedBox(),
+                LoadingIconButton(
+                  loading: this._loading,
+                  iconData: Icons.mail,
+                  onPress: this._onFormSubmit,
+                  normalText: 'Send Me Instructions',
+                  loadingText: 'Sending Mail',
                 ),
               if (_authFormType == AuthFormType.Login ||
                   _authFormType == AuthFormType.Register)

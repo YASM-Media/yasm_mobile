@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -30,6 +31,8 @@ class _CreateStoryState extends State<CreateStory> {
   File? bgImage;
 
   ScreenshotController _screenshotController = new ScreenshotController();
+
+  bool loading = false;
 
   @override
   void initState() {
@@ -163,10 +166,38 @@ class _CreateStoryState extends State<CreateStory> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('Post Story'),
-        icon: Icon(Icons.add_circle),
-        onPressed: _handleAddStory,
+      floatingActionButton: OfflineBuilder(
+        connectivityBuilder:
+            (BuildContext context, ConnectivityResult value, Widget child) {
+          bool connected = value != ConnectivityResult.none;
+
+          return connected
+              ? FloatingActionButton.extended(
+                  backgroundColor:
+                      this.loading ? Colors.grey[800] : Colors.pink,
+                  label: Text(
+                    this.loading ? 'Posting' : 'Post Story',
+                  ),
+                  icon: this.loading
+                      ? SizedBox(
+                          height:
+                              MediaQuery.of(context).size.longestSide * 0.025,
+                          width:
+                              MediaQuery.of(context).size.longestSide * 0.025,
+                          child: CircularProgressIndicator(
+                            color: Colors.grey,
+                          ),
+                        )
+                      : Icon(Icons.add_circle),
+                  onPressed: _handleAddStory,
+                )
+              : FloatingActionButton.extended(
+                  label: Text('You Are Offline'),
+                  icon: Icon(Icons.offline_bolt),
+                  onPressed: null,
+                );
+        },
+        child: SizedBox(),
       ),
     );
   }
@@ -175,6 +206,10 @@ class _CreateStoryState extends State<CreateStory> {
     Uint8List? screenshot = await this._screenshotController.capture();
 
     if (screenshot != null) {
+      setState(() {
+        this.loading = true;
+      });
+
       try {
         await this._storiesService.createStory(screenshot);
 
@@ -190,6 +225,10 @@ class _CreateStoryState extends State<CreateStory> {
         displaySnackBar(
             "Something went wrong, please try again later.", context);
       }
+
+      setState(() {
+        this.loading = false;
+      });
     }
   }
 }
