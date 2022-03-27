@@ -13,6 +13,7 @@ import 'package:yasm_mobile/providers/auth/auth.provider.dart';
 import 'package:yasm_mobile/services/user.service.dart';
 import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/widgets/common/custom_field.widget.dart';
+import 'package:yasm_mobile/widgets/common/loading_icon_button.widget.dart';
 
 class EmailUpdateTab extends StatefulWidget {
   const EmailUpdateTab({Key? key}) : super(key: key);
@@ -162,53 +163,12 @@ class _EmailUpdateTabState extends State<EmailUpdateTab> {
                     textInputType: TextInputType.visiblePassword,
                     obscureText: true,
                   ),
-                  OfflineBuilder(
-                    connectivityBuilder: (
-                      BuildContext context,
-                      ConnectivityResult connectivity,
-                      Widget _,
-                    ) {
-                      final bool connected =
-                          connectivity != ConnectivityResult.none;
-                      return ElevatedButton.icon(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                            this.loading ? Colors.grey[900]! : Colors.pink,
-                          ),
-                        ),
-                        onPressed: connected
-                            ? !this.loading
-                            ? this._onFormSubmit
-                            : null
-                            : null,
-                        label: Text(
-                          connected
-                              ? !this.loading
-                              ? 'Update Email Address'
-                              : 'Updating'
-                              : 'You are offline',
-                        ),
-                        icon: connected
-                            ? !this.loading
-                            ? Icon(
-                          Icons.edit,
-                        )
-                            : SizedBox(
-                          height:
-                          MediaQuery.of(context).size.longestSide *
-                              0.025,
-                          width: MediaQuery.of(context).size.longestSide *
-                              0.025,
-                          child: CircularProgressIndicator(
-                            color: Colors.grey,
-                          ),
-                        )
-                            : Icon(
-                          Icons.offline_bolt_outlined,
-                        ),
-                      );
-                    },
-                    child: SizedBox(),
+                  LoadingIconButton(
+                    loading: this.loading,
+                    iconData: Icons.edit,
+                    onPress: this._onFormSubmit,
+                    normalText: 'Update Email Address',
+                    loadingText: 'Updating Email Address',
                   ),
                 ],
               ),
