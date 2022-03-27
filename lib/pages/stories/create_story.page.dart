@@ -32,6 +32,8 @@ class _CreateStoryState extends State<CreateStory> {
 
   ScreenshotController _screenshotController = new ScreenshotController();
 
+  bool loading = false;
+
   @override
   void initState() {
     super.initState();
@@ -171,8 +173,22 @@ class _CreateStoryState extends State<CreateStory> {
 
           return connected
               ? FloatingActionButton.extended(
-                  label: Text('Post Story'),
-                  icon: Icon(Icons.add_circle),
+                  backgroundColor:
+                      this.loading ? Colors.grey[800] : Colors.pink,
+                  label: Text(
+                    this.loading ? 'Posting' : 'Post Story',
+                  ),
+                  icon: this.loading
+                      ? SizedBox(
+                          height:
+                              MediaQuery.of(context).size.longestSide * 0.025,
+                          width:
+                              MediaQuery.of(context).size.longestSide * 0.025,
+                          child: CircularProgressIndicator(
+                            color: Colors.grey,
+                          ),
+                        )
+                      : Icon(Icons.add_circle),
                   onPressed: _handleAddStory,
                 )
               : FloatingActionButton.extended(
@@ -190,6 +206,10 @@ class _CreateStoryState extends State<CreateStory> {
     Uint8List? screenshot = await this._screenshotController.capture();
 
     if (screenshot != null) {
+      setState(() {
+        this.loading = true;
+      });
+
       try {
         await this._storiesService.createStory(screenshot);
 
@@ -205,6 +225,10 @@ class _CreateStoryState extends State<CreateStory> {
         displaySnackBar(
             "Something went wrong, please try again later.", context);
       }
+
+      setState(() {
+        this.loading = false;
+      });
     }
   }
 }
