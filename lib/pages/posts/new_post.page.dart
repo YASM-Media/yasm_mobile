@@ -14,6 +14,7 @@ import 'package:yasm_mobile/utils/display_snackbar.util.dart';
 import 'package:yasm_mobile/utils/image_picker.util.dart';
 import 'package:yasm_mobile/utils/image_upload.util.dart';
 import 'package:yasm_mobile/widgets/common/custom_text_area.widget.dart';
+import 'package:yasm_mobile/widgets/common/loading_icon_button.widget.dart';
 import 'package:yasm_mobile/widgets/posts/file_image_carousel.widget.dart';
 import 'package:yasm_mobile/utils/show_bottom_sheet.util.dart' as SBS;
 
@@ -196,14 +197,12 @@ class _NewPostState extends State<NewPost> {
                         children: [
                           Icon(
                             Icons.photo_camera_back,
-                            size: MediaQuery.of(context).size.height *
-                                0.2,
+                            size: MediaQuery.of(context).size.height * 0.2,
                             color: Colors.grey,
                           ),
                           Text(
                             'Click to add image.',
-                            style:
-                            Theme.of(context).textTheme.subtitle1,
+                            style: Theme.of(context).textTheme.subtitle1,
                           )
                         ],
                       ),
@@ -234,52 +233,13 @@ class _NewPostState extends State<NewPost> {
                 helperText: 'Body of the post...',
                 minLines: 5,
               ),
-              OfflineBuilder(
-                connectivityBuilder: (
-                  BuildContext context,
-                  ConnectivityResult connectivity,
-                  Widget _,
-                ) {
-                  final bool connected = connectivity != ConnectivityResult.none;
-                  return ElevatedButton.icon(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        this._loading ? Colors.grey[900]! : Colors.pink,
-                      ),
-                    ),
-                    onPressed: connected
-                        ? !this._loading
-                            ? this._onFormSubmit
-                            : null
-                        : null,
-                    label: Text(
-                      connected
-                          ? !this._loading
-                              ? 'Create'
-                              : 'Creating'
-                          : 'You are offline',
-                    ),
-                    icon: connected
-                        ? !this._loading
-                            ? Icon(
-                                Icons.photo,
-                              )
-                            : SizedBox(
-                                height: MediaQuery.of(context).size.longestSide *
-                                    0.025,
-                                width: MediaQuery.of(context).size.longestSide *
-                                    0.025,
-                                child: CircularProgressIndicator(
-                                  color: Colors.grey,
-                                ),
-                              )
-                        : Icon(
-                            Icons.offline_bolt_outlined,
-                          ),
-                  );
-                },
-                child: SizedBox(),
-              )
+              LoadingIconButton(
+                loading: this._loading,
+                iconData: Icons.photo,
+                onPress: this._onFormSubmit,
+                normalText: 'Create Post',
+                loadingText: 'Creating Post',
+              ),
             ],
           ),
         ),
