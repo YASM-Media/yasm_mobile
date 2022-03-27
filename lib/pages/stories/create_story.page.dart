@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -163,10 +164,24 @@ class _CreateStoryState extends State<CreateStory> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('Post Story'),
-        icon: Icon(Icons.add_circle),
-        onPressed: _handleAddStory,
+      floatingActionButton: OfflineBuilder(
+        connectivityBuilder:
+            (BuildContext context, ConnectivityResult value, Widget child) {
+          bool connected = value != ConnectivityResult.none;
+
+          return connected
+              ? FloatingActionButton.extended(
+                  label: Text('Post Story'),
+                  icon: Icon(Icons.add_circle),
+                  onPressed: _handleAddStory,
+                )
+              : FloatingActionButton.extended(
+                  label: Text('You Are Offline'),
+                  icon: Icon(Icons.offline_bolt),
+                  onPressed: null,
+                );
+        },
+        child: SizedBox(),
       ),
     );
   }
